@@ -1,0 +1,2605 @@
+basePath: /
+definitions:
+  AISettings:
+    properties:
+      apiKeyPreview:
+        type: string
+      enabled:
+        type: boolean
+      hasApiKey:
+        type: boolean
+      lastAnalyzedAt:
+        type: string
+      lastErrorAt:
+        type: string
+      lastErrorMessage:
+        type: string
+      model:
+        type: string
+    type: object
+  Activity:
+    properties:
+      actor:
+        $ref: '#/definitions/EntryCreator'
+      createdAt:
+        type: string
+      entryId:
+        type: string
+      fromValue:
+        type: string
+      id:
+        type: string
+      source:
+        type: string
+      targetId:
+        type: string
+      toValue:
+        type: string
+      type:
+        type: string
+    type: object
+  ActivityList:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/Activity'
+        type: array
+    type: object
+  Administrator:
+    properties:
+      accounts:
+        items:
+          type: string
+        type: array
+      createdAt:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      imageUrl:
+        type: string
+      isBlocked:
+        type: boolean
+      name:
+        type: string
+      roles:
+        items:
+          type: string
+        type: array
+      username:
+        type: string
+    type: object
+  AdministratorList:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/Administrator'
+        type: array
+    type: object
+  Comment:
+    properties:
+      author:
+        $ref: '#/definitions/EntryCreator'
+      body:
+        type: string
+      createdAt:
+        type: string
+      entryId:
+        type: string
+      id:
+        type: string
+      isInternal:
+        type: boolean
+      updatedAt:
+        type: string
+    type: object
+  CommentList:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/Comment'
+        type: array
+    type: object
+  Config:
+    properties:
+      authUrl:
+        type: string
+      customAuthButtonText:
+        type: string
+      customAuthEnabled:
+        type: boolean
+      entryTypeTemplates:
+        additionalProperties:
+          type: string
+        type: object
+      logoUrl:
+        type: string
+      primaryColor:
+        type: string
+      projectName:
+        type: string
+      supportRequestEnabled:
+        type: boolean
+      supportRequestUrl:
+        type: string
+    type: object
+  ConsoleDashboard:
+    properties:
+      closedEntries:
+        type: integer
+      entriesByStatus:
+        additionalProperties:
+          format: int64
+          type: integer
+        type: object
+      entriesByType:
+        additionalProperties:
+          format: int64
+          type: integer
+        type: object
+      entriesPerDay:
+        items:
+          $ref: '#/definitions/ConsoleDashboardDayBucket'
+        type: array
+      internalEntries:
+        type: integer
+      openEntries:
+        type: integer
+      publicEntries:
+        type: integer
+      recentEntries:
+        items:
+          $ref: '#/definitions/ConsoleDashboardEntryRow'
+        type: array
+      topEntriesByVote:
+        items:
+          $ref: '#/definitions/ConsoleDashboardEntryRow'
+        type: array
+      totalComments:
+        type: integer
+      totalEntries:
+        type: integer
+      totalReleases:
+        type: integer
+      totalTopics:
+        type: integer
+      totalUsers:
+        type: integer
+      totalVotes:
+        type: integer
+    type: object
+  ConsoleDashboardDayBucket:
+    properties:
+      count:
+        type: integer
+      date:
+        type: string
+    type: object
+  ConsoleDashboardEntryRow:
+    properties:
+      commentCount:
+        type: integer
+      createdAt:
+        type: string
+      entryType:
+        type: string
+      id:
+        type: string
+      isInternal:
+        type: boolean
+      status:
+        type: string
+      title:
+        type: string
+      voteCount:
+        type: integer
+    type: object
+  ConsoleEntryTopicListItem:
+    properties:
+      color:
+        type: string
+      description:
+        type: string
+      entryCount:
+        type: integer
+      entryTypeCounts:
+        $ref: '#/definitions/EntryTypeCounts'
+      id:
+        type: string
+      sortOrder:
+        type: integer
+      source:
+        type: string
+      title:
+        type: string
+    type: object
+  ConsoleReleaseDetail:
+    properties:
+      description:
+        type: string
+      entries:
+        items:
+          $ref: '#/definitions/ConsoleReleaseEntrySummary'
+        type: array
+      id:
+        type: string
+      pdfFileName:
+        type: string
+      pdfFileSize:
+        type: integer
+      pdfFileUrl:
+        description: |-
+          Optional dedicated PDF attachment. URL points at /api/files/...;
+          the Console renders an upload/clear control and the Portal
+          renders a download link. Omitted from the wire when no PDF is
+          attached.
+        type: string
+      releaseDate:
+        type: string
+      state:
+        type: string
+      title:
+        type: string
+      versionName:
+        type: string
+    type: object
+  ConsoleReleaseEntrySummary:
+    properties:
+      id:
+        type: string
+      isInternal:
+        type: boolean
+      title:
+        type: string
+    type: object
+  ConsoleReleaseList:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/ConsoleReleaseListItem'
+        type: array
+    type: object
+  ConsoleReleaseListItem:
+    properties:
+      description:
+        type: string
+      entryCount:
+        type: integer
+      entryTypeCounts:
+        $ref: '#/definitions/EntryTypeCounts'
+      id:
+        type: string
+      pdfFileName:
+        type: string
+      pdfFileSize:
+        type: integer
+      pdfFileUrl:
+        description: |-
+          Optional dedicated PDF attachment. URL points at /api/files/...;
+          the Console renders an upload/clear control and the Portal
+          renders a download link. Omitted from the wire when no PDF is
+          attached.
+        type: string
+      releaseDate:
+        type: string
+      state:
+        type: string
+      title:
+        type: string
+      versionName:
+        type: string
+    type: object
+  Entry:
+    properties:
+      commentCount:
+        type: integer
+      createdAt:
+        type: string
+      creator:
+        $ref: '#/definitions/EntryCreator'
+      description:
+        type: string
+      entryType:
+        $ref: '#/definitions/EntryType'
+      id:
+        type: string
+      isVoted:
+        type: boolean
+      release:
+        $ref: '#/definitions/Release'
+      status:
+        $ref: '#/definitions/EntryStatus'
+      title:
+        type: string
+      updatedAt:
+        type: string
+      voteCount:
+        type: integer
+    type: object
+  EntryAuthorList:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/EntryCreator'
+        type: array
+    type: object
+  EntryCreator:
+    properties:
+      id:
+        type: string
+      imageUrl:
+        type: string
+      name:
+        type: string
+      username:
+        type: string
+    type: object
+  EntryList:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/Entry'
+        type: array
+      meta:
+        $ref: '#/definitions/ListMeta'
+    type: object
+  EntryRelation:
+    properties:
+      isAI:
+        type: boolean
+      peer:
+        $ref: '#/definitions/EntryRelationPeer'
+      type:
+        type: string
+    type: object
+  EntryRelationPeer:
+    properties:
+      id:
+        type: string
+      isInternal:
+        type: boolean
+      title:
+        type: string
+      voteCount:
+        type: integer
+    type: object
+  EntryStatus:
+    properties:
+      color:
+        type: string
+      icon:
+        type: string
+      title:
+        type: string
+      value:
+        type: string
+    type: object
+  EntryTopic:
+    properties:
+      color:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      sortOrder:
+        type: integer
+      source:
+        type: string
+      title:
+        type: string
+    type: object
+  EntryTopicList:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/ConsoleEntryTopicListItem'
+        type: array
+    type: object
+  EntryType:
+    properties:
+      color:
+        type: string
+      icon:
+        type: string
+      title:
+        type: string
+      value:
+        type: string
+    type: object
+  EntryTypeCounts:
+    properties:
+      bug:
+        type: integer
+      featureRequest:
+        type: integer
+      other:
+        type: integer
+      support:
+        type: integer
+      total:
+        type: integer
+    type: object
+  Error:
+    properties:
+      code:
+        description: Code of error which is always same with the returned HTTP status
+          code
+        type: integer
+      message:
+        description: Message of error
+        type: string
+    required:
+    - code
+    - message
+    type: object
+  FeatureRequestQuota:
+    properties:
+      max:
+        type: integer
+      unlimited:
+        type: boolean
+      used:
+        type: integer
+    type: object
+  FeedbackSettings:
+    properties:
+      defaultEntryTypeTemplates:
+        additionalProperties:
+          type: string
+        type: object
+      entryTypeTemplates:
+        additionalProperties:
+          type: string
+        type: object
+      maxFeatureRequestsPerUser:
+        type: integer
+      maxVotesPerUser:
+        type: integer
+      supportRequest:
+        $ref: '#/definitions/SupportRequestSettings'
+    type: object
+  File:
+    properties:
+      id:
+        type: string
+      isImage:
+        type: boolean
+      mimeType:
+        type: string
+      originalName:
+        type: string
+      size:
+        type: integer
+      url:
+        type: string
+    type: object
+  FindSimilarMatch:
+    properties:
+      entry:
+        $ref: '#/definitions/Entry'
+      reason:
+        type: string
+    type: object
+  GitHubIntegration:
+    properties:
+      active:
+        type: boolean
+      connectedAt:
+        type: string
+      connectedBy:
+        type: string
+      disabled:
+        type: boolean
+      hasToken:
+        type: boolean
+      owner:
+        type: string
+      repo:
+        type: string
+      tokenPreview:
+        type: string
+    type: object
+  GitHubIssue:
+    properties:
+      createdAt:
+        type: string
+      number:
+        type: integer
+      url:
+        type: string
+    type: object
+  Health:
+    properties:
+      status:
+        example: ok
+        type: string
+    type: object
+  IntegrationsResponse:
+    properties:
+      github:
+        $ref: '#/definitions/GitHubIntegration'
+    type: object
+  IntegrationsSettings:
+    properties:
+      github:
+        $ref: '#/definitions/GitHubIntegration'
+    type: object
+  ListMeta:
+    properties:
+      hasMore:
+        type: boolean
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
+  LoginResult:
+    properties:
+      user:
+        $ref: '#/definitions/UserInfo'
+    type: object
+  MeResult:
+    properties:
+      user:
+        $ref: '#/definitions/UserInfo'
+    type: object
+  MyProfile:
+    properties:
+      email:
+        type: string
+      hasPasswordAccount:
+        type: boolean
+      id:
+        type: string
+      imageUrl:
+        type: string
+      name:
+        type: string
+      username:
+        type: string
+    type: object
+  PortalChangelogEntry:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+    type: object
+  PortalChangelogItem:
+    properties:
+      description:
+        type: string
+      entries:
+        items:
+          $ref: '#/definitions/PortalChangelogEntry'
+        type: array
+      id:
+        type: string
+      pdfFileName:
+        type: string
+      pdfFileSize:
+        type: integer
+      pdfFileUrl:
+        description: |-
+          Optional dedicated PDF attachment. URL points at /api/files/...;
+          the Console renders an upload/clear control and the Portal
+          renders a download link. Omitted from the wire when no PDF is
+          attached.
+        type: string
+      releaseDate:
+        type: string
+      state:
+        type: string
+      title:
+        type: string
+      versionName:
+        type: string
+    type: object
+  PortalChangelogList:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/PortalChangelogItem'
+        type: array
+    type: object
+  PortalFeatureRequestQuota:
+    properties:
+      max:
+        type: integer
+      unlimited:
+        type: boolean
+      used:
+        type: integer
+    type: object
+  PortalFindSimilarResponse:
+    properties:
+      aiEnabled:
+        type: boolean
+      data:
+        items:
+          $ref: '#/definitions/FindSimilarMatch'
+        type: array
+    type: object
+  PortalSettings:
+    properties:
+      authUrl:
+        type: string
+      customAuthButtonText:
+        type: string
+      customAuthEnabled:
+        type: boolean
+      jwtPrivateKey:
+        type: string
+    type: object
+  PortalUserInfo:
+    properties:
+      email:
+        type: string
+      featureRequestQuota:
+        $ref: '#/definitions/PortalFeatureRequestQuota'
+      id:
+        type: string
+      imageUrl:
+        type: string
+      name:
+        type: string
+      roles:
+        items:
+          type: string
+        type: array
+      username:
+        type: string
+      voteQuota:
+        $ref: '#/definitions/PortalVoteQuota'
+    type: object
+  PortalVoteQuota:
+    properties:
+      max:
+        type: integer
+      unlimited:
+        type: boolean
+      used:
+        type: integer
+    type: object
+  Release:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      pdfFileName:
+        type: string
+      pdfFileSize:
+        type: integer
+      pdfFileUrl:
+        description: |-
+          Optional dedicated PDF attachment. URL points at /api/files/...;
+          the Console renders an upload/clear control and the Portal
+          renders a download link. Omitted from the wire when no PDF is
+          attached.
+        type: string
+      releaseDate:
+        type: string
+      state:
+        type: string
+      title:
+        type: string
+      versionName:
+        type: string
+    type: object
+  Settings:
+    properties:
+      ai:
+        $ref: '#/definitions/AISettings'
+      feedback:
+        $ref: '#/definitions/FeedbackSettings'
+      integrations:
+        $ref: '#/definitions/IntegrationsSettings'
+      logoUrl:
+        type: string
+      portal:
+        $ref: '#/definitions/PortalSettings'
+      primaryColor:
+        type: string
+      projectName:
+        type: string
+    type: object
+  SetupResult:
+    properties:
+      completed:
+        type: boolean
+    type: object
+  SetupStatus:
+    properties:
+      completed:
+        type: boolean
+    type: object
+  SupportRequestSettings:
+    properties:
+      enabled:
+        type: boolean
+      url:
+        type: string
+    type: object
+  User:
+    properties:
+      accounts:
+        items:
+          type: string
+        type: array
+      bugCount:
+        type: integer
+      createdAt:
+        type: string
+      email:
+        type: string
+      entryCount:
+        type: integer
+      featureRequestCount:
+        type: integer
+      id:
+        type: string
+      imageUrl:
+        type: string
+      isBlocked:
+        type: boolean
+      name:
+        type: string
+      otherCount:
+        type: integer
+      roles:
+        items:
+          type: string
+        type: array
+      supportCount:
+        type: integer
+      username:
+        type: string
+    type: object
+  UserInfo:
+    properties:
+      email:
+        type: string
+      featureRequestQuota:
+        $ref: '#/definitions/FeatureRequestQuota'
+      id:
+        type: string
+      imageUrl:
+        type: string
+      name:
+        type: string
+      roles:
+        items:
+          type: string
+        type: array
+      username:
+        type: string
+      voteQuota:
+        $ref: '#/definitions/VoteQuota'
+    type: object
+  UserList:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/User'
+        type: array
+      meta:
+        $ref: '#/definitions/ListMeta'
+    type: object
+  VoteQuota:
+    properties:
+      max:
+        type: integer
+      unlimited:
+        type: boolean
+      used:
+        type: integer
+    type: object
+  aianalyzer.Stats:
+    properties:
+      claimTtl:
+        type: string
+      enabled:
+        type: boolean
+      inFlightByName:
+        additionalProperties:
+          type: integer
+        type: object
+      pendingByName:
+        additionalProperties:
+          type: integer
+        type: object
+      pollInterval:
+        type: string
+      totalAnalyzed:
+        description: |-
+          TotalAnalyzed is the cumulative count of successful analyzer
+          runs over this deployment's lifetime, sourced from
+          Settings.AI.TotalAnalyzed which is $inc'd atomically per success.
+        type: integer
+      totalInFlight:
+        type: integer
+      totalPending:
+        type: integer
+    type: object
+  consoleAddEntryRelationRequest:
+    properties:
+      peerEntryId:
+        type: string
+      type:
+        type: string
+    required:
+    - peerEntryId
+    - type
+    type: object
+  consoleCreateEntryTopicRequest:
+    properties:
+      color:
+        maxLength: 32
+        type: string
+      description:
+        maxLength: 240
+        type: string
+      sortOrder:
+        type: integer
+      title:
+        maxLength: 60
+        minLength: 1
+        type: string
+    required:
+    - title
+    type: object
+  consoleCreateReleaseRequest:
+    properties:
+      description:
+        maxLength: 10000
+        type: string
+      pdfFileName:
+        maxLength: 255
+        type: string
+      pdfFileSize:
+        type: integer
+      pdfFileUrl:
+        description: |-
+          Optional PDF attachment. URL is the relative path returned by
+          the upload endpoint (/api/files/...); Name is the original
+          uploader filename rendered next to the download link; Size is
+          in bytes. All three travel together — pass either the full
+          trio or none.
+        maxLength: 500
+        type: string
+      releaseDate:
+        type: string
+      state:
+        type: string
+      title:
+        maxLength: 200
+        type: string
+      versionName:
+        maxLength: 60
+        minLength: 1
+        type: string
+    required:
+    - versionName
+    type: object
+  consoleMergeEntryRequest:
+    properties:
+      targetEntryId:
+        type: string
+    required:
+    - targetEntryId
+    type: object
+  consoleUpdateAISettingsRequest:
+    properties:
+      apiKey:
+        type: string
+      enabled:
+        type: boolean
+      model:
+        type: string
+    type: object
+  consoleUpdateCommentRequest:
+    properties:
+      isInternal:
+        type: boolean
+    type: object
+  consoleUpdateEntryRequest:
+    properties:
+      entryType:
+        type: string
+      isInternal:
+        type: boolean
+      releaseId:
+        type: string
+      status:
+        type: string
+      topicIds:
+        items:
+          type: string
+        type: array
+    type: object
+  consoleUpdateEntryTopicRequest:
+    properties:
+      color:
+        maxLength: 32
+        type: string
+      description:
+        maxLength: 240
+        type: string
+      sortOrder:
+        type: integer
+      title:
+        maxLength: 60
+        minLength: 1
+        type: string
+    type: object
+  consoleUpdateFeedbackSettings:
+    properties:
+      entryTypeTemplates:
+        additionalProperties:
+          type: string
+        type: object
+      maxFeatureRequestsPerUser:
+        type: integer
+      maxVotesPerUser:
+        type: integer
+      supportRequest:
+        $ref: '#/definitions/consoleUpdateSupportRequestSettings'
+    type: object
+  consoleUpdateGitHubIntegrationRequest:
+    properties:
+      owner:
+        example: acme-corp
+        type: string
+      repo:
+        example: webapp
+        type: string
+      token:
+        example: ghp_...
+        type: string
+    required:
+    - owner
+    - repo
+    - token
+    type: object
+  consoleUpdateMyPasswordRequest:
+    properties:
+      currentPassword:
+        minLength: 1
+        type: string
+      newPassword:
+        minLength: 10
+        type: string
+    required:
+    - currentPassword
+    - newPassword
+    type: object
+  consoleUpdateMyProfileRequest:
+    properties:
+      imageUrl:
+        type: string
+      name:
+        type: string
+    type: object
+  consoleUpdatePortalSettings:
+    properties:
+      authUrl:
+        type: string
+      customAuthButtonText:
+        type: string
+      customAuthEnabled:
+        type: boolean
+    type: object
+  consoleUpdateReleasePdf:
+    properties:
+      name:
+        maxLength: 255
+        type: string
+      size:
+        type: integer
+      url:
+        maxLength: 500
+        type: string
+    type: object
+  consoleUpdateReleaseRequest:
+    properties:
+      description:
+        maxLength: 10000
+        type: string
+      pdfFile:
+        allOf:
+        - $ref: '#/definitions/consoleUpdateReleasePdf'
+        description: |-
+          PdfFile carries the attachment slot for the release. The
+          triple is applied together: an empty URL clears the slot
+          (and is the only way to remove an existing attachment). nil
+          pointer leaves the existing PDF untouched.
+      releaseDate:
+        type: string
+      state:
+        type: string
+      title:
+        maxLength: 200
+        type: string
+      versionName:
+        maxLength: 60
+        minLength: 1
+        type: string
+    type: object
+  consoleUpdateSettingsRequest:
+    properties:
+      feedback:
+        $ref: '#/definitions/consoleUpdateFeedbackSettings'
+      logoUrl:
+        type: string
+      portal:
+        $ref: '#/definitions/consoleUpdatePortalSettings'
+      primaryColor:
+        type: string
+      projectName:
+        type: string
+    type: object
+  consoleUpdateSupportRequestSettings:
+    properties:
+      enabled:
+        type: boolean
+      url:
+        type: string
+    type: object
+  consoleUpdateUserBlockRequest:
+    properties:
+      isBlocked:
+        example: true
+        type: boolean
+    type: object
+  consoleUpdateUserRolesRequest:
+    properties:
+      roles:
+        example:
+        - admin
+        - editor
+        items:
+          type: string
+        type: array
+    required:
+    - roles
+    type: object
+  loginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 1
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  portalCreateCommentRequest:
+    properties:
+      body:
+        maxLength: 10000
+        minLength: 1
+        type: string
+    required:
+    - body
+    type: object
+  portalFindSimilarRequest:
+    properties:
+      description:
+        example: A system-aware toggle would be great.
+        type: string
+      title:
+        example: Add dark mode
+        maxLength: 200
+        minLength: 3
+        type: string
+    required:
+    - title
+    type: object
+  portalLoginCustomRequest:
+    properties:
+      token:
+        minLength: 1
+        type: string
+    required:
+    - token
+    type: object
+  portalLoginCustomResponse:
+    properties:
+      user:
+        $ref: '#/definitions/PortalUserInfo'
+    type: object
+  portalSubmitEntryRequest:
+    properties:
+      description:
+        example: Would love a system-aware dark mode toggle.
+        type: string
+      entryType:
+        example: feature-request
+        type: string
+      isInternal:
+        type: boolean
+      title:
+        example: Add dark mode
+        maxLength: 200
+        minLength: 3
+        type: string
+    required:
+    - title
+    type: object
+  setupRequest:
+    properties:
+      adminEmail:
+        type: string
+      adminPassword:
+        minLength: 10
+        type: string
+      projectName:
+        maxLength: 120
+        minLength: 1
+        type: string
+    required:
+    - adminEmail
+    - adminPassword
+    - projectName
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: |-
+    Open-source feedback portal with an admin console.
+    Single tenant per deployment. Authentication via HTTPOnly session cookie.
+  title: Mixdive API
+  version: 0.1.0
+paths:
+  /api/console/administrator:
+    get:
+      operationId: console-list-administrators
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AdministratorList'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: List administrators
+      tags:
+      - Console
+  /api/console/ai/queue:
+    get:
+      operationId: console-get-ai-queue
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/aianalyzer.Stats'
+      summary: Get AI queue stats (admin)
+      tags:
+      - Console
+  /api/console/dashboard:
+    get:
+      operationId: console-get-dashboard
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ConsoleDashboard'
+      summary: Get dashboard stats (admin/editor)
+      tags:
+      - Console
+  /api/console/entry:
+    get:
+      operationId: console-list-entries
+      parameters:
+      - in: query
+        name: authorId
+        type: string
+      - enum:
+        - feature-request
+        - bug
+        - support
+        - other
+        example: bug
+        in: query
+        name: entryType
+        type: string
+      - example: 25
+        in: query
+        name: limit
+        type: integer
+      - example: 1
+        in: query
+        name: page
+        type: integer
+      - example: dark mode
+        in: query
+        name: search
+        type: string
+      - enum:
+        - top
+        - new
+        example: new
+        in: query
+        name: sort
+        type: string
+      - enum:
+        - new
+        - evaluation
+        - in-progress
+        - completed
+        - cancelled
+        example: new
+        in: query
+        name: status
+        type: string
+      - in: query
+        name: topicId
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EntryList'
+      summary: List entries (admin)
+      tags:
+      - Console
+  /api/console/entry-author:
+    get:
+      operationId: console-list-entry-authors
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EntryAuthorList'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: List entry authors (admin)
+      tags:
+      - Console
+  /api/console/entry-topic:
+    get:
+      operationId: console-list-entry-topics
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EntryTopicList'
+      summary: List entry topics (admin)
+      tags:
+      - Console
+    post:
+      consumes:
+      - application/json
+      operationId: console-create-entry-topic
+      parameters:
+      - description: Topic
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/consoleCreateEntryTopicRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/EntryTopic'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Create entry topic (admin)
+      tags:
+      - Console
+  /api/console/entry-topic/{id}:
+    delete:
+      operationId: console-delete-entry-topic
+      parameters:
+      - description: topic id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Delete entry topic (admin)
+      tags:
+      - Console
+    patch:
+      consumes:
+      - application/json
+      operationId: console-update-entry-topic
+      parameters:
+      - description: topic id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Patch
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/consoleUpdateEntryTopicRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EntryTopic'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Update entry topic (admin)
+      tags:
+      - Console
+  /api/console/entry/{id}:
+    get:
+      operationId: console-get-entry
+      parameters:
+      - description: entry id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Entry'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Get entry (admin)
+      tags:
+      - Console
+    patch:
+      consumes:
+      - application/json
+      operationId: console-update-entry
+      parameters:
+      - description: entry id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Patch
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/consoleUpdateEntryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Entry'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Update entry (admin)
+      tags:
+      - Console
+  /api/console/entry/{id}/activity:
+    get:
+      operationId: console-list-activities
+      parameters:
+      - description: entry id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ActivityList'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+      summary: List activities on an entry (admin/editor)
+      tags:
+      - Console
+  /api/console/entry/{id}/comment:
+    get:
+      operationId: console-list-comments
+      parameters:
+      - description: entry id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/CommentList'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+      summary: List comments on an entry (admin)
+      tags:
+      - Console
+  /api/console/entry/{id}/comment/{commentId}:
+    patch:
+      consumes:
+      - application/json
+      operationId: console-update-comment
+      parameters:
+      - description: entry id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: comment id
+        in: path
+        name: commentId
+        required: true
+        type: string
+      - description: Patch
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/consoleUpdateCommentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Comment'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Update comment (admin)
+      tags:
+      - Console
+  /api/console/entry/{id}/github-issue:
+    post:
+      operationId: console-create-github-issue
+      parameters:
+      - description: entry id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Entry'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Publish entry as GitHub issue (admin)
+      tags:
+      - Console
+  /api/console/entry/{id}/merge:
+    post:
+      consumes:
+      - application/json
+      operationId: console-merge-entry
+      parameters:
+      - description: source entry id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Merge target
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/consoleMergeEntryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Entry'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Merge entry into another (admin/editor)
+      tags:
+      - Console
+  /api/console/entry/{id}/relation:
+    post:
+      consumes:
+      - application/json
+      operationId: console-add-entry-relation
+      parameters:
+      - description: entry id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Relation
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/consoleAddEntryRelationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Entry'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Add entry relation (admin)
+      tags:
+      - Console
+  /api/console/entry/{id}/relation/{peerEntryId}:
+    delete:
+      operationId: console-delete-entry-relation
+      parameters:
+      - description: entry id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: peer entry id
+        in: path
+        name: peerEntryId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Entry'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Remove entry relation (admin)
+      tags:
+      - Console
+  /api/console/entry/{id}/vote:
+    post:
+      operationId: console-add-vote
+      parameters:
+      - description: entry id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Entry'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Toggle vote on an entry (admin)
+      tags:
+      - Console
+  /api/console/integrations:
+    get:
+      operationId: console-get-integrations
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/IntegrationsResponse'
+      summary: List integrations
+      tags:
+      - Console
+  /api/console/integrations/github:
+    delete:
+      operationId: console-delete-github-integration
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/IntegrationsResponse'
+      summary: Disconnect the GitHub integration (admin)
+      tags:
+      - Console
+    put:
+      consumes:
+      - application/json
+      operationId: console-update-github-integration
+      parameters:
+      - description: GitHub credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/consoleUpdateGitHubIntegrationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/IntegrationsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Connect or update the GitHub integration (admin)
+      tags:
+      - Console
+  /api/console/me:
+    get:
+      operationId: console-get-my-profile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/MyProfile'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Get my profile
+      tags:
+      - Console
+    patch:
+      consumes:
+      - application/json
+      operationId: console-update-my-profile
+      parameters:
+      - description: Patch
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/consoleUpdateMyProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/MyProfile'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Update my profile
+      tags:
+      - Console
+  /api/console/me/password:
+    post:
+      consumes:
+      - application/json
+      operationId: console-update-my-password
+      parameters:
+      - description: Credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/consoleUpdateMyPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Update my password
+      tags:
+      - Console
+  /api/console/release:
+    get:
+      operationId: console-list-releases
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ConsoleReleaseList'
+      summary: List releases
+      tags:
+      - Console
+    post:
+      consumes:
+      - application/json
+      operationId: console-create-release
+      parameters:
+      - description: Release
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/consoleCreateReleaseRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/Release'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Create release (admin)
+      tags:
+      - Console
+  /api/console/release/{id}:
+    delete:
+      operationId: console-delete-release
+      parameters:
+      - description: release id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Delete release (admin)
+      tags:
+      - Console
+    get:
+      operationId: console-get-release
+      parameters:
+      - description: release id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ConsoleReleaseDetail'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Get release
+      tags:
+      - Console
+    patch:
+      consumes:
+      - application/json
+      operationId: console-update-release
+      parameters:
+      - description: release id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Patch
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/consoleUpdateReleaseRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Release'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Update release (admin)
+      tags:
+      - Console
+  /api/console/settings:
+    get:
+      operationId: console-get-settings
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Settings'
+      summary: Get settings
+      tags:
+      - Console
+    patch:
+      consumes:
+      - application/json
+      operationId: console-update-settings
+      parameters:
+      - description: Patch
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/consoleUpdateSettingsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Settings'
+      summary: Update settings
+      tags:
+      - Console
+  /api/console/settings/ai:
+    patch:
+      consumes:
+      - application/json
+      operationId: console-update-ai-settings
+      parameters:
+      - description: Patch
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/consoleUpdateAISettingsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Settings'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Update AI settings (admin)
+      tags:
+      - Console
+  /api/console/user:
+    get:
+      operationId: console-list-users
+      parameters:
+      - enum:
+        - asc
+        - desc
+        example: asc
+        in: query
+        name: direction
+        type: string
+      - example: 25
+        in: query
+        name: limit
+        type: integer
+      - example: 1
+        in: query
+        name: page
+        type: integer
+      - enum:
+        - all
+        - admin
+        - editor
+        - none
+        example: admin
+        in: query
+        name: role
+        type: string
+      - example: alice
+        in: query
+        name: search
+        type: string
+      - enum:
+        - new
+        - old
+        - email
+        - alpha
+        - created
+        - entries
+        - feature-requests
+        - bugs
+        - support
+        - others
+        example: alpha
+        in: query
+        name: sort
+        type: string
+      - enum:
+        - all
+        - active
+        - blocked
+        example: active
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserList'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: List users
+      tags:
+      - Console
+  /api/console/user/{id}/block:
+    patch:
+      consumes:
+      - application/json
+      operationId: console-update-user-block
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Block flag
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/consoleUpdateUserBlockRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Administrator'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Block or unblock a user
+      tags:
+      - Console
+  /api/console/user/{id}/roles:
+    patch:
+      consumes:
+      - application/json
+      operationId: console-update-user-roles
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Desired roles
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/consoleUpdateUserRolesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Administrator'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Update a user's roles
+      tags:
+      - Console
+  /api/files:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Multipart form upload. Field name "file". Returns metadata + a
+        relative URL to embed in markdown — `![alt](url)` for images, `[name](url)`
+        for other attachments.
+      operationId: upload-file
+      parameters:
+      - description: File to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/File'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "413":
+          description: Request Entity Too Large
+          schema:
+            $ref: '#/definitions/Error'
+        "415":
+          description: Unsupported Media Type
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Upload a file (image, video, or document)
+      tags:
+      - Files
+  /api/files/{id}:
+    get:
+      description: Returns the file bytes. On Cloud Storage backends this 302-redirects
+        to a short-lived signed URL. Path is `<id>.<extension>`.
+      operationId: get-file
+      parameters:
+      - description: file storage key (id.ext)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Fetch an uploaded file by id
+      tags:
+      - Files
+  /api/login:
+    post:
+      consumes:
+      - application/json
+      description: Verifies email + password against the stored argon2id hash and
+        issues an HTTPOnly session cookie.
+      operationId: auth-login
+      parameters:
+      - description: Credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/loginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/LoginResult'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Log in
+      tags:
+      - Auth
+  /api/logout:
+    post:
+      description: Deletes the active session and clears the cookie. Idempotent.
+      operationId: auth-logout
+      responses:
+        "204":
+          description: No Content
+      summary: Log out
+      tags:
+      - Auth
+  /api/me:
+    get:
+      description: Returns information about the user behind the session cookie.
+      operationId: auth-me
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/MeResult'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Current user
+      tags:
+      - Auth
+  /api/portal/auth/custom:
+    post:
+      consumes:
+      - application/json
+      description: Exchanges a JWT minted by the admin's external auth provider for
+        a Mixdive session cookie.
+      operationId: portal-login-custom
+      parameters:
+      - description: JWT from the external provider
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/portalLoginCustomRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portalLoginCustomResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Portal custom login
+      tags:
+      - Portal
+  /api/portal/changelog:
+    get:
+      operationId: portal-list-changelog
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/PortalChangelogList'
+      summary: List changelog releases
+      tags:
+      - Portal
+  /api/portal/changelog/{slug}:
+    get:
+      operationId: portal-get-changelog-release
+      parameters:
+      - description: version name or release id
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/PortalChangelogItem'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Get changelog release
+      tags:
+      - Portal
+  /api/portal/config:
+    get:
+      description: Returns project branding and the inbound auth URL (when custom
+        auth is on).
+      operationId: portal-get-config
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Config'
+      summary: Portal config
+      tags:
+      - Portal
+  /api/portal/entry:
+    get:
+      operationId: portal-list-entries
+      parameters:
+      - enum:
+        - feature-request
+        - bug
+        - support
+        - other
+        example: feature-request
+        in: query
+        name: entryType
+        type: string
+      - example: 25
+        in: query
+        name: limit
+        type: integer
+      - example: false
+        in: query
+        name: mine
+        type: boolean
+      - example: true
+        in: query
+        name: openOnly
+        type: boolean
+      - example: 1
+        in: query
+        name: page
+        type: integer
+      - example: dark mode
+        in: query
+        name: search
+        type: string
+      - enum:
+        - top
+        - new
+        example: top
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EntryList'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+      summary: List entries
+      tags:
+      - Portal
+    post:
+      consumes:
+      - application/json
+      operationId: portal-submit-entry
+      parameters:
+      - description: Entry
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/portalSubmitEntryRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/Entry'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Submit entry
+      tags:
+      - Portal
+  /api/portal/entry/{id}:
+    get:
+      operationId: portal-get-entry
+      parameters:
+      - description: entry id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Entry'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Get entry
+      tags:
+      - Portal
+  /api/portal/entry/{id}/comment:
+    get:
+      operationId: portal-list-comments
+      parameters:
+      - description: entry id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/CommentList'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+      summary: List comments on an entry
+      tags:
+      - Portal
+    post:
+      consumes:
+      - application/json
+      operationId: portal-create-comment
+      parameters:
+      - description: entry id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Comment
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/portalCreateCommentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/Comment'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Add a comment to an entry
+      tags:
+      - Portal
+  /api/portal/entry/{id}/vote:
+    post:
+      operationId: portal-add-vote
+      parameters:
+      - description: entry id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Entry'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Toggle vote on an entry
+      tags:
+      - Portal
+  /api/portal/entry/find-similar:
+    post:
+      consumes:
+      - application/json
+      operationId: portal-find-similar-entries
+      parameters:
+      - description: Draft
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/portalFindSimilarRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/PortalFindSimilarResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Find similar existing entries (AI)
+      tags:
+      - Portal
+  /api/setup:
+    post:
+      consumes:
+      - application/json
+      description: One-shot endpoint that initializes the deployment. After it succeeds,
+        GET /api/setup/status returns completed=true and this endpoint refuses.
+      operationId: setup-complete
+      parameters:
+      - description: Setup data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/setupRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/SetupResult'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Complete first-run setup
+      tags:
+      - Setup
+  /api/setup/status:
+    get:
+      description: Returns whether the first-run setup wizard has been completed.
+      operationId: setup-status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/SetupStatus'
+      summary: Setup status
+      tags:
+      - Setup
+  /health:
+    get:
+      description: Returns 200 when the server is running and Mongo is reachable.
+      operationId: system-health
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Health'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Health probe
+      tags:
+      - Health
+schemes:
+- http
+- https
+securityDefinitions:
+  CookieAuth:
+    in: cookie
+    name: mixdive_session
+    type: apiKey
+swagger: "2.0"

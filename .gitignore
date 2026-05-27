@@ -1,0 +1,43 @@
+# Local development notes & AI assistant context
+CLAUDE.md
+.claude/
+
+# Build artifacts
+bin/
+dist/
+*.test
+*.out
+
+# Frontend build output
+web/console/dist/
+web/portal/dist/
+
+# Dependencies
+node_modules/
+
+# Local data & uploaded files
+data/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+*.env
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Go build cache
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib

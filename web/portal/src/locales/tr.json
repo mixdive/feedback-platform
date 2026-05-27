@@ -1,0 +1,180 @@
+{
+  "common": {
+    "loading": "Yükleniyor…",
+    "cancel": "İptal",
+    "submit": "Gönder",
+    "continue": "Devam et",
+    "back": "Geri",
+    "logOut": "Çıkış yap",
+    "goToConsole": "Konsola git",
+    "signedIn": "Giriş yapıldı",
+    "anonymous": "Anonim",
+    "unknown": "Bilinmiyor",
+    "yours": "Sizin",
+    "you": "(siz)",
+    "byUser": "{{name}} tarafından",
+    "noDate": "Tarih yok",
+    "language": "Dil"
+  },
+  "language": {
+    "en": "English",
+    "tr": "Türkçe"
+  },
+  "nav": {
+    "feedback": "Geri Bildirim",
+    "changelog": "Sürüm Notları"
+  },
+  "auth": {
+    "gateTitle": "Devam etmek için giriş yapın",
+    "gateDescriptionWithProvider": "Bu portal kimlik doğrulaması gerektirir. Aşağıdaki düğmeyi kullanarak {{provider}} üzerinden giriş yapın.",
+    "gateDescriptionDefault": "Bu portal kimlik doğrulaması gerektirir. Aşağıdaki düğmeyi kullanarak sağlayıcınız üzerinden giriş yapın.",
+    "defaultLoginLabel": "Özel Giriş"
+  },
+  "portalUnavailable": "Portal şu anda kullanılamıyor.",
+  "entries": {
+    "pageTitle": "Geri Bildirim",
+    "newFeedback": "Yeni Geri Bildirim",
+    "newSupportRequest": "Yeni Destek Talebi",
+    "searchPlaceholder": "Geri bildirimde ara",
+    "clearSearch": "Aramayı temizle",
+    "sort": "Sırala",
+    "sortNewest": "En yeni",
+    "sortTopVotes": "En çok oy",
+    "tabAll": "Tümü",
+    "tabFeatureRequests": "Özellik İstekleri",
+    "tabBugs": "Hatalar",
+    "tabMine": "Benimkiler",
+    "noMatch": "\"{{query}}\" ile eşleşen geri bildirim yok.",
+    "emptyMine": "Henüz hiç geri bildirim göndermediniz.",
+    "emptyFeatureRequests": "Henüz açık özellik isteği yok.",
+    "emptyBugs": "Bildirilen açık hata yok.",
+    "emptyDefault": "Henüz açık geri bildirim yok. İlk gönderen siz olun.",
+    "voteCta": "Oy",
+    "loadError": "{{message}}"
+  },
+  "vote": {
+    "tooltip": "{{max}} oyun {{used}} tanesini kullandınız. Bir kayıt tamamlandığında veya iptal edildiğinde oylar iade edilir.",
+    "remaining_other": "{{max}} oyun {{remaining}} tanesi kaldı",
+    "countLabel_other": "oy"
+  },
+  "featureRequestQuota": {
+    "tooltip": "{{max}} özellik isteğinden {{used}} tanesi açık. Bir isteğiniz tamamlandığında veya iptal edildiğinde yer iade edilir.",
+    "remaining": "{{max}} özellik isteğinden {{remaining}} tanesi kaldı",
+    "hint": "{{max}} özellik isteği slotundan {{remaining}} tanesi kaldı. Bir isteğiniz tamamlandığında veya iptal edildiğinde yer iade edilir.",
+    "atLimit": "Kullanıcı başına {{max}} açık özellik isteği sınırına ulaştınız. Yenisini göndermeden önce birinin tamamlanmasını veya iptal edilmesini bekleyin."
+  },
+  "entryDetail": {
+    "backToEntries": "Geri bildirimlere dön",
+    "notFound": "Geri bildirim bulunamadı.",
+    "noDescription": "Açıklama yok.",
+    "sectionStatus": "Durum",
+    "sectionRelease": "Sürüm",
+    "sectionSubmitter": "Gönderen",
+    "sectionVotes": "Oylar",
+    "sectionComments": "Yorumlar",
+    "sectionSubmitted": "Gönderildi",
+    "sectionUpdated": "Güncellendi",
+    "voteCountLabel_other": "oy",
+    "commentCountLabel_other": "yorum"
+  },
+  "comments": {
+    "heading": "Yorumlar ({{count}})",
+    "loading": "Yorumlar yükleniyor…",
+    "empty": "Henüz yorum yok.",
+    "placeholder": "Yorum ekleyin. Markdown destekli. Dosya yapıştırabilir, sürükleyebilir veya ekleyebilirsiniz.",
+    "post": "Yorumu gönder",
+    "signInToComment": "Yorum eklemek için giriş yapın."
+  },
+  "entryLightbox": {
+    "fallbackTitle": "Geri Bildirim",
+    "openFullView": "Tam görünümü aç",
+    "close": "Kapat",
+    "loadFailed": "Geri bildirim yüklenemedi.",
+    "noDescription": "Açıklama yok."
+  },
+  "new": {
+    "stepBack": "Geri",
+    "stepChangeTitle": "Başlığı değiştir",
+    "titleHeading": "Yeni geri bildirim",
+    "titleSubtitle": "Tek cümleyle aklınızdakini yazın ve bunun bir özellik isteği mi yoksa hata mı olduğunu seçin. Aynı şeyi başkası daha önce paylaşmış mı kontrol edeceğiz.",
+    "fieldType": "Tür",
+    "fieldShortSummary": "Kısa özet",
+    "placeholderShortSummary": "Kısa özet",
+    "fieldTitle": "Başlık",
+    "fieldDescription": "Açıklama",
+    "fieldVisibility": "Görünürlük",
+    "matchesHeading": "Görünüşe göre bu zaten var olabilir",
+    "matchesIntro_other": "\"{{query}}\" için {{count}} benzer kayıt bulduk. Birini açıp okuyun, oy verin veya aşağı kaydırıp yeni geri bildirim oluşturun.",
+    "matchesVote": "Oy ver",
+    "matchesVoted": "Oy verildi",
+    "matchesOpen": "Bu geri bildirimi gör",
+    "noneMatch": "Bunların hiçbiri söylemek istediğinizle eşleşmiyor mu?",
+    "createNew": "Yeni geri bildirim oluştur",
+    "submitted": "Gönderildi",
+    "signInToVote": "Oy vermek için giriş yapın.",
+    "internalLabel": "Dahili olarak gönder (yalnızca yönetici)",
+    "internalDescription": "Portaldan gizlenir — yalnızca Konsolda görünür.",
+    "formHeadingFallback": "Yeni geri bildirim",
+    "formHeading": "Yeni {{type}}",
+    "stepSummary": "Özet",
+    "stepDetails": "Ayrıntılar",
+    "stepCaption": "· {{total}} adımdan {{current}}. adım",
+    "typeFeatureRequest": "Özellik İsteği",
+    "typeBug": "Hata",
+    "descriptionPlaceholder.feature-request": "Bu hangi sorunu çözer? Markdown destekli. Dosya yapıştırabilir, sürükleyebilir veya ekleyebilirsiniz.",
+    "descriptionPlaceholder.bug": "Yeniden üretme adımları, gördüğünüz ve beklediğiniz davranış. Markdown destekli. Ekran görüntüsü yapıştırabilir, sürükleyebilir veya ekleyebilirsiniz.",
+    "formPhase.feature-request": "Bunun neden önemli olduğuna dair birkaç ayrıntı ekleyin ki doğru yere yönlendirebilelim.",
+    "formPhase.bug": "Yeniden üretme adımlarını ve beklediğiniz davranışı ekleyin ki inceleyebilelim."
+  },
+  "changelog": {
+    "pageTitle": "Sürüm Notları",
+    "subtitle": "Yayınlanan güncellemeler ve sırada ne olduğu.",
+    "emptyTitle": "Henüz bir şey yayınlanmadı",
+    "emptyBody": "İlk güncellememizi yayınladığımızda sürüm notlarını burada paylaşacağız.",
+    "stateReleased": "Yayınlandı",
+    "statePlanned": "Planlandı",
+    "included": "Dahil edilenler",
+    "releasedOn": "{{date}} tarihinde yayınlandı.",
+    "backToChangelog": "Sürüm notlarına dön",
+    "copyLink": "Bağlantıyı kopyala",
+    "copied": "Bağlantı panoya kopyalandı",
+    "notFoundTitle": "Sürüm bulunamadı",
+    "notFoundBody": "Bu sürüm yeniden adlandırılmış veya kaldırılmış olabilir.",
+    "noNotesCompleted": "Bu sürüm için sürüm notu yok.",
+    "noNotesPlanned": "Bu sürüm için ayrıntılar henüz yayınlanmadı.",
+    "downloadPdf": "PDF İndir",
+    "titleSuffix": "Sürüm Notları"
+  },
+  "markdownEditor": {
+    "heading": "Başlık",
+    "bold": "Kalın",
+    "italic": "İtalik",
+    "code": "Kod",
+    "link": "Bağlantı",
+    "bulletList": "Madde işaretli liste",
+    "numberedList": "Numaralı liste",
+    "quote": "Alıntı",
+    "attachFile": "Dosya ekle",
+    "uploading": "Yükleniyor…",
+    "write": "Yaz",
+    "preview": "Önizleme",
+    "nothingToPreview": "Önizlenecek bir şey yok",
+    "uploadFailed": "Yükleme başarısız."
+  },
+  "entryTypeSelect": {
+    "noEntryType": "Tür yok"
+  },
+  "entryStatus": {
+    "new": "Yeni",
+    "evaluation": "Değerlendirme",
+    "in-progress": "Sürüyor",
+    "completed": "Tamamlandı",
+    "cancelled": "İptal edildi"
+  },
+  "entryType": {
+    "feature-request": "Özellik İsteği",
+    "bug": "Hata",
+    "support": "Destek",
+    "other": "Diğer"
+  }
+}

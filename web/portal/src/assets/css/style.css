@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  --color-mixdive-primary: oklch(0.7 0.14 230);
+
+  --color-brand-50:  oklch(0.975 0.018 230);
+  --color-brand-100: oklch(0.94  0.045 230);
+  --color-brand-200: oklch(0.88  0.080 230);
+  --color-brand-300: oklch(0.80  0.115 230);
+  --color-brand-400: oklch(0.70  0.140 230);
+  --color-brand-500: oklch(0.63  0.155 230);
+  --color-brand-600: oklch(0.56  0.160 230);
+  --color-brand-700: oklch(0.48  0.145 230);
+  --color-brand-800: oklch(0.40  0.115 230);
+  --color-brand-900: oklch(0.32  0.085 230);
+  --color-brand-950: oklch(0.22  0.060 230);
+
+  --color-accent-50:  oklch(0.97 0.04 75);
+  --color-accent-100: oklch(0.93 0.08 75);
+  --color-accent-500: oklch(0.78 0.16 70);
+  --color-accent-600: oklch(0.70 0.17 60);
+  --color-accent-700: oklch(0.60 0.15 55);
+
+  --color-canvas:      #ffffff;
+  --color-canvas-soft: oklch(0.985 0.003 230);
+
+  --shadow-soft: 0 1px 2px 0 rgb(24 24 27 / 0.04), 0 1px 3px 0 rgb(24 24 27 / 0.04);
+  --shadow-pop:  0 2px 6px -1px rgb(24 24 27 / 0.06), 0 4px 12px -2px rgb(24 24 27 / 0.06);
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  font-family: var(--font-sans);
+  /* Force light browser defaults until the architecture's useTheme() toggle
+     lands. Otherwise OS-dark-mode users get white text on our light pages. */
+  color-scheme: light;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  color: #18181b; /* zinc-900 */
+  background-color: var(--color-canvas);
+}

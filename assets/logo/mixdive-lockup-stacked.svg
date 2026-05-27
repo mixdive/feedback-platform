@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 86" role="img" aria-label="Mixdive">
+  <title>Mixdive</title>
+  <g transform="translate(40, 0)">
+    <rect x="20" y="0" width="20" height="10" rx="5" fill="#0B2545"/>
+    <rect x="10" y="18" width="40" height="10" rx="5" fill="#0B2545"/>
+    <rect x="0" y="36" width="60" height="10" rx="5" fill="#2EC4B6"/>
+  </g>
+  <text x="70" y="84" text-anchor="middle" font-family="Inter, 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="28" font-weight="500" letter-spacing="-0.7" fill="#0B2545">Mixdive</text>
+</svg>

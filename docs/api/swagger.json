@@ -1,0 +1,3874 @@
+{
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "Open-source feedback portal with an admin console.\nSingle tenant per deployment. Authentication via HTTPOnly session cookie.",
+        "title": "Mixdive API",
+        "contact": {},
+        "version": "0.1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/api/console/administrator": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "List administrators",
+                "operationId": "console-list-administrators",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/AdministratorList"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/ai/queue": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Get AI queue stats (admin)",
+                "operationId": "console-get-ai-queue",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/aianalyzer.Stats"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/dashboard": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Get dashboard stats (admin/editor)",
+                "operationId": "console-get-dashboard",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ConsoleDashboard"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/entry": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "List entries (admin)",
+                "operationId": "console-list-entries",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "authorId",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "feature-request",
+                            "bug",
+                            "support",
+                            "other"
+                        ],
+                        "type": "string",
+                        "example": "bug",
+                        "name": "entryType",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 25,
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "dark mode",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "top",
+                            "new"
+                        ],
+                        "type": "string",
+                        "example": "new",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "new",
+                            "evaluation",
+                            "in-progress",
+                            "completed",
+                            "cancelled"
+                        ],
+                        "type": "string",
+                        "example": "new",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "topicId",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/EntryList"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/entry-author": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "List entry authors (admin)",
+                "operationId": "console-list-entry-authors",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/EntryAuthorList"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/entry-topic": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "List entry topics (admin)",
+                "operationId": "console-list-entry-topics",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/EntryTopicList"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Create entry topic (admin)",
+                "operationId": "console-create-entry-topic",
+                "parameters": [
+                    {
+                        "description": "Topic",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/consoleCreateEntryTopicRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/EntryTopic"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/entry-topic/{id}": {
+            "delete": {
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Delete entry topic (admin)",
+                "operationId": "console-delete-entry-topic",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "topic id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Update entry topic (admin)",
+                "operationId": "console-update-entry-topic",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "topic id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Patch",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/consoleUpdateEntryTopicRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/EntryTopic"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/entry/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Get entry (admin)",
+                "operationId": "console-get-entry",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "entry id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Entry"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Update entry (admin)",
+                "operationId": "console-update-entry",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "entry id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Patch",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/consoleUpdateEntryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Entry"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/entry/{id}/activity": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "List activities on an entry (admin/editor)",
+                "operationId": "console-list-activities",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "entry id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ActivityList"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/entry/{id}/comment": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "List comments on an entry (admin)",
+                "operationId": "console-list-comments",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "entry id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/CommentList"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/entry/{id}/comment/{commentId}": {
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Update comment (admin)",
+                "operationId": "console-update-comment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "entry id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "comment id",
+                        "name": "commentId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Patch",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/consoleUpdateCommentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Comment"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/entry/{id}/github-issue": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Publish entry as GitHub issue (admin)",
+                "operationId": "console-create-github-issue",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "entry id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Entry"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/entry/{id}/merge": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Merge entry into another (admin/editor)",
+                "operationId": "console-merge-entry",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "source entry id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Merge target",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/consoleMergeEntryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Entry"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/entry/{id}/relation": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Add entry relation (admin)",
+                "operationId": "console-add-entry-relation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "entry id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Relation",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/consoleAddEntryRelationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Entry"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/entry/{id}/relation/{peerEntryId}": {
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Remove entry relation (admin)",
+                "operationId": "console-delete-entry-relation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "entry id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "peer entry id",
+                        "name": "peerEntryId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Entry"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/entry/{id}/vote": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Toggle vote on an entry (admin)",
+                "operationId": "console-add-vote",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "entry id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Entry"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/integrations": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "List integrations",
+                "operationId": "console-get-integrations",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/IntegrationsResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/integrations/github": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Connect or update the GitHub integration (admin)",
+                "operationId": "console-update-github-integration",
+                "parameters": [
+                    {
+                        "description": "GitHub credentials",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/consoleUpdateGitHubIntegrationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/IntegrationsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Disconnect the GitHub integration (admin)",
+                "operationId": "console-delete-github-integration",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/IntegrationsResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/me": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Get my profile",
+                "operationId": "console-get-my-profile",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/MyProfile"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Update my profile",
+                "operationId": "console-update-my-profile",
+                "parameters": [
+                    {
+                        "description": "Patch",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/consoleUpdateMyProfileRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/MyProfile"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/me/password": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Update my password",
+                "operationId": "console-update-my-password",
+                "parameters": [
+                    {
+                        "description": "Credentials",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/consoleUpdateMyPasswordRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/release": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "List releases",
+                "operationId": "console-list-releases",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ConsoleReleaseList"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Create release (admin)",
+                "operationId": "console-create-release",
+                "parameters": [
+                    {
+                        "description": "Release",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/consoleCreateReleaseRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/Release"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/release/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Get release",
+                "operationId": "console-get-release",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "release id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ConsoleReleaseDetail"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Delete release (admin)",
+                "operationId": "console-delete-release",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "release id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Update release (admin)",
+                "operationId": "console-update-release",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "release id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Patch",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/consoleUpdateReleaseRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Release"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/settings": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Get settings",
+                "operationId": "console-get-settings",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Settings"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Update settings",
+                "operationId": "console-update-settings",
+                "parameters": [
+                    {
+                        "description": "Patch",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/consoleUpdateSettingsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Settings"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/settings/ai": {
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Update AI settings (admin)",
+                "operationId": "console-update-ai-settings",
+                "parameters": [
+                    {
+                        "description": "Patch",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/consoleUpdateAISettingsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Settings"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/user": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "List users",
+                "operationId": "console-list-users",
+                "parameters": [
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "example": "asc",
+                        "name": "direction",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 25,
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "all",
+                            "admin",
+                            "editor",
+                            "none"
+                        ],
+                        "type": "string",
+                        "example": "admin",
+                        "name": "role",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "alice",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "new",
+                            "old",
+                            "email",
+                            "alpha",
+                            "created",
+                            "entries",
+                            "feature-requests",
+                            "bugs",
+                            "support",
+                            "others"
+                        ],
+                        "type": "string",
+                        "example": "alpha",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "all",
+                            "active",
+                            "blocked"
+                        ],
+                        "type": "string",
+                        "example": "active",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/UserList"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/user/{id}/block": {
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Block or unblock a user",
+                "operationId": "console-update-user-block",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Block flag",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/consoleUpdateUserBlockRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Administrator"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/user/{id}/roles": {
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Update a user's roles",
+                "operationId": "console-update-user-roles",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Desired roles",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/consoleUpdateUserRolesRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Administrator"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/files": {
+            "post": {
+                "description": "Multipart form upload. Field name \"file\". Returns metadata + a relative URL to embed in markdown — `![alt](url)` for images, `[name](url)` for other attachments.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Files"
+                ],
+                "summary": "Upload a file (image, video, or document)",
+                "operationId": "upload-file",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "File to upload",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/File"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "415": {
+                        "description": "Unsupported Media Type",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/files/{id}": {
+            "get": {
+                "description": "Returns the file bytes. On Cloud Storage backends this 302-redirects to a short-lived signed URL. Path is `\u003cid\u003e.\u003cextension\u003e`.",
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "Files"
+                ],
+                "summary": "Fetch an uploaded file by id",
+                "operationId": "get-file",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "file storage key (id.ext)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/login": {
+            "post": {
+                "description": "Verifies email + password against the stored argon2id hash and issues an HTTPOnly session cookie.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Log in",
+                "operationId": "auth-login",
+                "parameters": [
+                    {
+                        "description": "Credentials",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/loginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/LoginResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "description": "Deletes the active session and clears the cookie. Idempotent.",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Log out",
+                "operationId": "auth-logout",
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/api/me": {
+            "get": {
+                "description": "Returns information about the user behind the session cookie.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Current user",
+                "operationId": "auth-me",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/MeResult"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/portal/auth/custom": {
+            "post": {
+                "description": "Exchanges a JWT minted by the admin's external auth provider for a Mixdive session cookie.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Portal"
+                ],
+                "summary": "Portal custom login",
+                "operationId": "portal-login-custom",
+                "parameters": [
+                    {
+                        "description": "JWT from the external provider",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/portalLoginCustomRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portalLoginCustomResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/portal/changelog": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Portal"
+                ],
+                "summary": "List changelog releases",
+                "operationId": "portal-list-changelog",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/PortalChangelogList"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/portal/changelog/{slug}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Portal"
+                ],
+                "summary": "Get changelog release",
+                "operationId": "portal-get-changelog-release",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "version name or release id",
+                        "name": "slug",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/PortalChangelogItem"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/portal/config": {
+            "get": {
+                "description": "Returns project branding and the inbound auth URL (when custom auth is on).",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Portal"
+                ],
+                "summary": "Portal config",
+                "operationId": "portal-get-config",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Config"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/portal/entry": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Portal"
+                ],
+                "summary": "List entries",
+                "operationId": "portal-list-entries",
+                "parameters": [
+                    {
+                        "enum": [
+                            "feature-request",
+                            "bug",
+                            "support",
+                            "other"
+                        ],
+                        "type": "string",
+                        "example": "feature-request",
+                        "name": "entryType",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 25,
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": false,
+                        "name": "mine",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": true,
+                        "name": "openOnly",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "dark mode",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "top",
+                            "new"
+                        ],
+                        "type": "string",
+                        "example": "top",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/EntryList"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Portal"
+                ],
+                "summary": "Submit entry",
+                "operationId": "portal-submit-entry",
+                "parameters": [
+                    {
+                        "description": "Entry",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/portalSubmitEntryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/Entry"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/portal/entry/find-similar": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Portal"
+                ],
+                "summary": "Find similar existing entries (AI)",
+                "operationId": "portal-find-similar-entries",
+                "parameters": [
+                    {
+                        "description": "Draft",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/portalFindSimilarRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/PortalFindSimilarResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/portal/entry/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Portal"
+                ],
+                "summary": "Get entry",
+                "operationId": "portal-get-entry",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "entry id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Entry"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/portal/entry/{id}/comment": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Portal"
+                ],
+                "summary": "List comments on an entry",
+                "operationId": "portal-list-comments",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "entry id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/CommentList"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Portal"
+                ],
+                "summary": "Add a comment to an entry",
+                "operationId": "portal-create-comment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "entry id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Comment",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/portalCreateCommentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/Comment"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/portal/entry/{id}/vote": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Portal"
+                ],
+                "summary": "Toggle vote on an entry",
+                "operationId": "portal-add-vote",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "entry id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Entry"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/setup": {
+            "post": {
+                "description": "One-shot endpoint that initializes the deployment. After it succeeds, GET /api/setup/status returns completed=true and this endpoint refuses.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Setup"
+                ],
+                "summary": "Complete first-run setup",
+                "operationId": "setup-complete",
+                "parameters": [
+                    {
+                        "description": "Setup data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/setupRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/SetupResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/setup/status": {
+            "get": {
+                "description": "Returns whether the first-run setup wizard has been completed.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Setup"
+                ],
+                "summary": "Setup status",
+                "operationId": "setup-status",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SetupStatus"
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "description": "Returns 200 when the server is running and Mongo is reachable.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Health probe",
+                "operationId": "system-health",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Health"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "AISettings": {
+            "type": "object",
+            "properties": {
+                "apiKeyPreview": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "hasApiKey": {
+                    "type": "boolean"
+                },
+                "lastAnalyzedAt": {
+                    "type": "string"
+                },
+                "lastErrorAt": {
+                    "type": "string"
+                },
+                "lastErrorMessage": {
+                    "type": "string"
+                },
+                "model": {
+                    "type": "string"
+                }
+            }
+        },
+        "Activity": {
+            "type": "object",
+            "properties": {
+                "actor": {
+                    "$ref": "#/definitions/EntryCreator"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "entryId": {
+                    "type": "string"
+                },
+                "fromValue": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "source": {
+                    "type": "string"
+                },
+                "targetId": {
+                    "type": "string"
+                },
+                "toValue": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "ActivityList": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Activity"
+                    }
+                }
+            }
+        },
+        "Administrator": {
+            "type": "object",
+            "properties": {
+                "accounts": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "imageUrl": {
+                    "type": "string"
+                },
+                "isBlocked": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "AdministratorList": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Administrator"
+                    }
+                }
+            }
+        },
+        "Comment": {
+            "type": "object",
+            "properties": {
+                "author": {
+                    "$ref": "#/definitions/EntryCreator"
+                },
+                "body": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "entryId": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isInternal": {
+                    "type": "boolean"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "CommentList": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Comment"
+                    }
+                }
+            }
+        },
+        "Config": {
+            "type": "object",
+            "properties": {
+                "authUrl": {
+                    "type": "string"
+                },
+                "customAuthButtonText": {
+                    "type": "string"
+                },
+                "customAuthEnabled": {
+                    "type": "boolean"
+                },
+                "entryTypeTemplates": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "logoUrl": {
+                    "type": "string"
+                },
+                "primaryColor": {
+                    "type": "string"
+                },
+                "projectName": {
+                    "type": "string"
+                },
+                "supportRequestEnabled": {
+                    "type": "boolean"
+                },
+                "supportRequestUrl": {
+                    "type": "string"
+                }
+            }
+        },
+        "ConsoleDashboard": {
+            "type": "object",
+            "properties": {
+                "closedEntries": {
+                    "type": "integer"
+                },
+                "entriesByStatus": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                },
+                "entriesByType": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                },
+                "entriesPerDay": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ConsoleDashboardDayBucket"
+                    }
+                },
+                "internalEntries": {
+                    "type": "integer"
+                },
+                "openEntries": {
+                    "type": "integer"
+                },
+                "publicEntries": {
+                    "type": "integer"
+                },
+                "recentEntries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ConsoleDashboardEntryRow"
+                    }
+                },
+                "topEntriesByVote": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ConsoleDashboardEntryRow"
+                    }
+                },
+                "totalComments": {
+                    "type": "integer"
+                },
+                "totalEntries": {
+                    "type": "integer"
+                },
+                "totalReleases": {
+                    "type": "integer"
+                },
+                "totalTopics": {
+                    "type": "integer"
+                },
+                "totalUsers": {
+                    "type": "integer"
+                },
+                "totalVotes": {
+                    "type": "integer"
+                }
+            }
+        },
+        "ConsoleDashboardDayBucket": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "date": {
+                    "type": "string"
+                }
+            }
+        },
+        "ConsoleDashboardEntryRow": {
+            "type": "object",
+            "properties": {
+                "commentCount": {
+                    "type": "integer"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "entryType": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isInternal": {
+                    "type": "boolean"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "voteCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "ConsoleEntryTopicListItem": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "entryCount": {
+                    "type": "integer"
+                },
+                "entryTypeCounts": {
+                    "$ref": "#/definitions/EntryTypeCounts"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "sortOrder": {
+                    "type": "integer"
+                },
+                "source": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "ConsoleReleaseDetail": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "entries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ConsoleReleaseEntrySummary"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "pdfFileName": {
+                    "type": "string"
+                },
+                "pdfFileSize": {
+                    "type": "integer"
+                },
+                "pdfFileUrl": {
+                    "description": "Optional dedicated PDF attachment. URL points at /api/files/...;\nthe Console renders an upload/clear control and the Portal\nrenders a download link. Omitted from the wire when no PDF is\nattached.",
+                    "type": "string"
+                },
+                "releaseDate": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "versionName": {
+                    "type": "string"
+                }
+            }
+        },
+        "ConsoleReleaseEntrySummary": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "isInternal": {
+                    "type": "boolean"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "ConsoleReleaseList": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ConsoleReleaseListItem"
+                    }
+                }
+            }
+        },
+        "ConsoleReleaseListItem": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "entryCount": {
+                    "type": "integer"
+                },
+                "entryTypeCounts": {
+                    "$ref": "#/definitions/EntryTypeCounts"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "pdfFileName": {
+                    "type": "string"
+                },
+                "pdfFileSize": {
+                    "type": "integer"
+                },
+                "pdfFileUrl": {
+                    "description": "Optional dedicated PDF attachment. URL points at /api/files/...;\nthe Console renders an upload/clear control and the Portal\nrenders a download link. Omitted from the wire when no PDF is\nattached.",
+                    "type": "string"
+                },
+                "releaseDate": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "versionName": {
+                    "type": "string"
+                }
+            }
+        },
+        "Entry": {
+            "type": "object",
+            "properties": {
+                "commentCount": {
+                    "type": "integer"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "creator": {
+                    "$ref": "#/definitions/EntryCreator"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "entryType": {
+                    "$ref": "#/definitions/EntryType"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isVoted": {
+                    "type": "boolean"
+                },
+                "release": {
+                    "$ref": "#/definitions/Release"
+                },
+                "status": {
+                    "$ref": "#/definitions/EntryStatus"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "voteCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "EntryAuthorList": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/EntryCreator"
+                    }
+                }
+            }
+        },
+        "EntryCreator": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "imageUrl": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "EntryList": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Entry"
+                    }
+                },
+                "meta": {
+                    "$ref": "#/definitions/ListMeta"
+                }
+            }
+        },
+        "EntryRelation": {
+            "type": "object",
+            "properties": {
+                "isAI": {
+                    "type": "boolean"
+                },
+                "peer": {
+                    "$ref": "#/definitions/EntryRelationPeer"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "EntryRelationPeer": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "isInternal": {
+                    "type": "boolean"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "voteCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "EntryStatus": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "icon": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "EntryTopic": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "sortOrder": {
+                    "type": "integer"
+                },
+                "source": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "EntryTopicList": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ConsoleEntryTopicListItem"
+                    }
+                }
+            }
+        },
+        "EntryType": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "icon": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "EntryTypeCounts": {
+            "type": "object",
+            "properties": {
+                "bug": {
+                    "type": "integer"
+                },
+                "featureRequest": {
+                    "type": "integer"
+                },
+                "other": {
+                    "type": "integer"
+                },
+                "support": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "Error": {
+            "type": "object",
+            "required": [
+                "code",
+                "message"
+            ],
+            "properties": {
+                "code": {
+                    "description": "Code of error which is always same with the returned HTTP status code",
+                    "type": "integer"
+                },
+                "message": {
+                    "description": "Message of error",
+                    "type": "string"
+                }
+            }
+        },
+        "FeatureRequestQuota": {
+            "type": "object",
+            "properties": {
+                "max": {
+                    "type": "integer"
+                },
+                "unlimited": {
+                    "type": "boolean"
+                },
+                "used": {
+                    "type": "integer"
+                }
+            }
+        },
+        "FeedbackSettings": {
+            "type": "object",
+            "properties": {
+                "defaultEntryTypeTemplates": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "entryTypeTemplates": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "maxFeatureRequestsPerUser": {
+                    "type": "integer"
+                },
+                "maxVotesPerUser": {
+                    "type": "integer"
+                },
+                "supportRequest": {
+                    "$ref": "#/definitions/SupportRequestSettings"
+                }
+            }
+        },
+        "File": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "isImage": {
+                    "type": "boolean"
+                },
+                "mimeType": {
+                    "type": "string"
+                },
+                "originalName": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "FindSimilarMatch": {
+            "type": "object",
+            "properties": {
+                "entry": {
+                    "$ref": "#/definitions/Entry"
+                },
+                "reason": {
+                    "type": "string"
+                }
+            }
+        },
+        "GitHubIntegration": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "boolean"
+                },
+                "connectedAt": {
+                    "type": "string"
+                },
+                "connectedBy": {
+                    "type": "string"
+                },
+                "disabled": {
+                    "type": "boolean"
+                },
+                "hasToken": {
+                    "type": "boolean"
+                },
+                "owner": {
+                    "type": "string"
+                },
+                "repo": {
+                    "type": "string"
+                },
+                "tokenPreview": {
+                    "type": "string"
+                }
+            }
+        },
+        "GitHubIssue": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "number": {
+                    "type": "integer"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "Health": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "example": "ok"
+                }
+            }
+        },
+        "IntegrationsResponse": {
+            "type": "object",
+            "properties": {
+                "github": {
+                    "$ref": "#/definitions/GitHubIntegration"
+                }
+            }
+        },
+        "IntegrationsSettings": {
+            "type": "object",
+            "properties": {
+                "github": {
+                    "$ref": "#/definitions/GitHubIntegration"
+                }
+            }
+        },
+        "ListMeta": {
+            "type": "object",
+            "properties": {
+                "hasMore": {
+                    "type": "boolean"
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "LoginResult": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "$ref": "#/definitions/UserInfo"
+                }
+            }
+        },
+        "MeResult": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "$ref": "#/definitions/UserInfo"
+                }
+            }
+        },
+        "MyProfile": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "hasPasswordAccount": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "imageUrl": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "PortalChangelogEntry": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "PortalChangelogItem": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "entries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PortalChangelogEntry"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "pdfFileName": {
+                    "type": "string"
+                },
+                "pdfFileSize": {
+                    "type": "integer"
+                },
+                "pdfFileUrl": {
+                    "description": "Optional dedicated PDF attachment. URL points at /api/files/...;\nthe Console renders an upload/clear control and the Portal\nrenders a download link. Omitted from the wire when no PDF is\nattached.",
+                    "type": "string"
+                },
+                "releaseDate": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "versionName": {
+                    "type": "string"
+                }
+            }
+        },
+        "PortalChangelogList": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PortalChangelogItem"
+                    }
+                }
+            }
+        },
+        "PortalFeatureRequestQuota": {
+            "type": "object",
+            "properties": {
+                "max": {
+                    "type": "integer"
+                },
+                "unlimited": {
+                    "type": "boolean"
+                },
+                "used": {
+                    "type": "integer"
+                }
+            }
+        },
+        "PortalFindSimilarResponse": {
+            "type": "object",
+            "properties": {
+                "aiEnabled": {
+                    "type": "boolean"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/FindSimilarMatch"
+                    }
+                }
+            }
+        },
+        "PortalSettings": {
+            "type": "object",
+            "properties": {
+                "authUrl": {
+                    "type": "string"
+                },
+                "customAuthButtonText": {
+                    "type": "string"
+                },
+                "customAuthEnabled": {
+                    "type": "boolean"
+                },
+                "jwtPrivateKey": {
+                    "type": "string"
+                }
+            }
+        },
+        "PortalUserInfo": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "featureRequestQuota": {
+                    "$ref": "#/definitions/PortalFeatureRequestQuota"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "imageUrl": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "username": {
+                    "type": "string"
+                },
+                "voteQuota": {
+                    "$ref": "#/definitions/PortalVoteQuota"
+                }
+            }
+        },
+        "PortalVoteQuota": {
+            "type": "object",
+            "properties": {
+                "max": {
+                    "type": "integer"
+                },
+                "unlimited": {
+                    "type": "boolean"
+                },
+                "used": {
+                    "type": "integer"
+                }
+            }
+        },
+        "Release": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "pdfFileName": {
+                    "type": "string"
+                },
+                "pdfFileSize": {
+                    "type": "integer"
+                },
+                "pdfFileUrl": {
+                    "description": "Optional dedicated PDF attachment. URL points at /api/files/...;\nthe Console renders an upload/clear control and the Portal\nrenders a download link. Omitted from the wire when no PDF is\nattached.",
+                    "type": "string"
+                },
+                "releaseDate": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "versionName": {
+                    "type": "string"
+                }
+            }
+        },
+        "Settings": {
+            "type": "object",
+            "properties": {
+                "ai": {
+                    "$ref": "#/definitions/AISettings"
+                },
+                "feedback": {
+                    "$ref": "#/definitions/FeedbackSettings"
+                },
+                "integrations": {
+                    "$ref": "#/definitions/IntegrationsSettings"
+                },
+                "logoUrl": {
+                    "type": "string"
+                },
+                "portal": {
+                    "$ref": "#/definitions/PortalSettings"
+                },
+                "primaryColor": {
+                    "type": "string"
+                },
+                "projectName": {
+                    "type": "string"
+                }
+            }
+        },
+        "SetupResult": {
+            "type": "object",
+            "properties": {
+                "completed": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "SetupStatus": {
+            "type": "object",
+            "properties": {
+                "completed": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "SupportRequestSettings": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "User": {
+            "type": "object",
+            "properties": {
+                "accounts": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "bugCount": {
+                    "type": "integer"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "entryCount": {
+                    "type": "integer"
+                },
+                "featureRequestCount": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "imageUrl": {
+                    "type": "string"
+                },
+                "isBlocked": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "otherCount": {
+                    "type": "integer"
+                },
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "supportCount": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "UserInfo": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "featureRequestQuota": {
+                    "$ref": "#/definitions/FeatureRequestQuota"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "imageUrl": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "username": {
+                    "type": "string"
+                },
+                "voteQuota": {
+                    "$ref": "#/definitions/VoteQuota"
+                }
+            }
+        },
+        "UserList": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/User"
+                    }
+                },
+                "meta": {
+                    "$ref": "#/definitions/ListMeta"
+                }
+            }
+        },
+        "VoteQuota": {
+            "type": "object",
+            "properties": {
+                "max": {
+                    "type": "integer"
+                },
+                "unlimited": {
+                    "type": "boolean"
+                },
+                "used": {
+                    "type": "integer"
+                }
+            }
+        },
+        "aianalyzer.Stats": {
+            "type": "object",
+            "properties": {
+                "claimTtl": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "inFlightByName": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    }
+                },
+                "pendingByName": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    }
+                },
+                "pollInterval": {
+                    "type": "string"
+                },
+                "totalAnalyzed": {
+                    "description": "TotalAnalyzed is the cumulative count of successful analyzer\nruns over this deployment's lifetime, sourced from\nSettings.AI.TotalAnalyzed which is $inc'd atomically per success.",
+                    "type": "integer"
+                },
+                "totalInFlight": {
+                    "type": "integer"
+                },
+                "totalPending": {
+                    "type": "integer"
+                }
+            }
+        },
+        "consoleAddEntryRelationRequest": {
+            "type": "object",
+            "required": [
+                "peerEntryId",
+                "type"
+            ],
+            "properties": {
+                "peerEntryId": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "consoleCreateEntryTopicRequest": {
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "color": {
+                    "type": "string",
+                    "maxLength": 32
+                },
+                "description": {
+                    "type": "string",
+                    "maxLength": 240
+                },
+                "sortOrder": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 60,
+                    "minLength": 1
+                }
+            }
+        },
+        "consoleCreateReleaseRequest": {
+            "type": "object",
+            "required": [
+                "versionName"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "maxLength": 10000
+                },
+                "pdfFileName": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "pdfFileSize": {
+                    "type": "integer"
+                },
+                "pdfFileUrl": {
+                    "description": "Optional PDF attachment. URL is the relative path returned by\nthe upload endpoint (/api/files/...); Name is the original\nuploader filename rendered next to the download link; Size is\nin bytes. All three travel together — pass either the full\ntrio or none.",
+                    "type": "string",
+                    "maxLength": 500
+                },
+                "releaseDate": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 200
+                },
+                "versionName": {
+                    "type": "string",
+                    "maxLength": 60,
+                    "minLength": 1
+                }
+            }
+        },
+        "consoleMergeEntryRequest": {
+            "type": "object",
+            "required": [
+                "targetEntryId"
+            ],
+            "properties": {
+                "targetEntryId": {
+                    "type": "string"
+                }
+            }
+        },
+        "consoleUpdateAISettingsRequest": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "model": {
+                    "type": "string"
+                }
+            }
+        },
+        "consoleUpdateCommentRequest": {
+            "type": "object",
+            "properties": {
+                "isInternal": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "consoleUpdateEntryRequest": {
+            "type": "object",
+            "properties": {
+                "entryType": {
+                    "type": "string"
+                },
+                "isInternal": {
+                    "type": "boolean"
+                },
+                "releaseId": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "topicIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "consoleUpdateEntryTopicRequest": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string",
+                    "maxLength": 32
+                },
+                "description": {
+                    "type": "string",
+                    "maxLength": 240
+                },
+                "sortOrder": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 60,
+                    "minLength": 1
+                }
+            }
+        },
+        "consoleUpdateFeedbackSettings": {
+            "type": "object",
+            "properties": {
+                "entryTypeTemplates": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "maxFeatureRequestsPerUser": {
+                    "type": "integer"
+                },
+                "maxVotesPerUser": {
+                    "type": "integer"
+                },
+                "supportRequest": {
+                    "$ref": "#/definitions/consoleUpdateSupportRequestSettings"
+                }
+            }
+        },
+        "consoleUpdateGitHubIntegrationRequest": {
+            "type": "object",
+            "required": [
+                "owner",
+                "repo",
+                "token"
+            ],
+            "properties": {
+                "owner": {
+                    "type": "string",
+                    "example": "acme-corp"
+                },
+                "repo": {
+                    "type": "string",
+                    "example": "webapp"
+                },
+                "token": {
+                    "type": "string",
+                    "example": "ghp_..."
+                }
+            }
+        },
+        "consoleUpdateMyPasswordRequest": {
+            "type": "object",
+            "required": [
+                "currentPassword",
+                "newPassword"
+            ],
+            "properties": {
+                "currentPassword": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "newPassword": {
+                    "type": "string",
+                    "minLength": 10
+                }
+            }
+        },
+        "consoleUpdateMyProfileRequest": {
+            "type": "object",
+            "properties": {
+                "imageUrl": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "consoleUpdatePortalSettings": {
+            "type": "object",
+            "properties": {
+                "authUrl": {
+                    "type": "string"
+                },
+                "customAuthButtonText": {
+                    "type": "string"
+                },
+                "customAuthEnabled": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "consoleUpdateReleasePdf": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "url": {
+                    "type": "string",
+                    "maxLength": 500
+                }
+            }
+        },
+        "consoleUpdateReleaseRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "maxLength": 10000
+                },
+                "pdfFile": {
+                    "description": "PdfFile carries the attachment slot for the release. The\ntriple is applied together: an empty URL clears the slot\n(and is the only way to remove an existing attachment). nil\npointer leaves the existing PDF untouched.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/consoleUpdateReleasePdf"
+                        }
+                    ]
+                },
+                "releaseDate": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 200
+                },
+                "versionName": {
+                    "type": "string",
+                    "maxLength": 60,
+                    "minLength": 1
+                }
+            }
+        },
+        "consoleUpdateSettingsRequest": {
+            "type": "object",
+            "properties": {
+                "feedback": {
+                    "$ref": "#/definitions/consoleUpdateFeedbackSettings"
+                },
+                "logoUrl": {
+                    "type": "string"
+                },
+                "portal": {
+                    "$ref": "#/definitions/consoleUpdatePortalSettings"
+                },
+                "primaryColor": {
+                    "type": "string"
+                },
+                "projectName": {
+                    "type": "string"
+                }
+            }
+        },
+        "consoleUpdateSupportRequestSettings": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "consoleUpdateUserBlockRequest": {
+            "type": "object",
+            "properties": {
+                "isBlocked": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "consoleUpdateUserRolesRequest": {
+            "type": "object",
+            "required": [
+                "roles"
+            ],
+            "properties": {
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "admin",
+                        "editor"
+                    ]
+                }
+            }
+        },
+        "loginRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 1
+                }
+            }
+        },
+        "portalCreateCommentRequest": {
+            "type": "object",
+            "required": [
+                "body"
+            ],
+            "properties": {
+                "body": {
+                    "type": "string",
+                    "maxLength": 10000,
+                    "minLength": 1
+                }
+            }
+        },
+        "portalFindSimilarRequest": {
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "A system-aware toggle would be great."
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 200,
+                    "minLength": 3,
+                    "example": "Add dark mode"
+                }
+            }
+        },
+        "portalLoginCustomRequest": {
+            "type": "object",
+            "required": [
+                "token"
+            ],
+            "properties": {
+                "token": {
+                    "type": "string",
+                    "minLength": 1
+                }
+            }
+        },
+        "portalLoginCustomResponse": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "$ref": "#/definitions/PortalUserInfo"
+                }
+            }
+        },
+        "portalSubmitEntryRequest": {
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Would love a system-aware dark mode toggle."
+                },
+                "entryType": {
+                    "type": "string",
+                    "example": "feature-request"
+                },
+                "isInternal": {
+                    "type": "boolean"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 200,
+                    "minLength": 3,
+                    "example": "Add dark mode"
+                }
+            }
+        },
+        "setupRequest": {
+            "type": "object",
+            "required": [
+                "adminEmail",
+                "adminPassword",
+                "projectName"
+            ],
+            "properties": {
+                "adminEmail": {
+                    "type": "string"
+                },
+                "adminPassword": {
+                    "type": "string",
+                    "minLength": 10
+                },
+                "projectName": {
+                    "type": "string",
+                    "maxLength": 120,
+                    "minLength": 1
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "CookieAuth": {
+            "type": "apiKey",
+            "name": "mixdive_session",
+            "in": "cookie"
+        }
+    }
+}

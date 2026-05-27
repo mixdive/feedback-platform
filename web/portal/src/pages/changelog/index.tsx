@@ -1,0 +1,182 @@
+import { Link } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { CalendarDays, ChevronRight, FileText } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+
+import Markdown from '@/components/markdown'
+import { API } from '@/services/api'
+
+// ChangelogPage lays out the public changelog: each completed release
+// renders as a stacked card with date header, version chip, optional
+// title, markdown body, and the list of entries that shipped under
+// this release.
+export default function ChangelogPage() {
+  const { t, i18n } = useTranslation()
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['portal', 'changelog'],
+    queryFn: () => API().portal.listChangelog(),
+  })
+
+  return (
+    <div className="space-y-10">
+      <header className="space-y-2">
+        <h1 className="text-3xl font-semibold">{t('changelog.pageTitle')}</h1>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          {t('changelog.subtitle')}
+        </p>
+      </header>
+
+      {isLoading && <p className="text-sm text-zinc-500">{t('common.loading')}</p>}
+      {error && (
+        <p className="text-sm text-rose-600">{(error as Error).message}</p>
+      )}
+      {data && data.data.length === 0 && (
+        <div className="rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 p-12 text-center">
+          <h2 className="text-lg font-semibold">{t('changelog.emptyTitle')}</h2>
+          <p className="mt-2 text-sm text-zinc-500">
+            {t('changelog.emptyBody')}
+          </p>
+        </div>
+      )}
+
+      {data && data.data.length > 0 && (
+        <div className="space-y-12">
+          {data.data.map((release, idx) => (
+            <article
+              key={release.id}
+              className={
+                idx === data.data.length - 1
+                  ? 'space-y-4'
+                  : 'space-y-4 border-b border-zinc-200 dark:border-zinc-800 pb-12'
+              }
+            >
+              <div className="flex flex-wrap items-baseline gap-3">
+                <Link
+                  to={`/changelog/${encodeURIComponent(release.versionName)}`}
+                  className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50 hover:underline"
+                >
+                  {release.versionName}
+                </Link>
+                <span
+                  className={
+                    release.state === 'completed'
+                      ? 'rounded px-1.5 py-0.5 text-[10px] uppercase tracking-wider bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300'
+                      : 'rounded px-1.5 py-0.5 text-[10px] uppercase tracking-wider bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300'
+                  }
+                >
+                  {release.state === 'completed'
+                    ? t('changelog.stateReleased')
+                    : t('changelog.statePlanned')}
+                </span>
+                <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                  {formatLongDate(release.releaseDate, i18n.language, t('common.noDate'))}
+                </span>
+              </div>
+
+              {release.title && (
+                <h3 className="text-lg font-medium text-zinc-700 dark:text-zinc-300">
+                  <Link
+                    to={`/changelog/${encodeURIComponent(release.versionName)}`}
+                    className="hover:underline"
+                  >
+                    {release.title}
+                  </Link>
+                </h3>
+              )}
+
+              {release.description && (
+                <Markdown className="text-zinc-700 dark:text-zinc-300">
+                  {release.description}
+                </Markdown>
+              )}
+
+              {release.pdfFileUrl && (
+                <a
+                  href={release.pdfFileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                >
+                  <FileText className="size-4 text-zinc-500" />
+                  <span className="font-medium">
+                    {release.pdfFileName || t('changelog.downloadPdf')}
+                  </span>
+                  {release.pdfFileSize ? (
+                    <span className="text-xs text-zinc-500 tabular-nums">
+                      {formatBytes(release.pdfFileSize)}
+                    </span>
+                  ) : null}
+                </a>
+              )}
+
+              {release.entries.length > 0 && (
+                <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 divide-y divide-zinc-200 dark:divide-zinc-800">
+                  <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                    {t('changelog.included')}
+                  </div>
+                  {release.entries.map((e) => (
+                    <Link
+                      key={e.id}
+                      to={`/entry/${e.id}`}
+                      className="flex items-start gap-3 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-950/40"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="font-medium text-zinc-900 dark:text-zinc-100">
+                          {e.title}
+                        </div>
+                        {e.description && (
+                          <p className="mt-0.5 line-clamp-1 text-sm text-zinc-500">
+                            {plainPreview(e.description)}
+                          </p>
+                        )}
+                      </div>
+                      <ChevronRight className="size-4 shrink-0 text-zinc-400" />
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              {release.entries.length === 0 && !release.description && (
+                <p className="inline-flex items-center gap-2 text-sm text-zinc-400">
+                  <CalendarDays className="size-4" />
+                  {t('changelog.releasedOn', {
+                    date: formatLongDate(release.releaseDate, i18n.language, t('common.noDate')),
+                  })}
+                </p>
+              )}
+            </article>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function formatLongDate(isoDate: string | undefined, locale: string, fallback: string): string {
+  if (!isoDate) return fallback
+  const [y, m, d] = isoDate.split('-').map(Number)
+  if (!y || !m || !d) return isoDate
+  const date = new Date(Date.UTC(y, m - 1, d))
+  return date.toLocaleDateString(locale, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`
+}
+
+function plainPreview(s: string): string {
+  return s
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+    .replace(/[\*_~#>]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+}

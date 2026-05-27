@@ -1,0 +1,49 @@
+# Dev-only Mongo for local Mixdive development.
+#
+# This is NOT the production / self-host docker-compose.yml — that arrives in
+# the Distribution phase and bundles the Mixdive binary alongside Mongo.
+#
+# Mongo transactions require a replica set (even single-node). The healthcheck
+# below auto-runs rs.initiate() the first time the container starts, so
+# `make dev-mongo` followed by a fresh `make dev` works without a manual step.
+#
+# Usage:
+#   make dev-mongo         # bring up Mongo as `rs0`
+#   make dev-mongo-down    # stop, keep volume
+#   make dev-mongo-reset   # stop + drop the data volume
+#
+# Connection URI for the Go binary:
+#   mongodb://localhost:27017/?replicaSet=rs0
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: mixdive-dev-mongo
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          mongosh --quiet --eval '
+            try {
+              if (rs.status().ok) { quit(0); }
+              quit(1);
+            } catch (e) {
+              if (e.codeName === "NotYetInitialized") {
+                rs.initiate({ _id: "rs0", members: [{ _id: 0, host: "localhost:27017" }] });
+                quit(0);
+              }
+              quit(1);
+            }
+          '
+      interval: 5s
+      timeout: 10s
+      retries: 12
+      start_period: 5s
+
+volumes:
+  mongo-data:

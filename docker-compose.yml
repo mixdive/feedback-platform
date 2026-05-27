@@ -1,0 +1,58 @@
+# Self-host Mixdive recipe.
+#
+# Pulls every secret from the local `.env` file. Copy `.env.example` and
+# fill in JWT_SHARED_SECRET, JWT_ISSUER, JWT_AUDIENCE, BOOTSTRAP_ADMIN_*
+# before `docker compose up`.
+
+services:
+  mixdive:
+    build: .
+    image: mixdive/feedback-platform:0.1.0
+    ports:
+      - "8080:8080"
+    environment:
+      MIXDIVE_HTTP_ADDR: ":8080"
+      MONGO_URI: "mongodb://mongo:27017/?replicaSet=rs0"
+      MONGO_DATABASE: "mixdive"
+      JWT_SHARED_SECRET: "${JWT_SHARED_SECRET}"
+      JWT_ISSUER: "${JWT_ISSUER}"
+      JWT_AUDIENCE: "${JWT_AUDIENCE}"
+      JWT_ALGORITHM: "HS256"
+      BOOTSTRAP_ADMIN_EMAIL: "${BOOTSTRAP_ADMIN_EMAIL}"
+      BOOTSTRAP_ADMIN_PASSWORD: "${BOOTSTRAP_ADMIN_PASSWORD}"
+      COOKIE_NAME: "mixdive_session"
+      COOKIE_SECURE: "${COOKIE_SECURE:-true}"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          mongosh --quiet --eval '
+            try {
+              if (rs.status().ok) { quit(0); }
+              quit(1);
+            } catch (e) {
+              if (e.codeName === "NotYetInitialized") {
+                rs.initiate({ _id: "rs0", members: [{ _id: 0, host: "mongo:27017" }] });
+                quit(0);
+              }
+              quit(1);
+            }
+          '
+      interval: 5s
+      timeout: 10s
+      retries: 12
+      start_period: 5s
+    restart: unless-stopped
+
+volumes:
+  mongo-data:

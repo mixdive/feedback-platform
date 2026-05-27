@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* Console runs on an indigo/violet hue (285) so the admin surface reads
+     distinct from the Portal at first glance. Portal keeps the Mixdive
+     sky-blue (hue 230) since that is the public-facing brand. */
+  --color-brand-50:  oklch(0.975 0.020 285);
+  --color-brand-100: oklch(0.94  0.050 285);
+  --color-brand-200: oklch(0.88  0.090 285);
+  --color-brand-300: oklch(0.80  0.130 285);
+  --color-brand-400: oklch(0.70  0.160 285);
+  --color-brand-500: oklch(0.63  0.175 285);
+  --color-brand-600: oklch(0.56  0.180 285);
+  --color-brand-700: oklch(0.48  0.165 285);
+  --color-brand-800: oklch(0.40  0.130 285);
+  --color-brand-900: oklch(0.32  0.095 285);
+  --color-brand-950: oklch(0.22  0.065 285);
+
+  --color-accent-50:  oklch(0.97 0.04 75);
+  --color-accent-100: oklch(0.93 0.08 75);
+  --color-accent-500: oklch(0.78 0.16 70);
+  --color-accent-600: oklch(0.70 0.17 60);
+  --color-accent-700: oklch(0.60 0.15 55);
+
+  --color-canvas:      oklch(0.985 0.006 90);
+  --color-canvas-soft: oklch(0.97  0.010 90);
+
+  --shadow-soft: 0 1px 2px 0 rgb(24 24 27 / 0.04), 0 1px 3px 0 rgb(24 24 27 / 0.04);
+  --shadow-pop:  0 2px 6px -1px rgb(24 24 27 / 0.06), 0 4px 12px -2px rgb(24 24 27 / 0.06);
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  font-family: var(--font-sans);
+  /* Dark mode is class-based and not yet wired in v0.1. Force browser
+     defaults to the light scheme so OS dark-mode users don't get white
+     default text on our light backgrounds. */
+  color-scheme: light;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  /* Explicit base color so children inherit dark text by default; individual
+     components still apply their own text-zinc-* utilities where needed. */
+  color: #18181b; /* zinc-900 */
+  background-color: var(--color-canvas);
+}
