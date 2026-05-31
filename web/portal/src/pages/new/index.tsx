@@ -395,7 +395,11 @@ export default function NewEntryPage() {
                 }}
                 placeholder={descriptionPlaceholder}
                 rows={6}
-                upload={(file) => API().portal.uploadFile(file)}
+                upload={
+                  siteConfig?.uploadsEnabled
+                    ? (file) => API().portal.uploadFile(file)
+                    : undefined
+                }
               />
             </div>
 

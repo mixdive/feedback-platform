@@ -9,6 +9,7 @@ import Markdown from '@/components/markdown'
 import MarkdownEditor from '@/components/markdown-editor'
 import { API, type ApiComment, type ApiEntryCreator } from '@/services/api'
 import { useAppSelector } from '@/store/hooks'
+import { useSiteConfig } from '@/store/site/hooks'
 import { message } from '@/utils/helpers'
 
 function authorLabel(a: ApiEntryCreator | undefined, fallback: string): string {
@@ -25,6 +26,7 @@ export default function Comments({ entryId, count }: Props) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
   const me = useAppSelector((s) => s.auth.user)
+  const siteConfig = useSiteConfig()
   const [body, setBody] = useState('')
 
   const { data, isLoading, error } = useQuery({
@@ -84,7 +86,11 @@ export default function Comments({ entryId, count }: Props) {
             onChange={setBody}
             placeholder={t('comments.placeholder')}
             rows={4}
-            upload={(file) => API().portal.uploadFile(file)}
+            upload={
+              siteConfig?.uploadsEnabled
+                ? (file) => API().portal.uploadFile(file)
+                : undefined
+            }
           />
           <div className="flex justify-end">
             <Button type="submit" isLoading={createMut.isPending} disabled={!body.trim()}>

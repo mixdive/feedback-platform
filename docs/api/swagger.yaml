@@ -123,6 +123,8 @@ definitions:
         type: boolean
       supportRequestUrl:
         type: string
+      uploadsEnabled:
+        type: boolean
     type: object
   ConsoleDashboard:
     properties:
@@ -709,6 +711,8 @@ definitions:
         type: string
       projectName:
         type: string
+      uploads:
+        $ref: '#/definitions/UploadSettings'
     type: object
   SetupResult:
     properties:
@@ -725,6 +729,17 @@ definitions:
       enabled:
         type: boolean
       url:
+        type: string
+    type: object
+  UploadSettings:
+    properties:
+      backend:
+        type: string
+      enabled:
+        type: boolean
+      gcsBucket:
+        type: string
+      lastError:
         type: string
     type: object
   User:
@@ -1044,12 +1059,23 @@ definitions:
         type: string
       projectName:
         type: string
+      uploads:
+        $ref: '#/definitions/consoleUpdateUploadsSettings'
     type: object
   consoleUpdateSupportRequestSettings:
     properties:
       enabled:
         type: boolean
       url:
+        type: string
+    type: object
+  consoleUpdateUploadsSettings:
+    properties:
+      backend:
+        type: string
+      enabled:
+        type: boolean
+      gcsBucket:
         type: string
     type: object
   consoleUpdateUserBlockRequest:

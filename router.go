@@ -30,7 +30,7 @@ import (
 // settings + queue stats handlers (chunk 4) can refresh its snapshot
 // and read its Stats. Entry-create/edit handlers do NOT touch it —
 // the worker discovers new and edited entries by polling Mongo.
-func newRouter(do *dataoperations.DataOperations, store storage.Storage, worker *aianalyzer.Worker) *gin.Engine {
+func newRouter(do *dataoperations.DataOperations, store *storage.Holder, worker *aianalyzer.Worker) *gin.Engine {
 	r := gin.Default()
 
 	// System.
@@ -112,7 +112,10 @@ func newRouter(do *dataoperations.DataOperations, store storage.Storage, worker 
 			middlewares.RequireUserMiddleware(),
 			portal.CreateCommentHandler(do),
 		)
-		pgWrite.POST("/files", api.UploadFileHandler(do, store))
+		pgWrite.POST("/files",
+			middlewares.RequireUploadsEnabledMiddleware(do),
+			api.UploadFileHandler(do, store),
+		)
 	}
 
 	// Console. Setup must be complete and the request must carry a valid
@@ -131,14 +134,14 @@ func newRouter(do *dataoperations.DataOperations, store storage.Storage, worker 
 		cg.PATCH("/me", console.UpdateMyProfileHandler(do))
 		cg.POST("/me/password", console.UpdateMyPasswordHandler(do))
 
-		cg.GET("/settings", console.GetSettingsHandler(do))
+		cg.GET("/settings", console.GetSettingsHandler(do, store))
 		cg.PATCH("/settings",
 			middlewares.RequireAdminMiddleware(),
-			console.UpdateSettingsHandler(do),
+			console.UpdateSettingsHandler(do, store),
 		)
 		cg.PATCH("/settings/ai",
 			middlewares.RequireAdminMiddleware(),
-			console.UpdateAISettingsHandler(do, worker),
+			console.UpdateAISettingsHandler(do, worker, store),
 		)
 		// Integrations live under their own endpoint family rather than
 		// nested under /settings — separate page in the Console nav,
@@ -214,7 +217,10 @@ func newRouter(do *dataoperations.DataOperations, store storage.Storage, worker 
 		// (mirrors the rest of per-entry mutations).
 		cg.POST("/entry/:id/github-issue", console.CreateGitHubIssueHandler(do))
 
-		cg.POST("/files", api.UploadFileHandler(do, store))
+		cg.POST("/files",
+			middlewares.RequireUploadsEnabledMiddleware(do),
+			api.UploadFileHandler(do, store),
+		)
 
 		// Listing the administrator + user roster is read-only; editors see
 		// it too. Mutations to roles or block status are admin-only — only

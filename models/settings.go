@@ -30,10 +30,53 @@ type Settings struct {
 	Portal         PortalSettings
 	AI             AISettings
 	Feedback       FeedbackSettings
+	Uploads        UploadSettings
 	Integrations   IntegrationsSettings
 	SetupCompleted bool
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
+}
+
+// UploadBackend names the blob backend that holds uploaded files. Empty
+// reads as Local — matches the zero-value-is-default discipline used by
+// the other enums on this model.
+type UploadBackend string
+
+const (
+	UploadBackendLocal UploadBackend = "local"
+	UploadBackendGCS   UploadBackend = "gcs"
+)
+
+// LocalUploadPath is the on-disk root used when UploadBackend is
+// Local. Hardcoded so admins control where files land via a volume
+// mount at this path rather than via a settings field that's trivial
+// to misconfigure. Resolved relative to the server's working
+// directory; Docker / Cloud Run images should mount persistent
+// storage here.
+const LocalUploadPath = "./data/files"
+
+// UploadSettings controls whether file uploads are accepted and which
+// backend stores the blobs. Lives on the Settings document next to the
+// other sub-objects even though the admin UI renders it on the Feedback
+// settings page — uploads aren't a feedback knob conceptually, they
+// just share a UI surface.
+//
+// Zero value ({Enabled: false, Backend: "", GCSBucket: ""}) is the safe
+// default. Fresh deploys start with uploads off; the admin opts in.
+//
+// Backend transitions are hot-swapped: the settings update handler
+// rebuilds the active storage backend in-process after a successful
+// write. Files uploaded under a previous backend keep their original
+// StorageKey and only resolve when that backend is active again.
+//
+// GCS authentication uses Application Default Credentials (Cloud Run /
+// GCE / GKE inject these via the runtime service account). Bucket is
+// the only knob the admin needs to provide; non-GCP self-hosters who
+// want a GCS bucket can run with local storage instead.
+type UploadSettings struct {
+	Enabled   bool
+	Backend   UploadBackend
+	GCSBucket string
 }
 
 // DefaultMaxVotesPerUser is the default per-user vote quota seeded into

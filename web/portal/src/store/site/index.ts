@@ -10,6 +10,7 @@ export interface PortalConfig {
   entryTypeTemplates: Record<string, string>
   supportRequestEnabled: boolean
   supportRequestUrl?: string
+  uploadsEnabled: boolean
 }
 
 interface SiteState {

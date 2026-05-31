@@ -28,6 +28,7 @@ type configResponse struct {
 	EntryTypeTemplates    map[string]string `json:"entryTypeTemplates"`
 	SupportRequestEnabled bool              `json:"supportRequestEnabled"`
 	SupportRequestURL     string            `json:"supportRequestUrl,omitempty"`
+	UploadsEnabled        bool              `json:"uploadsEnabled"`
 } //@name Config
 
 // GetConfigHandler returns the Portal bootstrap config. Setup-completion is
@@ -64,6 +65,7 @@ func GetConfigHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
 			EntryTypeTemplates:    templates,
 			SupportRequestEnabled: s.Feedback.SupportRequest.Enabled,
 			SupportRequestURL:     s.Feedback.SupportRequest.URL,
+			UploadsEnabled:        s.Uploads.Enabled,
 		})
 	}
 }

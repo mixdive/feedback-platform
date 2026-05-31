@@ -8,6 +8,8 @@ import (
 
 	"github.com/mixdive/feedback-platform/api/response"
 	"github.com/mixdive/feedback-platform/dataoperations"
+	"github.com/mixdive/feedback-platform/models"
+	"github.com/mixdive/feedback-platform/pkg/storage"
 )
 
 // updatePortalRequest is the nested patch payload for PortalSettings.
@@ -26,6 +28,16 @@ type updateSupportRequestRequest struct {
 	Enabled *bool   `json:"enabled,omitempty"`
 	URL     *string `json:"url,omitempty"`
 } //@name consoleUpdateSupportRequestSettings
+
+// updateUploadsRequest is the nested patch payload for UploadSettings.
+// All fields are pointers so the binder can distinguish "not provided"
+// from "explicitly empty" — the admin can flip Enabled off without
+// re-sending the Backend / GCSBucket fields.
+type updateUploadsRequest struct {
+	Enabled   *bool   `json:"enabled,omitempty"`
+	Backend   *string `json:"backend,omitempty"`
+	GCSBucket *string `json:"gcsBucket,omitempty"`
+} //@name consoleUpdateUploadsSettings
 
 // updateFeedbackRequest is the nested patch payload for FeedbackSettings.
 //
@@ -51,6 +63,7 @@ type updateSettingsRequest struct {
 	PrimaryColor *string                `json:"primaryColor,omitempty"`
 	Portal       *updatePortalRequest   `json:"portal,omitempty"`
 	Feedback     *updateFeedbackRequest `json:"feedback,omitempty"`
+	Uploads      *updateUploadsRequest  `json:"uploads,omitempty"`
 } //@name consoleUpdateSettingsRequest
 
 // UpdateSettingsHandler patches the runtime settings document. Nested
@@ -65,7 +78,7 @@ type updateSettingsRequest struct {
 //	@Param		request	body		updateSettingsRequest	true	"Patch"
 //	@Success	200		{object}	settingsResponse
 //	@Router		/api/console/settings [patch]
-func UpdateSettingsHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func UpdateSettingsHandler(do *dataoperations.DataOperations, store *storage.Holder) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req updateSettingsRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
@@ -185,6 +198,48 @@ func UpdateSettingsHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
 				set["feedback.entrytypetemplates"] = out
 			}
 		}
+		if req.Uploads != nil {
+			// Compute the post-patch state of the three upload fields so
+			// validation runs against the merged values (admin can flip a
+			// single field without re-sending the rest).
+			nextEnabled := s.Uploads.Enabled
+			if req.Uploads.Enabled != nil {
+				nextEnabled = *req.Uploads.Enabled
+			}
+			nextBackend := s.Uploads.Backend
+			if req.Uploads.Backend != nil {
+				nextBackend = models.UploadBackend(strings.TrimSpace(*req.Uploads.Backend))
+			}
+			nextBucket := s.Uploads.GCSBucket
+			if req.Uploads.GCSBucket != nil {
+				nextBucket = strings.TrimSpace(*req.Uploads.GCSBucket)
+			}
+			if nextEnabled {
+				switch nextBackend {
+				case models.UploadBackendLocal:
+				case models.UploadBackendGCS:
+					if nextBucket == "" {
+						response.BadRequestWithMessage(c, "GCS bucket is required when backend is gcs.")
+						return
+					}
+				case "":
+					response.BadRequestWithMessage(c, "Upload backend is required when uploads are enabled.")
+					return
+				default:
+					response.BadRequestWithMessage(c, "Upload backend must be either \"local\" or \"gcs\".")
+					return
+				}
+			}
+			if req.Uploads.Enabled != nil {
+				set["uploads.enabled"] = *req.Uploads.Enabled
+			}
+			if req.Uploads.Backend != nil {
+				set["uploads.backend"] = string(nextBackend)
+			}
+			if req.Uploads.GCSBucket != nil {
+				set["uploads.gcsbucket"] = nextBucket
+			}
+		}
 		if err := do.UpdateSettings(set); err != nil {
 			response.SystemError(c, err)
 			return
@@ -194,7 +249,14 @@ func UpdateSettingsHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
 			response.SystemError(c, err)
 			return
 		}
-		response.Success(c, newSettingsResponse(updated, true))
+		// Hot-swap the active storage backend if uploads-related fields
+		// were touched. Build errors (e.g. GCS auth) are not fatal — the
+		// holder retains the previous backend and surfaces the message
+		// via LastBuildError on the response.
+		if req.Uploads != nil {
+			_ = store.Reload(updated.Uploads)
+		}
+		response.Success(c, newSettingsResponse(updated, true, store))
 	}
 }
 

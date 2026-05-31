@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/mixdive/feedback-platform/dataoperations"
+	"github.com/mixdive/feedback-platform/models"
 	"github.com/mixdive/feedback-platform/pkg/aianalyzer"
 	"github.com/mixdive/feedback-platform/pkg/mongodb"
 	"github.com/mixdive/feedback-platform/pkg/storage"
@@ -49,6 +50,7 @@ func main() {
 	// Idempotent ensure-passes for already-set-up deployments. Gated on
 	// SetupCompleted so a fresh deploy (no Mongo, no settings) doesn't
 	// trigger spurious work before the user opens the setup form.
+	var uploadSettings models.UploadSettings
 	if s, err := do.GetSettings(); err == nil && s != nil && s.SetupCompleted {
 		// Backfill feedback policy defaults on deployments that came up
 		// before the per-user vote quota shipped. Idempotent — no-op
@@ -66,15 +68,17 @@ func main() {
 		} else if n > 0 {
 			log.Printf("mixdive: backfilled %d entry-created activity row(s)", n)
 		}
+		uploadSettings = s.Uploads
 	}
 
-	// Storage backend for uploaded blobs. Defaults to filesystem +
-	// ./data/files so a fresh `go run .` works without extra env vars; Docker
-	// images set STORAGE_PATH to a volume mount, and Cloud Run flips
-	// STORAGE_TYPE to "gcs" with a STORAGE_BUCKET.
-	store, err := storage.New(storage.LoadConfig())
-	if err != nil {
-		log.Fatalf("mixdive: storage init failed: %v", err)
+	// Storage holder for uploaded blobs. Backend choice lives on the
+	// settings document; this constructor never fails — a misconfigured
+	// backend surfaces on the next Put and on the Console settings
+	// page rather than killing boot. The handler that patches settings
+	// calls Reload to hot-swap the backend in place.
+	store := storage.NewHolder(uploadSettings)
+	if msg := store.LastBuildError(); msg != "" {
+		log.Printf("mixdive: storage init: %s (admin can fix in Console settings)", msg)
 	}
 
 	// AI analyzer worker. Polls Mongo on a ticker; atomically claims

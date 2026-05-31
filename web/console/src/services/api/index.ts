@@ -355,6 +355,23 @@ export type ApiIntegrationsSettings = {
   github: ApiGitHubIntegration
 }
 
+// Backend storing uploaded files. "local" writes to the on-disk
+// LocalUploadPath directory (volume-mount in Docker / Cloud Run);
+// "gcs" writes to a Google Cloud Storage bucket using Application
+// Default Credentials.
+export type ApiUploadBackend = 'local' | 'gcs'
+
+// Admin-facing projection of the upload settings sub-block.
+// lastError surfaces the most recent backend-construction failure so
+// the admin can correct it from the same page. Empty when the active
+// backend is healthy or uploads are disabled.
+export type ApiUploadSettings = {
+  enabled: boolean
+  backend?: ApiUploadBackend
+  gcsBucket?: string
+  lastError?: string
+}
+
 export type ApiSettings = {
   projectName: string
   logoUrl?: string
@@ -362,6 +379,7 @@ export type ApiSettings = {
   portal: ApiPortalSettings
   ai: ApiAISettings
   feedback: ApiFeedbackSettings
+  uploads: ApiUploadSettings
   integrations: ApiIntegrationsSettings
 }
 
@@ -387,6 +405,10 @@ export type ApiSettingsPatch = {
     // wins the intersection.
     supportRequest?: Partial<ApiSupportRequestSettings>
   }
+  // Sparse: omit a leaf to leave it untouched. Enabling uploads
+  // requires a backend; selecting "gcs" requires a non-empty bucket.
+  // The server validates the merged state.
+  uploads?: Partial<Omit<ApiUploadSettings, 'lastError'>>
 }
 
 export type ApiUser = {

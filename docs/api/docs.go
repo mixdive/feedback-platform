@@ -2357,6 +2357,9 @@ const docTemplate = `{
                 },
                 "supportRequestUrl": {
                     "type": "string"
+                },
+                "uploadsEnabled": {
+                    "type": "boolean"
                 }
             }
         },
@@ -3227,6 +3230,9 @@ const docTemplate = `{
                 },
                 "projectName": {
                     "type": "string"
+                },
+                "uploads": {
+                    "$ref": "#/definitions/UploadSettings"
                 }
             }
         },
@@ -3253,6 +3259,23 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "UploadSettings": {
+            "type": "object",
+            "properties": {
+                "backend": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "gcsBucket": {
+                    "type": "string"
+                },
+                "lastError": {
                     "type": "string"
                 }
             }
@@ -3710,6 +3733,9 @@ const docTemplate = `{
                 },
                 "projectName": {
                     "type": "string"
+                },
+                "uploads": {
+                    "$ref": "#/definitions/consoleUpdateUploadsSettings"
                 }
             }
         },
@@ -3720,6 +3746,20 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "consoleUpdateUploadsSettings": {
+            "type": "object",
+            "properties": {
+                "backend": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "gcsBucket": {
                     "type": "string"
                 }
             }

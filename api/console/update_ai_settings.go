@@ -8,6 +8,7 @@ import (
 	"github.com/mixdive/feedback-platform/api/response"
 	"github.com/mixdive/feedback-platform/dataoperations"
 	"github.com/mixdive/feedback-platform/pkg/aianalyzer"
+	"github.com/mixdive/feedback-platform/pkg/storage"
 )
 
 // updateAISettingsRequest is the body for PATCH /api/console/settings/ai.
@@ -44,7 +45,7 @@ type updateAISettingsRequest struct {
 //	@Success	200		{object}	settingsResponse
 //	@Failure	400		{object}	response.ApiError
 //	@Router		/api/console/settings/ai [patch]
-func UpdateAISettingsHandler(do *dataoperations.DataOperations, worker *aianalyzer.Worker) gin.HandlerFunc {
+func UpdateAISettingsHandler(do *dataoperations.DataOperations, worker *aianalyzer.Worker, store *storage.Holder) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req updateAISettingsRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
@@ -96,6 +97,6 @@ func UpdateAISettingsHandler(do *dataoperations.DataOperations, worker *aianalyz
 			response.SystemError(c, err)
 			return
 		}
-		response.Success(c, newSettingsResponse(updated, true))
+		response.Success(c, newSettingsResponse(updated, true, store))
 	}
 }

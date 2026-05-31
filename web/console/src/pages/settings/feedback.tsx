@@ -11,6 +11,7 @@ import {
   type ApiEntryTypeValue,
   type ApiSettings,
   type ApiSupportRequestSettings,
+  type ApiUploadSettings,
 } from '@/services/api'
 import { useAppSelector } from '@/store/hooks'
 import { entryTypeInfo } from '@/utils/entry-type'
@@ -219,6 +220,8 @@ export default function FeedbackSettingsPage() {
         current={data.feedback.supportRequest}
       />
 
+      <UploadsCard isAdmin={isAdmin} current={data.uploads} />
+
       <EditTemplateDialog
         entryType={editingType}
         settings={data}
@@ -340,6 +343,185 @@ function SupportRequestCard({ isAdmin, current }: SupportRequestCardProps) {
             type="submit"
             isLoading={updateMut.isPending}
             disabled={!!urlValidationError || !dirty}
+          >
+            Save
+          </Button>
+        </div>
+      )}
+    </form>
+  )
+}
+
+interface UploadsCardProps {
+  isAdmin: boolean
+  current: ApiUploadSettings
+}
+
+function UploadsCard({ isAdmin, current }: UploadsCardProps) {
+  const queryClient = useQueryClient()
+  const [enabled, setEnabled] = useState(current.enabled)
+  const [backend, setBackend] = useState<'local' | 'gcs'>(
+    current.backend === 'gcs' ? 'gcs' : 'local',
+  )
+  const [gcsBucket, setGcsBucket] = useState(current.gcsBucket ?? '')
+
+  // Re-seed local edits whenever the server state changes (e.g. after
+  // a successful save invalidates the query and the parent re-passes
+  // the freshly-fetched settings).
+  useEffect(() => {
+    setEnabled(current.enabled)
+    setBackend(current.backend === 'gcs' ? 'gcs' : 'local')
+    setGcsBucket(current.gcsBucket ?? '')
+  }, [current.enabled, current.backend, current.gcsBucket])
+
+  const updateMut = useMutation({
+    mutationFn: (next: Partial<Omit<ApiUploadSettings, 'lastError'>>) =>
+      API().console.updateSettings({ uploads: next }),
+    onSuccess: () => {
+      message('Upload settings saved', 'success')
+      void queryClient.invalidateQueries({ queryKey: ['console', 'settings'] })
+    },
+    onError: (e) => message(e),
+  })
+
+  const trimmedBucket = gcsBucket.trim()
+  const bucketValidationError = (() => {
+    if (!enabled) return null
+    if (backend !== 'gcs') return null
+    if (trimmedBucket === '') return 'GCS bucket is required when backend is GCS.'
+    return null
+  })()
+
+  const dirty =
+    enabled !== current.enabled ||
+    (enabled && backend !== (current.backend === 'gcs' ? 'gcs' : 'local')) ||
+    (enabled && backend === 'gcs' && trimmedBucket !== (current.gcsBucket ?? ''))
+
+  return (
+    <form
+      className="space-y-5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6"
+      onSubmit={(e) => {
+        e.preventDefault()
+        if (!isAdmin || bucketValidationError || !dirty) return
+        const patch: Partial<Omit<ApiUploadSettings, 'lastError'>> = {
+          enabled,
+        }
+        if (enabled) {
+          patch.backend = backend
+          patch.gcsBucket = backend === 'gcs' ? trimmedBucket : ''
+        }
+        updateMut.mutate(patch)
+      }}
+    >
+      <div>
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+          File Uploads
+        </h2>
+        <p className="text-xs text-zinc-500 mt-1">
+          Lets end users and admins attach images, videos, and documents
+          to feedback. When disabled, the Portal attach button is hidden
+          and every new upload (Portal, Console, profile picture, logo)
+          is rejected with a 403. Previously-uploaded files remain
+          accessible via their existing links.
+        </p>
+      </div>
+      {current.lastError && (
+        <div className="rounded-md border border-rose-200 bg-rose-50 dark:border-rose-900 dark:bg-rose-950/40 px-3 py-2 text-xs text-rose-700 dark:text-rose-300">
+          <span className="font-semibold">Last backend error:</span>{' '}
+          {current.lastError}
+        </div>
+      )}
+      <fieldset disabled={!isAdmin} className="space-y-4 disabled:opacity-70">
+        <label className="flex items-start gap-3 rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 p-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={enabled}
+            onChange={(e) => setEnabled(e.target.checked)}
+            className="mt-0.5 size-4 rounded border-zinc-300 dark:border-zinc-700 text-sky-600 focus:ring-sky-500"
+          />
+          <span className="text-sm">
+            <span className="block font-medium text-zinc-900 dark:text-zinc-100">
+              Allow file uploads
+            </span>
+            <span className="block text-xs text-zinc-500">
+              When off, the Portal and Console reject new uploads with a
+              403. Reads of existing files still work.
+            </span>
+          </span>
+        </label>
+        {enabled && (
+          <div className="space-y-3 rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 p-3">
+            <span className="block text-sm font-medium">Storage backend</span>
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="radio"
+                name="upload-backend"
+                value="local"
+                checked={backend === 'local'}
+                onChange={() => setBackend('local')}
+                className="mt-0.5 size-4 border-zinc-300 dark:border-zinc-700 text-sky-600 focus:ring-sky-500"
+              />
+              <span className="text-sm">
+                <span className="block font-medium">Local volume</span>
+                <span className="block text-xs text-zinc-500">
+                  Files write to <code>./data/files</code> on the server.
+                  Mount a persistent volume there in production so files
+                  survive container restarts.
+                </span>
+              </span>
+            </label>
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="radio"
+                name="upload-backend"
+                value="gcs"
+                checked={backend === 'gcs'}
+                onChange={() => setBackend('gcs')}
+                className="mt-0.5 size-4 border-zinc-300 dark:border-zinc-700 text-sky-600 focus:ring-sky-500"
+              />
+              <span className="text-sm">
+                <span className="block font-medium">Google Cloud Storage</span>
+                <span className="block text-xs text-zinc-500">
+                  Files write to a GCS bucket. Authentication uses
+                  Application Default Credentials — the runtime service
+                  account on Cloud Run / GCE / GKE.
+                </span>
+              </span>
+            </label>
+            {backend === 'gcs' && (
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  GCS bucket
+                </label>
+                <input
+                  type="text"
+                  value={gcsBucket}
+                  onChange={(e) => setGcsBucket(e.target.value)}
+                  placeholder="my-mixdive-uploads"
+                  className="block w-full h-10 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-3 text-sm focus:border-sky-500 focus:outline-none disabled:cursor-not-allowed"
+                />
+                {bucketValidationError ? (
+                  <p className="text-xs text-rose-600 mt-1">
+                    {bucketValidationError}
+                  </p>
+                ) : (
+                  <p className="text-xs text-zinc-500 mt-1">
+                    Bucket name only. The runtime service account needs
+                    object read/write and (for previews) the
+                    iam.serviceAccountTokenCreator role on itself.
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </fieldset>
+      {isAdmin && (
+        <div className="flex justify-end">
+          <Button
+            type="submit"
+            isLoading={updateMut.isPending}
+            disabled={!!bucketValidationError || !dirty}
           >
             Save
           </Button>

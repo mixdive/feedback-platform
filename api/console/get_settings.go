@@ -10,6 +10,7 @@ import (
 	"github.com/mixdive/feedback-platform/api/response"
 	"github.com/mixdive/feedback-platform/dataoperations"
 	"github.com/mixdive/feedback-platform/models"
+	"github.com/mixdive/feedback-platform/pkg/storage"
 )
 
 // portalSettingsPayload is the admin-facing projection of PortalSettings.
@@ -91,6 +92,18 @@ type integrationsSettingsPayload struct {
 	GitHub githubIntegrationPayload `json:"github"`
 } //@name IntegrationsSettings
 
+// uploadSettingsPayload is the admin-facing projection of UploadSettings.
+// LastError surfaces the most recent backend-construction failure (e.g.
+// GCS client init, bucket auth) so the admin can correct it from the
+// same page they configured it on. Empty when the active backend is
+// healthy or uploads are disabled.
+type uploadSettingsPayload struct {
+	Enabled   bool   `json:"enabled"`
+	Backend   string `json:"backend,omitempty"`
+	GCSBucket string `json:"gcsBucket,omitempty"`
+	LastError string `json:"lastError,omitempty"`
+} //@name UploadSettings
+
 // settingsResponse is the admin-facing projection of the singleton settings
 // document. Reused by UpdateSettingsHandler in the same package.
 type settingsResponse struct {
@@ -100,6 +113,7 @@ type settingsResponse struct {
 	Portal       portalSettingsPayload       `json:"portal"`
 	AI           aiSettingsPayload           `json:"ai"`
 	Feedback     feedbackSettingsPayload     `json:"feedback"`
+	Uploads      uploadSettingsPayload       `json:"uploads"`
 	Integrations integrationsSettingsPayload `json:"integrations"`
 } //@name Settings
 
@@ -125,7 +139,7 @@ func maskAPIKey(key string) string {
 	return "•••• " + key[len(key)-4:]
 }
 
-func newSettingsResponse(s *models.Settings, includeSecrets bool) settingsResponse {
+func newSettingsResponse(s *models.Settings, includeSecrets bool, store *storage.Holder) settingsResponse {
 	key := ""
 	if includeSecrets {
 		key = s.Portal.JWTPrivateKey
@@ -175,6 +189,12 @@ func newSettingsResponse(s *models.Settings, includeSecrets bool) settingsRespon
 				URL:     s.Feedback.SupportRequest.URL,
 			},
 		},
+		Uploads: uploadSettingsPayload{
+			Enabled:   s.Uploads.Enabled,
+			Backend:   string(s.Uploads.Backend),
+			GCSBucket: s.Uploads.GCSBucket,
+			LastError: store.LastBuildError(),
+		},
 		Integrations: buildIntegrationsPayload(s.Integrations),
 	}
 }
@@ -206,7 +226,7 @@ func buildIntegrationsPayload(in models.IntegrationsSettings) integrationsSettin
 //	@Produce	json
 //	@Success	200	{object}	settingsResponse
 //	@Router		/api/console/settings [get]
-func GetSettingsHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func GetSettingsHandler(do *dataoperations.DataOperations, store *storage.Holder) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		s, err := do.GetSettings()
 		if err != nil || s == nil {
@@ -214,6 +234,6 @@ func GetSettingsHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
 			return
 		}
 		u := middlewares.CurrentUser(c)
-		response.Success(c, newSettingsResponse(s, u != nil && u.IsAdmin()))
+		response.Success(c, newSettingsResponse(s, u != nil && u.IsAdmin(), store))
 	}
 }

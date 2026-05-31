@@ -25,6 +25,10 @@ export type ApiPortalConfig = {
   // submission path.
   supportRequestEnabled: boolean
   supportRequestUrl?: string
+  // When false the Portal hides the attach affordance on the
+  // new-entry and comment forms. Server-side, POST /api/portal/files
+  // returns 403 — this flag is a UI hint, not the enforcement point.
+  uploadsEnabled: boolean
 }
 
 export type ApiEntryCreator = {
