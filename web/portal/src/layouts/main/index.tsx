@@ -53,8 +53,8 @@ export default function MainLayout() {
   return (
     <div className="min-h-full bg-canvas dark:bg-zinc-950">
       <header className="border-b border-zinc-200/70 dark:border-zinc-800 bg-white/80 backdrop-blur-sm dark:bg-zinc-900 shadow-soft">
-        <div className="mx-auto flex max-w-5xl items-center gap-3 px-6 py-4">
-          <Link to="/" className="flex items-center gap-3 text-zinc-900 dark:text-zinc-100 hover:opacity-80 transition-opacity">
+        <div className="mx-auto flex max-w-5xl items-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4">
+          <Link to="/" className="flex min-w-0 items-center gap-2 sm:gap-3 text-zinc-900 dark:text-zinc-100 hover:opacity-80 transition-opacity">
             {/* Brand rule (Portal):
                 - projectName set + logoUrl set  → custom logo + project name
                 - projectName set, no logoUrl    → project name only (text)
@@ -73,7 +73,7 @@ export default function MainLayout() {
                       alt=""
                       className="size-7 rounded-md object-contain"
                     />
-                    <div className="text-base font-semibold">{projectName}</div>
+                    <div className="truncate text-base font-semibold">{projectName}</div>
                   </>
                 )
               }
@@ -168,7 +168,7 @@ export default function MainLayout() {
           )}
         </div>
       </header>
-      <main className="mx-auto max-w-5xl px-6 py-8">
+      <main className="mx-auto max-w-5xl px-4 sm:px-6 py-6 sm:py-8">
         {requireLogin ? (
           <div className="rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 p-12 text-center">
             <h2 className="text-lg font-semibold">{t('auth.gateTitle')}</h2>

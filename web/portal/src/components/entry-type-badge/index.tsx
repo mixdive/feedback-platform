@@ -43,7 +43,7 @@ export default function EntryTypeBadge({
   const label = palette ? t(palette.titleKey) : entryType.title
   return (
     <span
-      className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-white"
+      className="inline-flex items-center gap-1 whitespace-nowrap rounded px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-white"
       style={{
         backgroundColor: entryType.color,
       }}

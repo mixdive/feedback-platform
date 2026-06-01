@@ -23,7 +23,7 @@ export default function ReleaseBadge({
     <span
       title={tooltip}
       className={clsx(
-        'inline-flex items-center gap-1 rounded-md border font-mono',
+        'inline-flex items-center gap-1 whitespace-nowrap rounded-md border font-mono',
         size === 'sm' ? 'px-1.5 py-0.5 text-[10px]' : 'px-2 py-0.5 text-xs',
         completed
           ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300'

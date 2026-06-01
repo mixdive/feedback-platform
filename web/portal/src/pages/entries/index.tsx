@@ -98,7 +98,7 @@ export default function EntriesPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-semibold">{t('entries.pageTitle')}</h1>
+          <h1 className="text-xl sm:text-2xl font-semibold">{t('entries.pageTitle')}</h1>
           {me && !me.voteQuota.unlimited && me.voteQuota.max > 0 && (
             <VoteQuotaChip used={me.voteQuota.used} max={me.voteQuota.max} />
           )}
@@ -178,7 +178,7 @@ export default function EntriesPage() {
               <li
                 key={f.id}
                 className={clsx(
-                  'flex items-start gap-4 rounded-xl border p-4 shadow-soft transition-all duration-150',
+                  'flex items-start gap-3 sm:gap-4 rounded-xl border p-3 sm:p-4 shadow-soft transition-all duration-150',
                   isClosed
                     ? 'border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 opacity-75 hover:opacity-100 hover:border-zinc-300 dark:hover:border-zinc-700'
                     : 'border-zinc-200/70 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-300 hover:shadow-pop dark:hover:border-zinc-700',
@@ -191,7 +191,7 @@ export default function EntriesPage() {
                   disabled={isPending}
                   onClick={() => voteMut.mutate(f.id)}
                   className={clsx(
-                    'flex shrink-0 self-start flex-col items-center justify-center rounded-lg border w-12 h-12 transition-all duration-150',
+                    'hidden sm:flex shrink-0 self-start flex-col items-center justify-center rounded-lg border w-12 h-12 transition-all duration-150',
                     f.isVoted
                       ? 'border-brand-500 bg-brand-50 text-brand-700 dark:border-brand-400 dark:bg-brand-500/10 dark:text-brand-300 hover:bg-brand-100 dark:hover:bg-brand-500/20'
                       : 'border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:border-brand-400 hover:text-brand-700 hover:bg-brand-50 dark:hover:bg-brand-500/10',
@@ -209,11 +209,11 @@ export default function EntriesPage() {
                   </span>
                 </button>
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-start gap-2">
                     <Link
                       to={`/entry/${f.id}`}
                       className={clsx(
-                        'truncate font-medium hover:underline focus:outline-none focus:underline',
+                        'min-w-0 flex-1 font-medium hover:underline focus:outline-none focus:underline',
                         isClosed && 'text-zinc-500 dark:text-zinc-400',
                       )}
                     >
@@ -224,14 +224,20 @@ export default function EntriesPage() {
                         {t('common.yours')}
                       </span>
                     )}
-                    {f.entryType && f.entryType.value !== 'other' && (
-                      <EntryTypeBadge entryType={f.entryType} />
-                    )}
-                    {f.status && <StatusBadge status={f.status} />}
-                    {f.release && <ReleaseBadge release={f.release} size="sm" />}
                   </div>
+                  {(f.entryType?.value && f.entryType.value !== 'other') ||
+                  f.status ||
+                  f.release ? (
+                    <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                      {f.entryType && f.entryType.value !== 'other' && (
+                        <EntryTypeBadge entryType={f.entryType} />
+                      )}
+                      {f.status && <StatusBadge status={f.status} />}
+                      {f.release && <ReleaseBadge release={f.release} size="sm" />}
+                    </div>
+                  ) : null}
                   {f.description && (
-                    <p className="mt-1 line-clamp-1 text-sm text-zinc-600 dark:text-zinc-400">
+                    <p className="mt-2 line-clamp-1 text-sm text-zinc-600 dark:text-zinc-400">
                       {markdownToPlainText(f.description)}
                     </p>
                   )}
@@ -247,6 +253,29 @@ export default function EntriesPage() {
                       {f.commentCount}
                     </span>
                   </div>
+                  <button
+                    type="button"
+                    aria-pressed={f.isVoted}
+                    aria-busy={isPending}
+                    disabled={isPending}
+                    onClick={() => voteMut.mutate(f.id)}
+                    className={clsx(
+                      'mt-3 sm:hidden inline-flex items-center gap-1.5 self-start rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide transition-all duration-150',
+                      f.isVoted
+                        ? 'border-brand-500 bg-brand-50 text-brand-700 dark:border-brand-400 dark:bg-brand-500/10 dark:text-brand-300'
+                        : 'border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 active:bg-brand-50 dark:active:bg-brand-500/10',
+                      isPending && 'cursor-wait',
+                    )}
+                  >
+                    {isPending ? (
+                      <Loader2 className="size-3.5 animate-spin" />
+                    ) : (
+                      <ChevronUp className="size-3.5" />
+                    )}
+                    <span>{t('entries.voteCta')}</span>
+                    <span className="text-zinc-500 dark:text-zinc-400">·</span>
+                    <span>{f.voteCount}</span>
+                  </button>
                 </div>
               </li>
             )
