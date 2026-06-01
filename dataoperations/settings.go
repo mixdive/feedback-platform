@@ -3,6 +3,8 @@ package dataoperations
 import (
 	"time"
 
+	"go.mongodb.org/mongo-driver/v2/bson"
+
 	"github.com/mixdive/feedback-platform/models"
 	"github.com/mixdive/feedback-platform/pkg/mongodb"
 )
@@ -93,10 +95,12 @@ func (do *DataOperations) MaxFeatureRequestsPerUser() (int, error) {
 // first time the server boots with this code; any admin-set value
 // already on the doc is preserved.
 //
-// Templates: only seeded when EntryTypeTemplates is nil (legacy
-// deployments that never had the field). Once the field exists — even
-// if the admin has cleared every template — defaults are NOT restored,
-// so admin intent (an explicitly empty template) wins on every
+// Templates: only seeded when EntryTypeTemplatesByLang is nil (legacy
+// deployments that never had the field, AFTER the
+// MigrateEntryTypeTemplatesToMultiLang pass has lifted any flat
+// legacy map into the nested shape). Once the field exists — even if
+// the admin has cleared every entry — defaults are NOT restored, so
+// admin intent (an explicitly empty template) wins on every
 // subsequent boot.
 func (do *DataOperations) EnsureFeedbackDefaults() error {
 	s, err := do.GetSettings()
@@ -110,13 +114,79 @@ func (do *DataOperations) EnsureFeedbackDefaults() error {
 	if s.Feedback.MaxFeatureRequestsPerUser <= 0 {
 		patch["feedback.maxfeaturerequestsperuser"] = models.DefaultMaxFeatureRequestsPerUser
 	}
-	if s.Feedback.EntryTypeTemplates == nil {
-		patch["feedback.entrytypetemplates"] = models.DefaultEntryTypeTemplates()
+	if s.Feedback.EntryTypeTemplatesByLang == nil {
+		patch["feedback.entrytypetemplatesbylang"] = models.DefaultEntryTypeTemplates()
 	}
 	if len(patch) == 0 {
 		return nil
 	}
 	return do.UpdateSettings(patch)
+}
+
+// MigrateEntryTypeTemplatesToMultiLang lifts a legacy flat
+// FeedbackSettings.entrytypetemplates (Mongo: map[string]string —
+// keyed by EntryType value) into the nested
+// FeedbackSettings.entrytypetemplatesbylang shape (keyed by EntryType
+// then by language code). Each legacy value lands under the
+// DefaultTemplateLanguage key; the old field is $unset so only one
+// document shape per collection is in flight at any time.
+//
+// Idempotent: a deploy that already has the nested field set (either
+// because this pass ran previously or because the deployment was born
+// after the rename) is a no-op. Must run BEFORE EnsureFeedbackDefaults
+// at boot so an existing flat map blocks the "seed bundled defaults"
+// branch instead of doubling up.
+func (do *DataOperations) MigrateEntryTypeTemplatesToMultiLang() error {
+	// Pull the raw settings doc so we can inspect both the legacy and
+	// the new field by their Mongo names — the typed Settings struct
+	// no longer carries the legacy field, so a typed read would lose
+	// the values we need to migrate.
+	raw, err := mongodb.GetOneById[bson.M](do.DB, CollectionSettings, models.SettingsID)
+	if err != nil || raw == nil {
+		return err
+	}
+	feedback, _ := (*raw)["feedback"].(bson.M)
+	if feedback == nil {
+		return nil
+	}
+	// If the new nested field is already populated, there is nothing
+	// to do. We do not attempt to merge — a populated nested field is
+	// authoritative.
+	if existing, ok := feedback["entrytypetemplatesbylang"].(bson.M); ok && existing != nil {
+		return nil
+	}
+	legacy, _ := feedback["entrytypetemplates"].(bson.M)
+	if legacy == nil {
+		// No legacy field either — EnsureFeedbackDefaults will seed
+		// the bundled defaults under the nested shape.
+		return nil
+	}
+	lifted := map[string]map[string]string{}
+	for entryType, v := range legacy {
+		if entryType == "" {
+			continue
+		}
+		s, ok := v.(string)
+		if !ok {
+			// Unexpected shape — skip rather than corrupt. The
+			// EnsureFeedbackDefaults pass will fall back to bundled
+			// defaults if the resulting lifted map is empty.
+			continue
+		}
+		lifted[entryType] = map[string]string{models.DefaultTemplateLanguage: s}
+	}
+	if len(lifted) == 0 {
+		// Nothing usable to lift; let EnsureFeedbackDefaults seed
+		// bundled defaults. Still unset the legacy field so the
+		// document shape collapses to a single canonical form.
+		return mongodb.UnsetValue(do.DB, CollectionSettings, models.SettingsID, "feedback.entrytypetemplates")
+	}
+	if err := do.UpdateSettings(map[string]any{
+		"feedback.entrytypetemplatesbylang": lifted,
+	}); err != nil {
+		return err
+	}
+	return mongodb.UnsetValue(do.DB, CollectionSettings, models.SettingsID, "feedback.entrytypetemplates")
 }
 
 // RecordAISettingsError stamps Settings.AI.LastErrorAt to now and

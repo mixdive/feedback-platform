@@ -48,8 +48,14 @@ function creatorLabel(c: ApiEntryCreator | undefined, fallback: string): string 
   return c.name || c.username || fallback
 }
 
+// DEFAULT_TEMPLATE_LANGUAGE mirrors the backend's
+// models.DefaultTemplateLanguage — when the visitor's active language
+// has no template for the chosen entry type, we render this
+// language's copy before falling back to the per-type placeholder.
+const DEFAULT_TEMPLATE_LANGUAGE = 'en'
+
 export default function NewEntryPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const dispatch = useAppDispatch()
@@ -68,10 +74,22 @@ export default function NewEntryPage() {
   const [isInternal, setIsInternal] = useState(false)
   const [matches, setMatches] = useState<ApiFindSimilarMatch[]>([])
 
-  // Admin-configured per-entry-type markdown template. Empty string =
-  // no template — the description field falls back to the per-type
-  // placeholder copy.
-  const template = siteConfig?.entryTypeTemplates?.[entryType] ?? ''
+  // Active language for template selection. resolvedLanguage handles
+  // BCP-47 region tags ("en-US" → "en"); fall back to "en" if i18next
+  // hasn't initialized yet for some reason.
+  const activeLang = (
+    i18n.resolvedLanguage ||
+    i18n.language ||
+    DEFAULT_TEMPLATE_LANGUAGE
+  ).split('-')[0]
+
+  // Admin-configured per-(entry-type, language) markdown template.
+  // Tries the visitor's active language first, falls back to the
+  // default-language template, then to empty (which means the
+  // description field shows the per-type placeholder copy).
+  const perLang = siteConfig?.entryTypeTemplates?.[entryType]
+  const template =
+    perLang?.[activeLang] ?? perLang?.[DEFAULT_TEMPLATE_LANGUAGE] ?? ''
 
   // Apply the per-entry-type template the first time we reach the form
   // phase, only if the user hasn't touched the description yet.
@@ -83,14 +101,14 @@ export default function NewEntryPage() {
     setDescription(template)
   }, [phase, descriptionTouched, description, template])
 
-  // If the user switches the entry type while still on the title page
-  // and the description is still untouched, drop any template carry-over
-  // from a previous pick so the form-phase effect can reapply the new
-  // template cleanly.
+  // If the user switches the entry type OR the active language while
+  // still on the title page and the description is still untouched,
+  // drop any template carry-over from a previous pick so the
+  // form-phase effect can reapply the right template cleanly.
   useEffect(() => {
     if (descriptionTouched) return
     setDescription('')
-  }, [entryType, descriptionTouched])
+  }, [entryType, activeLang, descriptionTouched])
 
   // Visibility toggle is admin/editor-only — the option stays invisible
   // to regular portal users by design.

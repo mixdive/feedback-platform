@@ -30,6 +30,20 @@ const TEMPLATE_TYPES: ApiEntryTypeValue[] = [
   'bug',
 ]
 
+// Languages exposed in the template editor. Mirrors the Portal's
+// SUPPORTED_LANGUAGES — kept here as a flat constant rather than
+// imported from the Portal app since the two builds are independent.
+// Order is render order in the tab strip; the first entry is the
+// default-language tab opened first.
+const TEMPLATE_LANGUAGES = [
+  { code: 'en', label: 'English' },
+  { code: 'tr', label: 'Türkçe' },
+] as const
+
+type TemplateLanguageCode = (typeof TEMPLATE_LANGUAGES)[number]['code']
+
+const DEFAULT_TEMPLATE_LANGUAGE: TemplateLanguageCode = 'en'
+
 export default function FeedbackSettingsPage() {
   const queryClient = useQueryClient()
   const isAdmin = !!useAppSelector((s) => s.auth.user?.roles?.includes('admin'))
@@ -183,8 +197,14 @@ export default function FeedbackSettingsPage() {
         <ul className="divide-y divide-zinc-100 dark:divide-zinc-800 border border-zinc-200 dark:border-zinc-800 rounded-md">
           {TEMPLATE_TYPES.map((entryType) => {
             const info = entryTypeInfo(entryType)
-            const stored = data.feedback.entryTypeTemplates?.[entryType] ?? ''
-            const hasTemplate = stored.trim() !== ''
+            const perLang =
+              data.feedback.entryTypeTemplates?.[entryType] ?? {}
+            const summary = TEMPLATE_LANGUAGES.map(({ code, label }) => {
+              const stored = (perLang[code] ?? '').trim()
+              return stored
+                ? `${label} (${stored.length} ${stored.length === 1 ? 'char' : 'chars'})`
+                : `${label}: not configured`
+            }).join(' · ')
             return (
               <li
                 key={entryType}
@@ -194,11 +214,7 @@ export default function FeedbackSettingsPage() {
                   <div className="text-sm font-medium">
                     {info?.title ?? entryType}
                   </div>
-                  <div className="text-xs text-zinc-500">
-                    {hasTemplate
-                      ? `${stored.length} ${stored.length === 1 ? 'char' : 'chars'} configured`
-                      : 'No template — placeholder text will show'}
-                  </div>
+                  <div className="text-xs text-zinc-500">{summary}</div>
                 </div>
                 <Button
                   type="button"
@@ -539,24 +555,43 @@ interface EditTemplateDialogProps {
 
 function EditTemplateDialog({ entryType, settings, onClose }: EditTemplateDialogProps) {
   const queryClient = useQueryClient()
-  const [draft, setDraft] = useState('')
+  // Draft per language. We hold every language's buffer in state so
+  // an admin can hop between tabs without losing pending edits, and
+  // Save sends the whole map (concurrent-edit safety).
+  const [drafts, setDrafts] = useState<Record<TemplateLanguageCode, string>>(
+    () => emptyDrafts(),
+  )
+  const [activeLang, setActiveLang] = useState<TemplateLanguageCode>(
+    DEFAULT_TEMPLATE_LANGUAGE,
+  )
 
-  const stored = entryType
-    ? settings.feedback.entryTypeTemplates?.[entryType] ?? ''
-    : ''
-  const defaultTemplate = entryType
-    ? settings.feedback.defaultEntryTypeTemplates?.[entryType] ?? ''
-    : ''
+  const storedPerLang: Record<string, string> = entryType
+    ? settings.feedback.entryTypeTemplates?.[entryType] ?? {}
+    : {}
+  const defaultsPerLang: Record<string, string> = entryType
+    ? settings.feedback.defaultEntryTypeTemplates?.[entryType] ?? {}
+    : {}
   const info = entryType ? entryTypeInfo(entryType) : undefined
 
-  // Re-seed the draft whenever the dialog is opened for a new entry
-  // type. Closing the dialog with the X / Cancel discards the draft.
+  // Re-seed every per-language draft whenever the dialog opens for a
+  // new entry type. Closing the dialog with the X / Cancel discards
+  // the drafts.
   useEffect(() => {
-    if (entryType) setDraft(stored)
-  }, [entryType, stored])
+    if (!entryType) return
+    const seed = emptyDrafts()
+    for (const { code } of TEMPLATE_LANGUAGES) {
+      seed[code] = storedPerLang[code] ?? ''
+    }
+    setDrafts(seed)
+    setActiveLang(DEFAULT_TEMPLATE_LANGUAGE)
+    // We intentionally re-seed only on entryType change. Re-keying
+    // on storedPerLang would stomp the admin's in-flight edits every
+    // time the React Query cache refreshes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entryType])
 
   const saveMut = useMutation({
-    mutationFn: (next: Record<string, string>) =>
+    mutationFn: (next: Record<string, Record<string, string>>) =>
       API().console.updateSettings({ feedback: { entryTypeTemplates: next } }),
     onSuccess: () => {
       message(`${info?.title ?? entryType} template saved`, 'success')
@@ -566,9 +601,19 @@ function EditTemplateDialog({ entryType, settings, onClose }: EditTemplateDialog
     onError: (e) => message(e),
   })
 
-  const dirty = draft !== stored
-  const canReset = defaultTemplate !== '' && draft !== defaultTemplate
+  const activeDraft = drafts[activeLang] ?? ''
+  const activeDefault = defaultsPerLang[activeLang] ?? ''
+
+  const dirty = TEMPLATE_LANGUAGES.some(({ code }) => {
+    const d = drafts[code] ?? ''
+    const s = storedPerLang[code] ?? ''
+    return d !== s
+  })
+  const canReset = activeDefault !== '' && activeDraft !== activeDefault
   const open = entryType !== null
+
+  const setActiveDraft = (next: string) =>
+    setDrafts((prev) => ({ ...prev, [activeLang]: next }))
 
   return (
     <Dialog
@@ -586,7 +631,9 @@ function EditTemplateDialog({ entryType, settings, onClose }: EditTemplateDialog
               </DialogTitle>
               <p className="text-xs text-zinc-500 mt-1">
                 Pre-fills the description field on the Portal new-feedback
-                form for this entry type.
+                form for this entry type. The Portal renders the
+                template for the visitor's selected language; missing
+                translations fall back to English.
               </p>
             </div>
             <button
@@ -599,9 +646,47 @@ function EditTemplateDialog({ entryType, settings, onClose }: EditTemplateDialog
             </button>
           </div>
 
+          <div
+            role="tablist"
+            aria-label="Template language"
+            className="inline-flex rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 p-0.5 text-sm"
+          >
+            {TEMPLATE_LANGUAGES.map(({ code, label }) => {
+              const isActive = activeLang === code
+              const draft = drafts[code] ?? ''
+              const stored = storedPerLang[code] ?? ''
+              const langDirty = draft !== stored
+              return (
+                <button
+                  key={code}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => setActiveLang(code)}
+                  disabled={saveMut.isPending}
+                  className={
+                    'inline-flex items-center gap-1.5 rounded px-3 py-1 font-medium transition-colors ' +
+                    (isActive
+                      ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm'
+                      : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300')
+                  }
+                >
+                  {label}
+                  {langDirty && (
+                    <span
+                      aria-hidden
+                      title="Unsaved changes"
+                      className="size-1.5 rounded-full bg-amber-500"
+                    />
+                  )}
+                </button>
+              )
+            })}
+          </div>
+
           <MarkdownEditor
-            value={draft}
-            onChange={setDraft}
+            value={activeDraft}
+            onChange={setActiveDraft}
             placeholder="Markdown supported. Use headings, bullets, and prompts to guide what users should fill in."
             rows={14}
           />
@@ -612,17 +697,17 @@ function EditTemplateDialog({ entryType, settings, onClose }: EditTemplateDialog
                 <Button
                   type="button"
                   variant="ghost"
-                  onClick={() => setDraft(defaultTemplate)}
+                  onClick={() => setActiveDraft(activeDefault)}
                   disabled={saveMut.isPending}
                 >
                   Reset to default
                 </Button>
               )}
-              {draft !== '' && (
+              {activeDraft !== '' && (
                 <Button
                   type="button"
                   variant="ghost"
-                  onClick={() => setDraft('')}
+                  onClick={() => setActiveDraft('')}
                   disabled={saveMut.isPending}
                 >
                   Clear
@@ -644,12 +729,20 @@ function EditTemplateDialog({ entryType, settings, onClose }: EditTemplateDialog
                 disabled={!dirty || !entryType}
                 onClick={() => {
                   if (!entryType) return
-                  // Send the full map so any concurrent admin edits to
-                  // other types are not clobbered.
-                  const next: Record<string, string> = {
+                  // Send the full nested map so any concurrent admin
+                  // edits to other entry types or other languages are
+                  // not clobbered. The entry under edit lands its
+                  // full per-language buffer set.
+                  const next: Record<string, Record<string, string>> = {
                     ...(settings.feedback.entryTypeTemplates ?? {}),
                   }
-                  next[entryType] = draft
+                  const merged: Record<string, string> = {
+                    ...(next[entryType] ?? {}),
+                  }
+                  for (const { code } of TEMPLATE_LANGUAGES) {
+                    merged[code] = drafts[code] ?? ''
+                  }
+                  next[entryType] = merged
                   saveMut.mutate(next)
                 }}
               >
@@ -661,4 +754,12 @@ function EditTemplateDialog({ entryType, settings, onClose }: EditTemplateDialog
       </div>
     </Dialog>
   )
+}
+
+function emptyDrafts(): Record<TemplateLanguageCode, string> {
+  const out = {} as Record<TemplateLanguageCode, string>
+  for (const { code } of TEMPLATE_LANGUAGES) {
+    out[code] = ''
+  }
+  return out
 }

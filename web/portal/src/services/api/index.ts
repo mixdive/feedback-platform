@@ -13,11 +13,14 @@ export type ApiPortalConfig = {
   authUrl?: string
   customAuthButtonText?: string
   // Admin-managed markdown templates used to pre-fill the description
-  // field on the new-entry form. Keys are EntryType values
-  // ("feature-request", "bug", "support", "other"); empty string = no
-  // template, in which case the new-entry form falls back to the
-  // per-type placeholder copy.
-  entryTypeTemplates: Record<string, string>
+  // field on the new-entry form. Outer key is the EntryType value
+  // ("feature-request", "bug", "support", "other"); inner key is a
+  // BCP-47 language code matching SUPPORTED_LANGUAGES ("en", "tr").
+  // The new-entry form picks the inner value for the visitor's
+  // active language; missing translations fall back to the
+  // DefaultTemplateLanguage entry, and an entirely missing entry
+  // type renders the per-type placeholder copy instead.
+  entryTypeTemplates: Record<string, Record<string, string>>
   // "New Support Request" Portal button. When supportRequestEnabled
   // is true and supportRequestUrl is set, the entries page renders
   // the button as a link that opens the URL in a new tab. When

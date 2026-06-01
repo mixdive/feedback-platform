@@ -42,14 +42,16 @@ type updateUploadsRequest struct {
 // updateFeedbackRequest is the nested patch payload for FeedbackSettings.
 //
 // EntryTypeTemplates, when present, replaces the entire templates map.
-// The Console UI always submits the full set of current templates, so a
-// PATCH that omits the field leaves templates untouched and a PATCH
-// that includes it is authoritative for every key.
+// The Console UI always submits the full set of current templates
+// (across every entry type and every language), so a PATCH that
+// omits the field leaves templates untouched and a PATCH that
+// includes it is authoritative for every (entry-type, language)
+// pair.
 type updateFeedbackRequest struct {
-	MaxVotesPerUser           *int                         `json:"maxVotesPerUser,omitempty"`
-	MaxFeatureRequestsPerUser *int                         `json:"maxFeatureRequestsPerUser,omitempty"`
-	EntryTypeTemplates        *map[string]string           `json:"entryTypeTemplates,omitempty"`
-	SupportRequest            *updateSupportRequestRequest `json:"supportRequest,omitempty"`
+	MaxVotesPerUser           *int                                  `json:"maxVotesPerUser,omitempty"`
+	MaxFeatureRequestsPerUser *int                                  `json:"maxFeatureRequestsPerUser,omitempty"`
+	EntryTypeTemplates        *map[string]map[string]string         `json:"entryTypeTemplates,omitempty"`
+	SupportRequest            *updateSupportRequestRequest          `json:"supportRequest,omitempty"`
 } //@name consoleUpdateFeedbackSettings
 
 // updateSettingsRequest is the body for PATCH /api/console/settings.
@@ -182,20 +184,30 @@ func UpdateSettingsHandler(do *dataoperations.DataOperations, store *storage.Hol
 				}
 			}
 			if req.Feedback.EntryTypeTemplates != nil {
-				// Validate keys are known EntryType values and normalize
-				// the map (trim trailing whitespace; preserve internal
-				// markdown verbatim). We do NOT reject unknown keys —
-				// future entry types should be forward-compatible — but
-				// we drop empty keys defensively.
+				// Validate keys and normalize values. Outer keys are
+				// EntryType values, inner keys are language codes; we
+				// do NOT reject unknown values on either axis —
+				// forward-compatibility for future entry types and
+				// languages means an admin's existing data is never
+				// dropped on an upgrade. Empty keys are dropped
+				// defensively; trailing whitespace is trimmed off
+				// every leaf to keep the document tidy.
 				in := *req.Feedback.EntryTypeTemplates
-				out := make(map[string]string, len(in))
-				for k, v := range in {
-					if k == "" {
+				out := make(map[string]map[string]string, len(in))
+				for entryType, byLang := range in {
+					if entryType == "" {
 						continue
 					}
-					out[k] = strings.TrimRight(v, " \t\r\n")
+					inner := make(map[string]string, len(byLang))
+					for lang, body := range byLang {
+						if lang == "" {
+							continue
+						}
+						inner[lang] = strings.TrimRight(body, " \t\r\n")
+					}
+					out[entryType] = inner
 				}
-				set["feedback.entrytypetemplates"] = out
+				set["feedback.entrytypetemplatesbylang"] = out
 			}
 		}
 		if req.Uploads != nil {

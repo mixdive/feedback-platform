@@ -15,20 +15,22 @@ import (
 //
 // EntryTypeTemplates is the admin-managed per-entry-type markdown
 // template used to pre-fill the description field on the new-entry
-// form. Keys are EntryType values ("feature-request", "bug", "support",
-// "other"); empty string = no template, in which case the Portal falls
-// back to the per-type placeholder copy.
+// form. Outer key is EntryType ("feature-request", "bug", "support",
+// "other"); inner key is a BCP-47 language code matching the Portal's
+// SUPPORTED_LANGUAGES set ("en", "tr"). Empty inner value = no
+// template for that pair, in which case the Portal falls back to the
+// DefaultTemplateLanguage entry before the per-type placeholder copy.
 type configResponse struct {
-	ProjectName           string            `json:"projectName"`
-	LogoURL               string            `json:"logoUrl,omitempty"`
-	PrimaryColor          string            `json:"primaryColor,omitempty"`
-	CustomAuthEnabled     bool              `json:"customAuthEnabled"`
-	AuthURL               string            `json:"authUrl,omitempty"`
-	CustomAuthButtonText  string            `json:"customAuthButtonText,omitempty"`
-	EntryTypeTemplates    map[string]string `json:"entryTypeTemplates"`
-	SupportRequestEnabled bool              `json:"supportRequestEnabled"`
-	SupportRequestURL     string            `json:"supportRequestUrl,omitempty"`
-	UploadsEnabled        bool              `json:"uploadsEnabled"`
+	ProjectName           string                       `json:"projectName"`
+	LogoURL               string                       `json:"logoUrl,omitempty"`
+	PrimaryColor          string                       `json:"primaryColor,omitempty"`
+	CustomAuthEnabled     bool                         `json:"customAuthEnabled"`
+	AuthURL               string                       `json:"authUrl,omitempty"`
+	CustomAuthButtonText  string                       `json:"customAuthButtonText,omitempty"`
+	EntryTypeTemplates    map[string]map[string]string `json:"entryTypeTemplates"`
+	SupportRequestEnabled bool                         `json:"supportRequestEnabled"`
+	SupportRequestURL     string                       `json:"supportRequestUrl,omitempty"`
+	UploadsEnabled        bool                         `json:"uploadsEnabled"`
 } //@name Config
 
 // GetConfigHandler returns the Portal bootstrap config. Setup-completion is
@@ -51,7 +53,7 @@ func GetConfigHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
 		// Backfill the templates map on the wire so legacy deployments
 		// that came up before EnsureFeedbackDefaults landed still
 		// surface the bundled starter templates on the Portal.
-		templates := s.Feedback.EntryTypeTemplates
+		templates := s.Feedback.EntryTypeTemplatesByLang
 		if templates == nil {
 			templates = models.DefaultEntryTypeTemplates()
 		}

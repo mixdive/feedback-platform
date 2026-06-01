@@ -41,9 +41,11 @@ type aiSettingsPayload struct {
 
 // feedbackSettingsPayload is the admin-facing projection of
 // FeedbackSettings. Exposes the per-user vote quota, the per-user
-// feature-request quota, and the per-entry-type description templates.
-// Keys in EntryTypeTemplates are EntryType values ("feature-request",
-// "bug", "support", "other"); empty string = no template.
+// feature-request quota, and the per-(entry-type, language)
+// description templates. Outer key is EntryType ("feature-request",
+// "bug", "support", "other"); inner key is a BCP-47 language code
+// ("en", "tr"); inner value is the markdown template ("" = no
+// template for that pair).
 //
 // DefaultEntryTypeTemplates is the bundled starter set, returned on
 // every response so the Console "Reset to default" button can restore
@@ -59,11 +61,11 @@ type supportRequestPayload struct {
 } //@name SupportRequestSettings
 
 type feedbackSettingsPayload struct {
-	MaxVotesPerUser           int                   `json:"maxVotesPerUser"`
-	MaxFeatureRequestsPerUser int                   `json:"maxFeatureRequestsPerUser"`
-	EntryTypeTemplates        map[string]string     `json:"entryTypeTemplates"`
-	DefaultEntryTypeTemplates map[string]string     `json:"defaultEntryTypeTemplates"`
-	SupportRequest            supportRequestPayload `json:"supportRequest"`
+	MaxVotesPerUser           int                          `json:"maxVotesPerUser"`
+	MaxFeatureRequestsPerUser int                          `json:"maxFeatureRequestsPerUser"`
+	EntryTypeTemplates        map[string]map[string]string `json:"entryTypeTemplates"`
+	DefaultEntryTypeTemplates map[string]map[string]string `json:"defaultEntryTypeTemplates"`
+	SupportRequest            supportRequestPayload        `json:"supportRequest"`
 } //@name FeedbackSettings
 
 // githubIntegrationPayload is the admin-facing projection of
@@ -156,7 +158,7 @@ func newSettingsResponse(s *models.Settings, includeSecrets bool, store *storage
 	// not yet landed) come back with a nil map. Surface defaults so the
 	// Console editor renders the bundled starter templates the admin
 	// can immediately accept or edit.
-	templates := s.Feedback.EntryTypeTemplates
+	templates := s.Feedback.EntryTypeTemplatesByLang
 	if templates == nil {
 		templates = models.DefaultEntryTypeTemplates()
 	}

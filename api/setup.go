@@ -114,7 +114,7 @@ func SetupHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
 		s.Feedback = models.FeedbackSettings{
 			MaxVotesPerUser:           models.DefaultMaxVotesPerUser,
 			MaxFeatureRequestsPerUser: models.DefaultMaxFeatureRequestsPerUser,
-			EntryTypeTemplates:        models.DefaultEntryTypeTemplates(),
+			EntryTypeTemplatesByLang:  models.DefaultEntryTypeTemplates(),
 		}
 		s.SetupCompleted = true
 		if existing == nil {

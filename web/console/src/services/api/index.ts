@@ -308,10 +308,13 @@ export type ApiAIQueueStats = {
 // so future feedback rules (per-user comment caps, weighted votes, …)
 // land in one place rather than flattening more fields onto the parent.
 //
-// entryTypeTemplates is the admin-managed markdown template per entry
-// type, used by the Portal to pre-fill the description field on the
-// new-entry form. Keys are EntryType values; empty string = no
-// template for that type.
+// entryTypeTemplates is the admin-managed markdown template per
+// (entry type, language) pair, used by the Portal to pre-fill the
+// description field on the new-entry form. Outer key is the EntryType
+// value, inner key is the BCP-47 language code matching the Portal's
+// SUPPORTED_LANGUAGES set ("en", "tr"); empty inner value = no
+// template for that pair, in which case the Portal falls back to its
+// default language entry before the per-type placeholder copy.
 export type ApiSupportRequestSettings = {
   enabled: boolean
   url: string
@@ -320,12 +323,12 @@ export type ApiSupportRequestSettings = {
 export type ApiFeedbackSettings = {
   maxVotesPerUser: number
   maxFeatureRequestsPerUser: number
-  entryTypeTemplates: Record<string, string>
-  // Bundled starter templates per entry type, static on every
-  // response. The "Reset to default" button in the Console template
-  // editor pulls from here so admins can restore the original copy
-  // without a second round trip.
-  defaultEntryTypeTemplates: Record<string, string>
+  entryTypeTemplates: Record<string, Record<string, string>>
+  // Bundled starter templates per (entry type, language), static on
+  // every response. The "Reset to default" button in the Console
+  // template editor pulls from here so admins can restore the
+  // original copy without a second round trip.
+  defaultEntryTypeTemplates: Record<string, Record<string, string>>
   // Controls the Portal "New Support Request" button. Enabled+URL
   // pair behaves like the Portal customAuth pair — enabling the
   // button requires a valid absolute URL.
@@ -396,9 +399,10 @@ export type ApiSettingsPatch = {
     >
   >
   feedback?: Partial<Omit<ApiFeedbackSettings, 'supportRequest'>> & {
-    // When present, replaces the entire templates map. Omit the field
-    // to leave templates untouched.
-    entryTypeTemplates?: Record<string, string>
+    // When present, replaces the entire templates map (across every
+    // entry type and every language). Omit the field to leave
+    // templates untouched.
+    entryTypeTemplates?: Record<string, Record<string, string>>
     // Sparse: omit a leaf to leave it untouched. Flipping enabled to
     // true requires a usable url; the server validates this. Omit
     // from the parent Partial so this Partial<> override actually

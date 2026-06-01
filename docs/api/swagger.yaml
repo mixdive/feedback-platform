@@ -111,7 +111,9 @@ definitions:
         type: boolean
       entryTypeTemplates:
         additionalProperties:
-          type: string
+          additionalProperties:
+            type: string
+          type: object
         type: object
       logoUrl:
         type: string
@@ -449,11 +451,15 @@ definitions:
     properties:
       defaultEntryTypeTemplates:
         additionalProperties:
-          type: string
+          additionalProperties:
+            type: string
+          type: object
         type: object
       entryTypeTemplates:
         additionalProperties:
-          type: string
+          additionalProperties:
+            type: string
+          type: object
         type: object
       maxFeatureRequestsPerUser:
         type: integer
@@ -958,7 +964,9 @@ definitions:
     properties:
       entryTypeTemplates:
         additionalProperties:
-          type: string
+          additionalProperties:
+            type: string
+          type: object
         type: object
       maxFeatureRequestsPerUser:
         type: integer

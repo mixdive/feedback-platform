@@ -238,6 +238,24 @@ func SetValue(db *MongoDB, collectionName string, id string, fieldName string, v
 	return err
 }
 
+// UnsetValue removes a single field from one document by ID. Sibling of
+// SetValue for $unset-style migrations that retire a renamed BSON key
+// after copying its contents to a new one.
+func UnsetValue(db *MongoDB, collectionName string, id string, fieldName string) error {
+	db.logMongo()
+	client, err := db.getClient()
+	if err != nil {
+		return err
+	}
+
+	update := bson.M{"$unset": bson.M{fieldName: ""}}
+
+	collection := client.Database(db.DBName).Collection(collectionName)
+
+	_, err = collection.UpdateOne(context.TODO(), bson.M{"_id": id}, update)
+	return err
+}
+
 func UpsertOne[T any](db *MongoDB, collectionName string, id string, record *T) error {
 	db.logMongo()
 	client, err := db.getClient()

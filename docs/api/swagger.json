@@ -2338,7 +2338,10 @@
                 "entryTypeTemplates": {
                     "type": "object",
                     "additionalProperties": {
-                        "type": "string"
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
                     }
                 },
                 "logoUrl": {
@@ -2839,13 +2842,19 @@
                 "defaultEntryTypeTemplates": {
                     "type": "object",
                     "additionalProperties": {
-                        "type": "string"
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
                     }
                 },
                 "entryTypeTemplates": {
                     "type": "object",
                     "additionalProperties": {
-                        "type": "string"
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
                     }
                 },
                 "maxFeatureRequestsPerUser": {
@@ -3588,7 +3597,10 @@
                 "entryTypeTemplates": {
                     "type": "object",
                     "additionalProperties": {
-                        "type": "string"
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
                     }
                 },
                 "maxFeatureRequestsPerUser": {

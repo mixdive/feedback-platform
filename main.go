@@ -52,6 +52,15 @@ func main() {
 	// trigger spurious work before the user opens the setup form.
 	var uploadSettings models.UploadSettings
 	if s, err := do.GetSettings(); err == nil && s != nil && s.SetupCompleted {
+		// Lift legacy flat entry-type templates (map[string]string,
+		// keyed by EntryType) into the nested multi-language shape
+		// (map[string]map[string]string, keyed by EntryType then by
+		// language code). Idempotent; must run BEFORE
+		// EnsureFeedbackDefaults so a deployment with an existing
+		// flat map does not get bundled defaults stacked on top.
+		if err := do.MigrateEntryTypeTemplatesToMultiLang(); err != nil {
+			log.Printf("mixdive: migrate entry-type templates to multi-lang: %v", err)
+		}
 		// Backfill feedback policy defaults on deployments that came up
 		// before the per-user vote quota shipped. Idempotent — no-op
 		// once feedback.maxvotesperuser is set.

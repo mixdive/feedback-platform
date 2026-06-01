@@ -7,7 +7,7 @@ export interface PortalConfig {
   customAuthEnabled: boolean
   authUrl?: string
   customAuthButtonText?: string
-  entryTypeTemplates: Record<string, string>
+  entryTypeTemplates: Record<string, Record<string, string>>
   supportRequestEnabled: boolean
   supportRequestUrl?: string
   uploadsEnabled: boolean

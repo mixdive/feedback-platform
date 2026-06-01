@@ -2340,7 +2340,10 @@ const docTemplate = `{
                 "entryTypeTemplates": {
                     "type": "object",
                     "additionalProperties": {
-                        "type": "string"
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
                     }
                 },
                 "logoUrl": {
@@ -2841,13 +2844,19 @@ const docTemplate = `{
                 "defaultEntryTypeTemplates": {
                     "type": "object",
                     "additionalProperties": {
-                        "type": "string"
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
                     }
                 },
                 "entryTypeTemplates": {
                     "type": "object",
                     "additionalProperties": {
-                        "type": "string"
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
                     }
                 },
                 "maxFeatureRequestsPerUser": {
@@ -3590,7 +3599,10 @@ const docTemplate = `{
                 "entryTypeTemplates": {
                     "type": "object",
                     "additionalProperties": {
-                        "type": "string"
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
                     }
                 },
                 "maxFeatureRequestsPerUser": {

@@ -91,8 +91,15 @@ const DefaultMaxVotesPerUser = 20
 // zero — same backfill-by-fallback pattern as DefaultMaxVotesPerUser.
 const DefaultMaxFeatureRequestsPerUser = 10
 
-// Default templates seeded into FeedbackSettings.EntryTypeTemplates on
-// first-run setup and backfilled by EnsureFeedbackDefaults on running
+// DefaultTemplateLanguage is the canonical language for entry-type
+// templates. New deployments get this language seeded with bundled
+// copy; the Portal falls back to this language at render time when
+// the user's active language has no template configured for the
+// chosen entry type.
+const DefaultTemplateLanguage = "en"
+
+// Default templates seeded into FeedbackSettings.EntryTypeTemplatesByLang
+// on first-run setup and backfilled by EnsureFeedbackDefaults on running
 // deployments that came up before the templates feature shipped. Empty
 // string = no template — the Portal description field renders the
 // per-type placeholder as before.
@@ -127,6 +134,40 @@ What actually happened. Attach screenshots, screen recordings, or error messages
 - App version:
 - URL where it happened:`
 
+// Turkish counterparts of the bundled defaults. Shipped so deployments
+// whose Portal users select Turkish from the language picker get a
+// usable template out of the box rather than the English fallback.
+const DefaultFeatureRequestTemplateTR = `## Sorun
+Çözmek istediğiniz sorun nedir? Kimleri etkiliyor ve ne sıklıkla yaşanıyor?
+
+## Önerilen çözüm
+Görmek istediğiniz davranış nedir? Ekran görüntüleri veya taslaklar memnuniyetle kabul edilir.
+
+## Değerlendirilen alternatifler
+Denediğiniz geçici çözümler veya düşündüğünüz diğer yaklaşımlar.
+
+## Ek bağlam
+Anlamamıza yardımcı olacak bağlantılar, örnekler veya başka her şey.`
+
+const DefaultBugTemplateTR = `## Ne oldu
+Hatanın net bir açıklaması.
+
+## Adım adım nasıl tekrarlanır
+1.
+2.
+3.
+
+## Beklenen davranış
+Olmasını beklediğiniz şey.
+
+## Gerçekleşen davranış
+Aslında ne oldu? Mümkünse ekran görüntüleri, ekran kayıtları veya hata mesajları ekleyin.
+
+## Ortam
+- Tarayıcı / işletim sistemi / cihaz:
+- Uygulama sürümü:
+- Olayın yaşandığı URL:`
+
 // FeedbackSettings groups every feedback-domain knob that lives on the
 // singleton Settings document. Keeping them under one sub-object keeps
 // future feedback policy (per-user comment quotas, vote weighting, …)
@@ -143,18 +184,30 @@ What actually happened. Attach screenshots, screen recordings, or error messages
 // requests don't count against the cap; on an open→closed transition
 // the author's quota is refunded by 1.
 //
-// EntryTypeTemplates is the admin-managed markdown template per entry
-// type, used by the Portal to pre-fill the description field on the
-// new-entry form. Keys are EntryType values (kebab-case strings —
-// "feature-request", "bug"). Empty value = no template for that type.
-// A nil map (no field on the document) is the pre-feature legacy state
-// and triggers a one-shot seed via EnsureFeedbackDefaults; once the
-// map exists, even an admin who has cleared every entry will not have
-// defaults restored.
+// EntryTypeTemplatesByLang is the admin-managed markdown template per
+// (entry type, language) pair, used by the Portal to pre-fill the
+// description field on the new-entry form. Outer key is EntryType
+// (kebab-case — "feature-request", "bug"); inner key is a BCP-47
+// language code matching the Portal's SUPPORTED_LANGUAGES set ("en",
+// "tr"). Empty inner value = no template for that pair, and at render
+// time the Portal falls back to the DefaultTemplateLanguage entry
+// before giving up to the per-type placeholder copy.
+//
+// A nil outer map is the pre-feature legacy state and triggers a
+// one-shot seed via EnsureFeedbackDefaults; once the map exists, even
+// an admin who has cleared every entry will not have defaults
+// restored.
+//
+// The Go field was renamed from EntryTypeTemplates (flat
+// map[string]string) on the multi-language rollout. The BSON key
+// changed in lockstep (entrytypetemplates → entrytypetemplatesbylang)
+// so legacy flat documents decode silently as nil on first boot under
+// the new code; MigrateEntryTypeTemplatesToMultiLang then lifts each
+// legacy value into {"en": v} under the new key and $unsets the old.
 type FeedbackSettings struct {
 	MaxVotesPerUser           int
 	MaxFeatureRequestsPerUser int
-	EntryTypeTemplates        map[string]string
+	EntryTypeTemplatesByLang  map[string]map[string]string
 	SupportRequest            SupportRequestSettings
 }
 
@@ -170,13 +223,20 @@ type SupportRequestSettings struct {
 	URL     string
 }
 
-// DefaultEntryTypeTemplates returns a fresh map of the bundled default
-// templates. The map is allocated on every call so callers can mutate
-// the result without affecting the source of truth.
-func DefaultEntryTypeTemplates() map[string]string {
-	return map[string]string{
-		string(EntryTypeFeatureRequest): DefaultFeatureRequestTemplate,
-		string(EntryTypeBug):            DefaultBugTemplate,
+// DefaultEntryTypeTemplates returns a fresh nested map of the bundled
+// default templates, keyed first by entry type then by language code.
+// Allocated on every call so callers can mutate the result without
+// affecting the source of truth.
+func DefaultEntryTypeTemplates() map[string]map[string]string {
+	return map[string]map[string]string{
+		string(EntryTypeFeatureRequest): {
+			"en": DefaultFeatureRequestTemplate,
+			"tr": DefaultFeatureRequestTemplateTR,
+		},
+		string(EntryTypeBug): {
+			"en": DefaultBugTemplate,
+			"tr": DefaultBugTemplateTR,
+		},
 	}
 }
 
