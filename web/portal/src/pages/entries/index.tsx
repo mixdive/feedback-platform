@@ -156,17 +156,7 @@ export default function EntriesPage() {
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <TabSwitcher tab={tab} onChange={setTab} showMine={!!me} />
-        <label className="flex items-center gap-2 text-sm text-zinc-500">
-          {t('entries.sort')}
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value as Sort)}
-            className="h-8 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-2 text-sm transition-colors focus:border-brand-500 focus:outline-none"
-          >
-            <option value="new">{t('entries.sortNewest')}</option>
-            <option value="top">{t('entries.sortTopVotes')}</option>
-          </select>
-        </label>
+        <SortSwitcher sort={sort} onChange={setSort} />
       </div>
 
       {isLoading && <p className="text-zinc-500">{t('common.loading')}</p>}
@@ -298,6 +288,39 @@ function TabSwitcher({
           )}
         >
           {tt.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function SortSwitcher({
+  sort,
+  onChange,
+}: {
+  sort: Sort
+  onChange: (next: Sort) => void
+}) {
+  const { t } = useTranslation()
+  const options: { value: Sort; label: string }[] = [
+    { value: 'new', label: t('entries.sortNewest') },
+    { value: 'top', label: t('entries.sortTopVotes') },
+  ]
+  return (
+    <div className="inline-flex flex-wrap rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-0.5 text-sm shadow-soft">
+      {options.map((o) => (
+        <button
+          key={o.value}
+          type="button"
+          onClick={() => onChange(o.value)}
+          className={clsx(
+            'px-3 py-1.5 rounded-md font-medium transition-all duration-150',
+            sort === o.value
+              ? 'bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300'
+              : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300',
+          )}
+        >
+          {o.label}
         </button>
       ))}
     </div>
