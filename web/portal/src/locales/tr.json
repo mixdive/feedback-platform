@@ -83,7 +83,8 @@
     "empty": "Henüz yorum yok.",
     "placeholder": "Yorum ekleyin. Markdown destekli. Dosya yapıştırabilir, sürükleyebilir veya ekleyebilirsiniz.",
     "post": "Yorumu gönder",
-    "signInToComment": "Yorum eklemek için giriş yapın."
+    "signInToComment": "Yorum eklemek için giriş yapın.",
+    "team": "Ekip"
   },
   "entryLightbox": {
     "fallbackTitle": "Geri Bildirim",

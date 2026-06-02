@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { MessageSquare } from 'lucide-react'
+import { MessageSquare, ShieldCheck } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import dayjs from 'dayjs'
 
@@ -130,6 +130,12 @@ function CommentItem({ comment }: { comment: ApiComment }) {
             <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
               {authorLabel(author, t('common.unknown'))}
             </span>
+            {comment.authorIsTeam && (
+              <span className="inline-flex items-center gap-1 rounded bg-indigo-100 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-200">
+                <ShieldCheck className="size-3" />
+                {t('comments.team')}
+              </span>
+            )}
             <span className="text-xs text-zinc-500" title={comment.createdAt}>
               {dayjs(comment.createdAt).format('LL · LT')}
             </span>

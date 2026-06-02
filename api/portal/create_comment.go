@@ -68,6 +68,10 @@ func CreateCommentHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
 			return
 		}
 		authors := map[string]api.EntryCreator{u.ID: api.BuildEntryCreator(*u)}
-		response.Created(c, api.BuildCommentResponse(*cm, authors))
+		team := map[string]bool{}
+		if u.HasConsoleAccess() {
+			team[u.ID] = true
+		}
+		response.Created(c, api.BuildCommentResponse(*cm, authors, team))
 	}
 }

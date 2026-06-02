@@ -126,6 +126,10 @@ export type ApiComment = {
   body: string
   isInternal: boolean
   author?: ApiEntryCreator
+  // True when the author is a team member (admin or editor). Surfaces
+  // render a "Team" badge next to the name; the precise role never crosses
+  // the wire.
+  authorIsTeam?: boolean
   createdAt: string
   updatedAt: string
 }

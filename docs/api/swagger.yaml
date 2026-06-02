@@ -81,6 +81,14 @@ definitions:
     properties:
       author:
         $ref: '#/definitions/EntryCreator'
+      authorIsTeam:
+        description: |-
+          AuthorIsTeam marks the comment author as a member of the team
+          (admin or editor — anyone with Console access). Both surfaces render
+          a small "Team" badge next to the name when true. Roles themselves
+          never cross the wire (see EntryCreator) — this is the single derived
+          signal we expose, and it carries no admin/editor distinction.
+        type: boolean
       body:
         type: string
       createdAt:

@@ -2294,6 +2294,10 @@ const docTemplate = `{
                 "author": {
                     "$ref": "#/definitions/EntryCreator"
                 },
+                "authorIsTeam": {
+                    "description": "AuthorIsTeam marks the comment author as a member of the team\n(admin or editor — anyone with Console access). Both surfaces render\na small \"Team\" badge next to the name when true. Roles themselves\nnever cross the wire (see EntryCreator) — this is the single derived\nsignal we expose, and it carries no admin/editor distinction.",
+                    "type": "boolean"
+                },
                 "body": {
                     "type": "string"
                 },

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Lock, MessageSquare, Globe } from 'lucide-react'
+import { Lock, MessageSquare, Globe, ShieldCheck } from 'lucide-react'
 import dayjs from 'dayjs'
 
 import Markdown from '@/components/markdown'
@@ -99,6 +99,12 @@ function CommentItem({ comment, onToggleInternal, isUpdating }: CommentItemProps
             <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
               {authorLabel(author)}
             </span>
+            {comment.authorIsTeam && (
+              <span className="inline-flex items-center gap-1 rounded bg-indigo-100 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-200">
+                <ShieldCheck className="size-3" />
+                Team
+              </span>
+            )}
             <span className="text-xs text-zinc-500" title={comment.createdAt}>
               {dayjs(comment.createdAt).format('MMM D, YYYY · h:mm A')}
             </span>

@@ -87,7 +87,8 @@
     "empty": "No comments yet.",
     "placeholder": "Add a comment. Markdown supported. Paste, drop, or attach files.",
     "post": "Post comment",
-    "signInToComment": "Sign in to add a comment."
+    "signInToComment": "Sign in to add a comment.",
+    "team": "Team"
   },
   "entryLightbox": {
     "fallbackTitle": "Feedback",

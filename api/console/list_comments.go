@@ -35,14 +35,14 @@ func ListCommentsHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
 			response.SystemError(c, err)
 			return
 		}
-		authors, err := api.LoadCommentAuthors(do, comments)
+		authors, team, err := api.LoadCommentAuthors(do, comments)
 		if err != nil {
 			response.SystemError(c, err)
 			return
 		}
 		out := make([]api.CommentResponse, 0, len(comments))
 		for _, cm := range comments {
-			out = append(out, api.BuildCommentResponse(cm, authors))
+			out = append(out, api.BuildCommentResponse(cm, authors, team))
 		}
 		response.Success(c, api.CommentListResponse{Data: out})
 	}

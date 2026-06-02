@@ -6,6 +6,7 @@ import (
 	"github.com/mixdive/feedback-platform/api"
 	"github.com/mixdive/feedback-platform/api/response"
 	"github.com/mixdive/feedback-platform/dataoperations"
+	"github.com/mixdive/feedback-platform/models"
 )
 
 // updateCommentRequest is the body for PATCH
@@ -60,11 +61,11 @@ func UpdateCommentHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
 			response.SystemError(c, err)
 			return
 		}
-		authors, err := api.LoadEntryCreators(do, []string{updated.UserID})
+		authors, team, err := api.LoadCommentAuthors(do, []models.Comment{*updated})
 		if err != nil {
 			response.SystemError(c, err)
 			return
 		}
-		response.Success(c, api.BuildCommentResponse(*updated, authors))
+		response.Success(c, api.BuildCommentResponse(*updated, authors, team))
 	}
 }
