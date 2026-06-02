@@ -106,6 +106,7 @@ func LoginCustomHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
 		}
 		username := claimString(claims, "username", "name")
 		photoURL := claimString(claims, "photoUrl", "picture")
+		email := claimString(claims, "email")
 
 		user, err := do.FindUserByKey(userID)
 		if err != nil {
@@ -113,15 +114,32 @@ func LoginCustomHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
 			return
 		}
 
+		// Account linking: when this external userId isn't known yet but the
+		// JWT carries an email that already belongs to an existing user
+		// (e.g. the bootstrap admin, or a prior Google sign-in), attach the
+		// Custom account to that user instead of creating a duplicate. The
+		// email is trusted because the token was signed by the admin's own
+		// auth system — the same provider that owns the userId.
+		if user == nil && email != "" {
+			byEmail, err := do.FindUserByKey(email)
+			if err != nil {
+				response.SystemError(c, err)
+				return
+			}
+			user = byEmail
+		}
+
 		now := time.Now().UTC()
 		if user == nil {
 			user = models.NewUser()
 			user.SetAccount(models.UserAccountTypeCustom, models.UserAccount{
-				ID:        userID,
-				Name:      username,
-				Username:  username,
-				ImageURL:  photoURL,
-				CreatedAt: now,
+				ID:              userID,
+				Name:            username,
+				Username:        username,
+				ImageURL:        photoURL,
+				Email:           email,
+				IsEmailVerified: email != "",
+				CreatedAt:       now,
 			})
 			if err := do.InsertUser(user); err != nil {
 				response.SystemError(c, err)
@@ -143,6 +161,10 @@ func LoginCustomHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
 			}
 			if photoURL != "" {
 				existing.ImageURL = photoURL
+			}
+			if email != "" {
+				existing.Email = email
+				existing.IsEmailVerified = true
 			}
 			user.SetAccount(models.UserAccountTypeCustom, existing)
 			if err := do.UpdateUser(user); err != nil {
@@ -174,6 +196,12 @@ func newPortalUserPayload(do *dataoperations.DataOperations, u *models.User) use
 		out.ImageURL = pickNonEmpty(out.ImageURL, a.ImageURL)
 	}
 	if a, ok := u.CustomAccount(); ok {
+		out.Email = pickNonEmpty(out.Email, a.Email)
+		out.Name = pickNonEmpty(out.Name, a.Name)
+		out.Username = pickNonEmpty(out.Username, a.Username)
+		out.ImageURL = pickNonEmpty(out.ImageURL, a.ImageURL)
+	}
+	if a, ok := u.GoogleAccount(); ok {
 		out.Email = pickNonEmpty(out.Email, a.Email)
 		out.Name = pickNonEmpty(out.Name, a.Name)
 		out.Username = pickNonEmpty(out.Username, a.Username)

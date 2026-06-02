@@ -12,6 +12,12 @@ export type ApiPortalConfig = {
   customAuthEnabled: boolean
   authUrl?: string
   customAuthButtonText?: string
+  // Google Identity Services sign-in. Independent of custom auth — both
+  // can be on at once, in which case the portal renders both buttons.
+  // googleClientId is the public OAuth client ID the GIS browser library
+  // needs; it is not a secret.
+  googleAuthEnabled: boolean
+  googleClientId?: string
   // Admin-managed markdown templates used to pre-fill the description
   // field on the new-entry form. Outer key is the EntryType value
   // ("feature-request", "bug", "support", "other"); inner key is a
@@ -252,6 +258,8 @@ export const API = () => ({
     logout: () => request<void>('POST', '/api/logout'),
     customLogin: (token: string) =>
       request<{ user: ApiPortalUser }>('POST', '/api/portal/auth/custom', { token }),
+    googleLogin: (idToken: string) =>
+      request<{ user: ApiPortalUser }>('POST', '/api/portal/auth/google', { idToken }),
   },
   portal: {
     config: () => request<ApiPortalConfig>('GET', '/api/portal/config'),

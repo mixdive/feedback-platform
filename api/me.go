@@ -98,6 +98,12 @@ func newUserPayload(u *models.User) userPayload {
 		out.Username = firstNonEmpty(out.Username, a.Username)
 		out.ImageURL = firstNonEmpty(out.ImageURL, a.ImageURL)
 	}
+	if a, ok := u.GoogleAccount(); ok {
+		out.Email = firstNonEmpty(out.Email, a.Email)
+		out.Name = firstNonEmpty(out.Name, a.Name)
+		out.Username = firstNonEmpty(out.Username, a.Username)
+		out.ImageURL = firstNonEmpty(out.ImageURL, a.ImageURL)
+	}
 	return out
 }
 

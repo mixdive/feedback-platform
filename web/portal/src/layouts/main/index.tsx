@@ -3,6 +3,7 @@ import { LogIn, LogOut, ShieldCheck } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import clsx from 'clsx'
 
+import GoogleLoginButton from '@/components/google-login-button'
 import LanguagePicker from '@/components/language-picker'
 import { API } from '@/services/api'
 import { useSiteConfig } from '@/store/site/hooks'
@@ -46,7 +47,8 @@ export default function MainLayout() {
     '?'
 
   const customAuthOn = !!config?.customAuthEnabled && !!config?.authUrl
-  const requireLogin = status === 'unauthenticated' && customAuthOn
+  const googleAuthOn = !!config?.googleAuthEnabled && !!config?.googleClientId
+  const requireLogin = status === 'unauthenticated' && (customAuthOn || googleAuthOn)
   const isAdmin = !!user?.roles?.includes('admin')
   const loginLabel = config?.customAuthButtonText?.trim() || t('auth.defaultLoginLabel')
 
@@ -177,14 +179,21 @@ export default function MainLayout() {
                 ? t('auth.gateDescriptionWithProvider', { provider: config.projectName })
                 : t('auth.gateDescriptionDefault')}
             </p>
-            <button
-              type="button"
-              onClick={handleCustomLogin}
-              className="mt-6 inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-500 shadow-soft transition-all"
-            >
-              <LogIn className="size-4" />
-              {loginLabel}
-            </button>
+            <div className="mt-6 flex flex-col items-center gap-3">
+              {customAuthOn && (
+                <button
+                  type="button"
+                  onClick={handleCustomLogin}
+                  className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-500 shadow-soft transition-all"
+                >
+                  <LogIn className="size-4" />
+                  {loginLabel}
+                </button>
+              )}
+              {googleAuthOn && config?.googleClientId && (
+                <GoogleLoginButton clientId={config.googleClientId} />
+              )}
+            </div>
           </div>
         ) : (
           <Outlet />

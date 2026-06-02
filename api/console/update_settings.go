@@ -14,11 +14,14 @@ import (
 
 // updatePortalRequest is the nested patch payload for PortalSettings.
 // JWTPrivateKey is intentionally absent — it is generated at setup and
-// cannot be rotated through the API in v0.1.
+// cannot be rotated through the API in v0.1. GoogleClientID is accepted
+// (it is not a secret) but GoogleAuthEnabled=true requires it to be set.
 type updatePortalRequest struct {
 	CustomAuthEnabled    *bool   `json:"customAuthEnabled,omitempty"`
 	AuthURL              *string `json:"authUrl,omitempty"`
 	CustomAuthButtonText *string `json:"customAuthButtonText,omitempty"`
+	GoogleAuthEnabled    *bool   `json:"googleAuthEnabled,omitempty"`
+	GoogleClientID       *string `json:"googleClientId,omitempty"`
 } //@name consoleUpdatePortalSettings
 
 // updateSupportRequestRequest is the nested patch payload for the
@@ -126,6 +129,22 @@ func UpdateSettingsHandler(do *dataoperations.DataOperations, store *storage.Hol
 				}
 			}
 
+			// Google auth mirrors the custom-auth invariant: enabling
+			// requires a usable Client ID. Pull the current value so the
+			// admin can flip the toggle without re-sending an unchanged ID.
+			nextGoogleEnabled := s.Portal.GoogleAuthEnabled
+			if req.Portal.GoogleAuthEnabled != nil {
+				nextGoogleEnabled = *req.Portal.GoogleAuthEnabled
+			}
+			nextGoogleClientID := s.Portal.GoogleClientID
+			if req.Portal.GoogleClientID != nil {
+				nextGoogleClientID = strings.TrimSpace(*req.Portal.GoogleClientID)
+			}
+			if nextGoogleEnabled && nextGoogleClientID == "" {
+				response.BadRequestWithMessage(c, "Google Client ID is required when Google authentication is enabled.")
+				return
+			}
+
 			if req.Portal.CustomAuthEnabled != nil {
 				set["portal.customauthenabled"] = *req.Portal.CustomAuthEnabled
 			}
@@ -134,6 +153,12 @@ func UpdateSettingsHandler(do *dataoperations.DataOperations, store *storage.Hol
 			}
 			if req.Portal.CustomAuthButtonText != nil {
 				set["portal.customauthbuttontext"] = strings.TrimSpace(*req.Portal.CustomAuthButtonText)
+			}
+			if req.Portal.GoogleAuthEnabled != nil {
+				set["portal.googleauthenabled"] = *req.Portal.GoogleAuthEnabled
+			}
+			if req.Portal.GoogleClientID != nil {
+				set["portal.googleclientid"] = nextGoogleClientID
 			}
 		}
 		if req.Feedback != nil {

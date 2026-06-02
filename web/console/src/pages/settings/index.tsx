@@ -4,7 +4,7 @@ import clsx from 'clsx'
 const sections = [
   { to: 'profile', label: 'My Profile' },
   { to: 'project', label: 'Project' },
-  { to: 'portal', label: 'Portal' },
+  { to: 'portal', label: 'Authentication' },
   { to: 'feedback', label: 'Feedback' },
   { to: 'ai', label: 'AI' },
   { to: 'integrations', label: 'Integrations' },

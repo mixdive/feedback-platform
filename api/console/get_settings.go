@@ -22,6 +22,8 @@ type portalSettingsPayload struct {
 	AuthURL              string `json:"authUrl"`
 	CustomAuthButtonText string `json:"customAuthButtonText"`
 	JWTPrivateKey        string `json:"jwtPrivateKey,omitempty"`
+	GoogleAuthEnabled    bool   `json:"googleAuthEnabled"`
+	GoogleClientID       string `json:"googleClientId"`
 } //@name PortalSettings
 
 // aiSettingsPayload is the admin-facing projection of AISettings. The
@@ -171,6 +173,8 @@ func newSettingsResponse(s *models.Settings, includeSecrets bool, store *storage
 			AuthURL:              s.Portal.AuthURL,
 			CustomAuthButtonText: s.Portal.CustomAuthButtonText,
 			JWTPrivateKey:        key,
+			GoogleAuthEnabled:    s.Portal.GoogleAuthEnabled,
+			GoogleClientID:       s.Portal.GoogleClientID,
 		},
 		AI: aiSettingsPayload{
 			Enabled:          s.AI.Enabled,

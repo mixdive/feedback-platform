@@ -159,6 +159,12 @@ func (u *User) CustomAccount() (UserAccount, bool) {
 	return a, ok
 }
 
+// GoogleAccount returns the Google account, or zero-value + false if absent.
+func (u *User) GoogleAccount() (UserAccount, bool) {
+	a, ok := u.Accounts[UserAccountTypeGoogle]
+	return a, ok
+}
+
 // RebuildKeys regenerates the Keys slice from every account currently on
 // the user. Stable order so equal user states produce equal Keys.
 func (u *User) RebuildKeys() {

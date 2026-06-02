@@ -41,3 +41,8 @@ Thumbs.db
 *.dll
 *.so
 *.dylib
+
+# Delve / VSCode Go debugger binaries
+__debug_bin*
+debug
+debug.test

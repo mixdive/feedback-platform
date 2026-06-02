@@ -256,11 +256,25 @@ func NewSettings() *Settings {
 // Settings document. Keeping them under one sub-object means any future
 // portal feature (custom domain, branding override, …) lands here without
 // flattening more fields onto the parent.
+//
+// Two independent portal sign-in methods can be enabled at once. Custom
+// auth verifies a JWT minted by the admin's own auth URL (HS256 against
+// JWTPrivateKey); Google auth verifies a Google Identity Services ID token
+// against Google's public keys with GoogleClientID as the expected
+// audience. When both are on the Portal shows both buttons; when only one
+// is on it shows only that one.
+//
+// GoogleClientID is NOT a secret — Google Identity Services embeds it in
+// every Portal visitor's browser — so it is exposed freely on the public
+// config endpoint and stored cleartext. The GIS ID-token flow needs no
+// client secret server-side.
 type PortalSettings struct {
 	CustomAuthEnabled    bool
 	AuthURL              string
 	CustomAuthButtonText string
 	JWTPrivateKey        string
+	GoogleAuthEnabled    bool
+	GoogleClientID       string
 }
 
 // NewPortalSettings constructs a default PortalSettings with a freshly

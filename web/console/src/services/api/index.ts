@@ -266,6 +266,12 @@ export type ApiPortalSettings = {
   // endpoint refuses changes to it. Only sent to admins; editors and
   // other roles get an undefined value here.
   jwtPrivateKey?: string
+  // Google Identity Services sign-in. Independent of custom auth — both
+  // can be enabled at once. googleClientId is NOT a secret (the browser
+  // GIS library embeds it) so it is returned in full to every role.
+  // Enabling googleAuthEnabled requires a non-empty googleClientId.
+  googleAuthEnabled: boolean
+  googleClientId: string
 }
 
 // AI settings live on the singleton settings document. The cleartext
@@ -399,7 +405,11 @@ export type ApiSettingsPatch = {
   portal?: Partial<
     Pick<
       ApiPortalSettings,
-      'customAuthEnabled' | 'authUrl' | 'customAuthButtonText'
+      | 'customAuthEnabled'
+      | 'authUrl'
+      | 'customAuthButtonText'
+      | 'googleAuthEnabled'
+      | 'googleClientId'
     >
   >
   feedback?: Partial<Omit<ApiFeedbackSettings, 'supportRequest'>> & {

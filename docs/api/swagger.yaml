@@ -123,6 +123,10 @@ definitions:
             type: string
           type: object
         type: object
+      googleAuthEnabled:
+        type: boolean
+      googleClientId:
+        type: string
       logoUrl:
         type: string
       primaryColor:
@@ -650,6 +654,10 @@ definitions:
         type: string
       customAuthEnabled:
         type: boolean
+      googleAuthEnabled:
+        type: boolean
+      googleClientId:
+        type: string
       jwtPrivateKey:
         type: string
     type: object
@@ -1026,6 +1034,10 @@ definitions:
         type: string
       customAuthEnabled:
         type: boolean
+      googleAuthEnabled:
+        type: boolean
+      googleClientId:
+        type: string
     type: object
   consoleUpdateReleasePdf:
     properties:
@@ -1154,6 +1166,19 @@ definitions:
     - token
     type: object
   portalLoginCustomResponse:
+    properties:
+      user:
+        $ref: '#/definitions/PortalUserInfo'
+    type: object
+  portalLoginGoogleRequest:
+    properties:
+      idToken:
+        minLength: 1
+        type: string
+    required:
+    - idToken
+    type: object
+  portalLoginGoogleResponse:
     properties:
       user:
         $ref: '#/definitions/PortalUserInfo'
@@ -2303,6 +2328,42 @@ paths:
           schema:
             $ref: '#/definitions/Error'
       summary: Portal custom login
+      tags:
+      - Portal
+  /api/portal/auth/google:
+    post:
+      consumes:
+      - application/json
+      description: Exchanges a Google Identity Services ID token for a Mixdive session
+        cookie.
+      operationId: portal-login-google
+      parameters:
+      - description: Google ID token
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/portalLoginGoogleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portalLoginGoogleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Portal Google login
       tags:
       - Portal
   /api/portal/changelog:

@@ -1671,6 +1671,59 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/portal/auth/google": {
+            "post": {
+                "description": "Exchanges a Google Identity Services ID token for a Mixdive session cookie.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Portal"
+                ],
+                "summary": "Portal Google login",
+                "operationId": "portal-login-google",
+                "parameters": [
+                    {
+                        "description": "Google ID token",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/portalLoginGoogleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portalLoginGoogleResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
         "/api/portal/changelog": {
             "get": {
                 "produces": [
@@ -2349,6 +2402,12 @@ const docTemplate = `{
                             "type": "string"
                         }
                     }
+                },
+                "googleAuthEnabled": {
+                    "type": "boolean"
+                },
+                "googleClientId": {
+                    "type": "string"
                 },
                 "logoUrl": {
                     "type": "string"
@@ -3136,6 +3195,12 @@ const docTemplate = `{
                 "customAuthEnabled": {
                     "type": "boolean"
                 },
+                "googleAuthEnabled": {
+                    "type": "boolean"
+                },
+                "googleClientId": {
+                    "type": "string"
+                },
                 "jwtPrivateKey": {
                     "type": "string"
                 }
@@ -3681,6 +3746,12 @@ const docTemplate = `{
                 },
                 "customAuthEnabled": {
                     "type": "boolean"
+                },
+                "googleAuthEnabled": {
+                    "type": "boolean"
+                },
+                "googleClientId": {
+                    "type": "string"
                 }
             }
         },
@@ -3867,6 +3938,26 @@ const docTemplate = `{
             }
         },
         "portalLoginCustomResponse": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "$ref": "#/definitions/PortalUserInfo"
+                }
+            }
+        },
+        "portalLoginGoogleRequest": {
+            "type": "object",
+            "required": [
+                "idToken"
+            ],
+            "properties": {
+                "idToken": {
+                    "type": "string",
+                    "minLength": 1
+                }
+            }
+        },
+        "portalLoginGoogleResponse": {
             "type": "object",
             "properties": {
                 "user": {

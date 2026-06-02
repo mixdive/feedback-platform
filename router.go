@@ -70,6 +70,7 @@ func newRouter(do *dataoperations.DataOperations, store *storage.Holder, worker 
 	)
 	{
 		pgPublic.POST("/auth/custom", portal.LoginCustomHandler(do))
+		pgPublic.POST("/auth/google", portal.LoginGoogleHandler(do))
 		// Changelog is intentionally public so the marketing/landing flow
 		// can link to /changelog without requiring a sign-in. Only
 		// completed releases surface here.

@@ -27,6 +27,8 @@ type configResponse struct {
 	CustomAuthEnabled     bool                         `json:"customAuthEnabled"`
 	AuthURL               string                       `json:"authUrl,omitempty"`
 	CustomAuthButtonText  string                       `json:"customAuthButtonText,omitempty"`
+	GoogleAuthEnabled     bool                         `json:"googleAuthEnabled"`
+	GoogleClientID        string                       `json:"googleClientId,omitempty"`
 	EntryTypeTemplates    map[string]map[string]string `json:"entryTypeTemplates"`
 	SupportRequestEnabled bool                         `json:"supportRequestEnabled"`
 	SupportRequestURL     string                       `json:"supportRequestUrl,omitempty"`
@@ -64,6 +66,8 @@ func GetConfigHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
 			CustomAuthEnabled:     s.Portal.CustomAuthEnabled,
 			AuthURL:               s.Portal.AuthURL,
 			CustomAuthButtonText:  s.Portal.CustomAuthButtonText,
+			GoogleAuthEnabled:     s.Portal.GoogleAuthEnabled,
+			GoogleClientID:        s.Portal.GoogleClientID,
 			EntryTypeTemplates:    templates,
 			SupportRequestEnabled: s.Feedback.SupportRequest.Enabled,
 			SupportRequestURL:     s.Feedback.SupportRequest.URL,

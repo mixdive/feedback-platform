@@ -7,6 +7,8 @@ export interface PortalConfig {
   customAuthEnabled: boolean
   authUrl?: string
   customAuthButtonText?: string
+  googleAuthEnabled: boolean
+  googleClientId?: string
   entryTypeTemplates: Record<string, Record<string, string>>
   supportRequestEnabled: boolean
   supportRequestUrl?: string

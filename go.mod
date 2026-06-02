@@ -4,6 +4,7 @@ go 1.25.4
 
 require (
 	cloud.google.com/go/storage v1.62.1
+	github.com/anthropics/anthropic-sdk-go v1.39.0
 	github.com/gin-gonic/gin v1.12.0
 	github.com/go-playground/validator/v10 v10.30.1
 	github.com/golang-jwt/jwt/v5 v5.3.1
@@ -14,6 +15,7 @@ require (
 	go.mongodb.org/mongo-driver/v2 v2.5.0
 	golang.org/x/crypto v0.49.0
 	golang.org/x/text v0.35.0
+	google.golang.org/api v0.274.0
 )
 
 require (
@@ -30,7 +32,6 @@ require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
-	github.com/anthropics/anthropic-sdk-go v1.39.0 // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/buger/jsonparser v1.1.2 // indirect
 	github.com/bytedance/gopkg v0.1.3 // indirect
@@ -101,7 +102,6 @@ require (
 	golang.org/x/sys v0.42.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
 	golang.org/x/tools v0.42.0 // indirect
-	google.golang.org/api v0.274.0 // indirect
 	google.golang.org/genproto v0.0.0-20260319201613-d00831a3d3e7 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260401024825-9d38bb4040a9 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260401024825-9d38bb4040a9 // indirect
