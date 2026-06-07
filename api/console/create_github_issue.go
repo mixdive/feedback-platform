@@ -58,7 +58,7 @@ import (
 //	@Failure	404	{object}	response.ApiError
 //	@Failure	409	{object}	response.ApiError
 //	@Router		/api/console/entry/{id}/github-issue [post]
-func CreateGitHubIssueHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func CreateGitHubIssueHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 

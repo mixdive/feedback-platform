@@ -31,7 +31,7 @@ type integrationsResponse struct {
 //	@Produce	json
 //	@Success	200	{object}	integrationsResponse
 //	@Router		/api/console/integrations [get]
-func GetIntegrationsHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func GetIntegrationsHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		s, err := do.GetSettings()
 		if err != nil || s == nil {
@@ -75,7 +75,7 @@ type updateGitHubIntegrationRequest struct {
 //	@Success	200		{object}	integrationsResponse
 //	@Failure	400		{object}	response.ApiError
 //	@Router		/api/console/integrations/github [put]
-func UpdateGitHubIntegrationHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func UpdateGitHubIntegrationHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req updateGitHubIntegrationRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
@@ -140,7 +140,7 @@ func UpdateGitHubIntegrationHandler(do *dataoperations.DataOperations) gin.Handl
 //	@Produce	json
 //	@Success	200	{object}	integrationsResponse
 //	@Router		/api/console/integrations/github [delete]
-func DeleteGitHubIntegrationHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func DeleteGitHubIntegrationHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		patch := map[string]any{
 			"integrations.github.owner":       "",

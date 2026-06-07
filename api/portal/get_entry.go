@@ -19,7 +19,7 @@ import (
 //	@Success	200	{object}	entryResponse
 //	@Failure	404	{object}	response.ApiError
 //	@Router		/api/portal/entry/{id} [get]
-func GetEntryHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func GetEntryHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 		e, err := do.FindEntryByID(id)

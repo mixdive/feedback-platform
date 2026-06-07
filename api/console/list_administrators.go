@@ -70,7 +70,7 @@ func userToAdministratorResponse(u models.User) administratorResponse {
 //	@Success	200	{object}	administratorListResponse
 //	@Failure	500	{object}	response.ApiError
 //	@Router		/api/console/administrator [get]
-func ListAdministratorsHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func ListAdministratorsHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		users, err := do.ListUsersWithRoles()
 		if err != nil {

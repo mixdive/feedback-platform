@@ -76,7 +76,7 @@ type loginCustomResponse struct {
 //	@Failure	401		{object}	response.ApiError
 //	@Failure	503		{object}	response.ApiError
 //	@Router		/api/portal/auth/custom [post]
-func LoginCustomHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func LoginCustomHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		s, err := do.GetSettings()
 		if err != nil || s == nil {
@@ -183,7 +183,7 @@ func LoginCustomHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
 	}
 }
 
-func newPortalUserPayload(do *dataoperations.DataOperations, u *models.User) userPayload {
+func newPortalUserPayload(do dataoperations.Store, u *models.User) userPayload {
 	roles := make([]string, 0, len(u.Roles))
 	for _, r := range u.Roles {
 		roles = append(roles, string(r))

@@ -172,7 +172,7 @@ func BuildRelease(r models.Release) ReleaseResponse {
 //
 // One ListReleases call covers any number of input IDs; list-page
 // queries that span dozens of entry releaseIds still hit Mongo once.
-func LoadReleases(do *dataoperations.DataOperations, releaseIDs []string) (map[string]ReleaseResponse, error) {
+func LoadReleases(do dataoperations.Store, releaseIDs []string) (map[string]ReleaseResponse, error) {
 	uniq := map[string]struct{}{}
 	for _, id := range releaseIDs {
 		if id == "" {
@@ -233,7 +233,7 @@ func BuildGitHubIssue(g models.GitHubIssue) (GitHubIssueResponse, bool) {
 // never existed) are simply absent from the map — the caller falls back to
 // rendering the entry without a creator. The empty-string ID is skipped
 // so anonymously authored records never trigger a lookup.
-func LoadEntryCreators(do *dataoperations.DataOperations, userIDs []string) (map[string]EntryCreator, error) {
+func LoadEntryCreators(do dataoperations.Store, userIDs []string) (map[string]EntryCreator, error) {
 	uniq := make([]string, 0, len(userIDs))
 	seen := map[string]struct{}{}
 	for _, id := range userIDs {

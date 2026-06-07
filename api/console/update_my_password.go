@@ -34,7 +34,7 @@ type updateMyPasswordRequest struct {
 //	@Failure	400	{object}	response.ApiError
 //	@Failure	401	{object}	response.ApiError
 //	@Router		/api/console/me/password [post]
-func UpdateMyPasswordHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func UpdateMyPasswordHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		u := middlewares.CurrentUser(c)
 		if u == nil {

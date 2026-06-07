@@ -23,7 +23,7 @@ import (
 //	@Success	204
 //	@Failure	404	{object}	response.ApiError
 //	@Router		/api/console/release/{id} [delete]
-func DeleteReleaseHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func DeleteReleaseHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 		existing, err := findReleaseOrNotFound(do, id)

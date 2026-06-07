@@ -56,7 +56,7 @@ type mergeEntryRequest struct {
 //	@Failure	404		{object}	response.ApiError
 //	@Failure	500		{object}	response.ApiError
 //	@Router		/api/console/entry/{id}/merge [post]
-func MergeEntryHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func MergeEntryHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		srcID := c.Param("id")
 		var req mergeEntryRequest

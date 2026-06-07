@@ -50,7 +50,7 @@ type updateReleasePdf struct {
 //	@Failure	404		{object}	response.ApiError
 //	@Failure	409		{object}	response.ApiError
 //	@Router		/api/console/release/{id} [patch]
-func UpdateReleaseHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func UpdateReleaseHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 		existing, err := findReleaseOrNotFound(do, id)

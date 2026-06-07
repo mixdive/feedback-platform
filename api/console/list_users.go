@@ -137,7 +137,7 @@ type listUsersQuery struct {
 //	@Success	200		{object}	userListResponse
 //	@Failure	500		{object}	response.ApiError
 //	@Router		/api/console/user [get]
-func ListUsersHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func ListUsersHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var request listUsersQuery
 		if err := c.ShouldBindQuery(&request); err != nil {

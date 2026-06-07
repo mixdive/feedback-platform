@@ -11,7 +11,7 @@ import (
 // first-run setup hasn't been completed. Apply to every API group except
 // /api/setup itself; the frontend uses the resulting 503 to redirect to the
 // setup form.
-func RequireSetupCompletedMiddleware(do *dataoperations.DataOperations) gin.HandlerFunc {
+func RequireSetupCompletedMiddleware(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		s, err := do.GetSettings()
 		if err != nil {

@@ -32,7 +32,7 @@ type createCommentRequest struct {
 //	@Failure	401		{object}	response.ApiError
 //	@Failure	404		{object}	response.ApiError
 //	@Router		/api/portal/entry/{id}/comment [post]
-func CreateCommentHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func CreateCommentHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 		var req createCommentRequest

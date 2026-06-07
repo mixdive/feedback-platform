@@ -64,8 +64,8 @@ type Snapshot struct {
 // startup. The Worker itself stays unchanged.
 type Analyzer interface {
 	Name() string
-	ClaimNext(do *dataoperations.DataOperations, claimTTL time.Duration) (*models.Entry, error)
-	Process(ctx context.Context, do *dataoperations.DataOperations, entry *models.Entry) error
-	PendingCount(do *dataoperations.DataOperations, claimTTL time.Duration) (int, error)
-	InFlightCount(do *dataoperations.DataOperations, claimTTL time.Duration) (int, error)
+	ClaimNext(do dataoperations.Store, claimTTL time.Duration) (*models.Entry, error)
+	Process(ctx context.Context, do dataoperations.Store, entry *models.Entry) error
+	PendingCount(do dataoperations.Store, claimTTL time.Duration) (int, error)
+	InFlightCount(do dataoperations.Store, claimTTL time.Duration) (int, error)
 }

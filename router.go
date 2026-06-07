@@ -12,6 +12,7 @@ import (
 	"github.com/mixdive/feedback-platform/api/middlewares"
 	"github.com/mixdive/feedback-platform/api/portal"
 	"github.com/mixdive/feedback-platform/dataoperations"
+	"github.com/mixdive/feedback-platform/models"
 	"github.com/mixdive/feedback-platform/pkg/aianalyzer"
 	"github.com/mixdive/feedback-platform/pkg/storage"
 	"github.com/mixdive/feedback-platform/web"
@@ -30,8 +31,20 @@ import (
 // settings + queue stats handlers (chunk 4) can refresh its snapshot
 // and read its Stats. Entry-create/edit handlers do NOT touch it —
 // the worker discovers new and edited entries by polling Mongo.
-func newRouter(do *dataoperations.DataOperations, store *storage.Holder, worker *aianalyzer.Worker) *gin.Engine {
+//
+// demoUser is non-nil only in DEMO mode. When set, the cookie-backed
+// AttachUser is replaced by an auto-login as that user, and a global
+// read-only guard rejects every mutating request — so the demo is fully
+// browsable yet immutable. In normal mode demoUser is nil and nothing
+// changes.
+func newRouter(do dataoperations.Store, store *storage.Holder, worker *aianalyzer.Worker, demoUser *models.User) *gin.Engine {
 	r := gin.Default()
+
+	// DEMO mode: block every mutating request up front so no handler can
+	// change the in-memory dataset.
+	if demoUser != nil {
+		r.Use(middlewares.DemoReadOnlyMiddleware())
+	}
 
 	// System.
 	r.GET("/health", api.HealthHandler(do))
@@ -50,7 +63,13 @@ func newRouter(do *dataoperations.DataOperations, store *storage.Holder, worker 
 
 	// Auth. Login is public; /me + /logout need the cookie attached so they
 	// can resolve the current session.
+	// In DEMO mode there is no session store, so auto-login as the demo
+	// admin instead of resolving a cookie. Every route group that uses
+	// attachUser then sees an authenticated admin.
 	attachUser := middlewares.AttachUserMiddleware(do)
+	if demoUser != nil {
+		attachUser = middlewares.DemoUserMiddleware(demoUser)
+	}
 	r.POST("/api/login", api.LoginHandler(do))
 	r.POST("/api/logout", attachUser, api.LogoutHandler(do))
 	r.GET("/api/me", attachUser, api.MeHandler(do))

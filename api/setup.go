@@ -31,7 +31,7 @@ type setupStatusResponse struct {
 //	@Produce	json
 //	@Success	200	{object}	setupStatusResponse
 //	@Router		/api/setup/status [get]
-func SetupStatusHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func SetupStatusHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		s, err := do.GetSettings()
 		completed := false
@@ -79,7 +79,7 @@ type setupResponse struct {
 //	@Failure	400		{object}	response.ApiError
 //	@Failure	409		{object}	response.ApiError
 //	@Router		/api/setup [post]
-func SetupHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func SetupHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		existing, err := do.GetSettings()
 		if err != nil {

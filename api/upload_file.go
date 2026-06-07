@@ -102,7 +102,7 @@ func BuildFileResponse(f models.File) FileResponse {
 //	@Failure	413		{object}	response.ApiError
 //	@Failure	415		{object}	response.ApiError
 //	@Router		/api/files [post]
-func UploadFileHandler(do *dataoperations.DataOperations, store storage.Storage) gin.HandlerFunc {
+func UploadFileHandler(do dataoperations.Store, store storage.Storage) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		fh, err := c.FormFile("file")
 		if err != nil {

@@ -23,7 +23,7 @@ import (
 //	@Success	200			{object}	entryResponse
 //	@Failure	404			{object}	response.ApiError
 //	@Router		/api/console/entry/{id}/relation/{peerEntryId} [delete]
-func DeleteEntryRelationHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func DeleteEntryRelationHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 		peerID := c.Param("peerEntryId")

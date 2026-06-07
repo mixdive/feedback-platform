@@ -79,15 +79,15 @@ func NewRelationAnalyzer(snapshot func() Snapshot) *RelationAnalyzer {
 
 func (a *RelationAnalyzer) Name() string { return RelationAnalyzerName }
 
-func (a *RelationAnalyzer) ClaimNext(do *dataoperations.DataOperations, claimTTL time.Duration) (*models.Entry, error) {
+func (a *RelationAnalyzer) ClaimNext(do dataoperations.Store, claimTTL time.Duration) (*models.Entry, error) {
 	return do.ClaimNextPendingForRelationAnalysis(claimTTL)
 }
 
-func (a *RelationAnalyzer) PendingCount(do *dataoperations.DataOperations, claimTTL time.Duration) (int, error) {
+func (a *RelationAnalyzer) PendingCount(do dataoperations.Store, claimTTL time.Duration) (int, error) {
 	return do.CountEntriesPendingRelationAnalysis(claimTTL)
 }
 
-func (a *RelationAnalyzer) InFlightCount(do *dataoperations.DataOperations, claimTTL time.Duration) (int, error) {
+func (a *RelationAnalyzer) InFlightCount(do dataoperations.Store, claimTTL time.Duration) (int, error) {
 	return do.CountEntriesInFlightRelationAnalysis(claimTTL)
 }
 
@@ -100,7 +100,7 @@ func (a *RelationAnalyzer) InFlightCount(do *dataoperations.DataOperations, clai
 // land before SetEntryRelationAnalysis flips status to done. If the
 // second write crashes, the entry has correct relations and a
 // non-final analysis status — the next tick won't re-claim it.
-func (a *RelationAnalyzer) Process(ctx context.Context, do *dataoperations.DataOperations, e *models.Entry) error {
+func (a *RelationAnalyzer) Process(ctx context.Context, do dataoperations.Store, e *models.Entry) error {
 	snap := a.snapshot()
 	if !snap.Enabled || snap.APIKey == "" {
 		return do.SetEntryRelationAnalysis(e.ID, models.EntryRelationAnalysis{})

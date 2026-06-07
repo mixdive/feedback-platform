@@ -43,7 +43,7 @@ type entryTopicListResponse struct {
 //	@Produce	json
 //	@Success	200	{object}	entryTopicListResponse
 //	@Router		/api/console/entry-topic [get]
-func ListEntryTopicsHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func ListEntryTopicsHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		topics, err := do.ListEntryTopics()
 		if err != nil {

@@ -33,7 +33,7 @@ type updateUserBlockRequest struct {
 //	@Failure	404		{object}	response.ApiError
 //	@Failure	409		{object}	response.ApiError
 //	@Router		/api/console/user/{id}/block [patch]
-func UpdateUserBlockHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func UpdateUserBlockHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 		if id == "" {

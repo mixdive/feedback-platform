@@ -81,15 +81,15 @@ func (a *TopicAnalyzer) Name() string { return TopicAnalyzerName }
 
 // ClaimNext atomically claims the next entry needing topic
 // analysis.
-func (a *TopicAnalyzer) ClaimNext(do *dataoperations.DataOperations, claimTTL time.Duration) (*models.Entry, error) {
+func (a *TopicAnalyzer) ClaimNext(do dataoperations.Store, claimTTL time.Duration) (*models.Entry, error) {
 	return do.ClaimNextPendingForTopicAnalysis(claimTTL)
 }
 
-func (a *TopicAnalyzer) PendingCount(do *dataoperations.DataOperations, claimTTL time.Duration) (int, error) {
+func (a *TopicAnalyzer) PendingCount(do dataoperations.Store, claimTTL time.Duration) (int, error) {
 	return do.CountEntriesPendingTopicAnalysis(claimTTL)
 }
 
-func (a *TopicAnalyzer) InFlightCount(do *dataoperations.DataOperations, claimTTL time.Duration) (int, error) {
+func (a *TopicAnalyzer) InFlightCount(do dataoperations.Store, claimTTL time.Duration) (int, error) {
 	return do.CountEntriesInFlightTopicAnalysis(claimTTL)
 }
 
@@ -104,7 +104,7 @@ func (a *TopicAnalyzer) InFlightCount(do *dataoperations.DataOperations, claimTT
 // the same title is handled by re-checking after the model returns
 // — if the title now exists, we use that record's ID and skip the
 // insert.
-func (a *TopicAnalyzer) Process(ctx context.Context, do *dataoperations.DataOperations, e *models.Entry) error {
+func (a *TopicAnalyzer) Process(ctx context.Context, do dataoperations.Store, e *models.Entry) error {
 	snap := a.snapshot()
 	if !snap.Enabled || snap.APIKey == "" {
 		return do.SetEntryTopicAnalysis(e.ID, models.EntryTopicAnalysis{})
@@ -177,7 +177,7 @@ func (a *TopicAnalyzer) Process(ctx context.Context, do *dataoperations.DataOper
 // Returns "" with no error when the model's title is blank — the
 // analyzer treats that as a clean "no topic" outcome rather than a
 // failure, mirroring the category analyzer's behavior.
-func resolveOrCreateTopic(do *dataoperations.DataOperations, existing []models.EntryTopic, result topicToolResult) (string, error) {
+func resolveOrCreateTopic(do dataoperations.Store, existing []models.EntryTopic, result topicToolResult) (string, error) {
 	title := strings.TrimSpace(result.Topic)
 	if title == "" {
 		return "", nil

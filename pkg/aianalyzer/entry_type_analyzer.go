@@ -88,17 +88,17 @@ func (a *EntryTypeAnalyzer) Name() string { return EntryTypeAnalyzerName }
 
 // ClaimNext atomically claims the next entry needing entry-type
 // analysis run. The Worker calls this once per tick.
-func (a *EntryTypeAnalyzer) ClaimNext(do *dataoperations.DataOperations, claimTTL time.Duration) (*models.Entry, error) {
+func (a *EntryTypeAnalyzer) ClaimNext(do dataoperations.Store, claimTTL time.Duration) (*models.Entry, error) {
 	return do.ClaimNextPendingForEntryTypeAnalysis(claimTTL)
 }
 
 // PendingCount delegates to the matching DB query so the Worker's
 // stats surface includes a per-analyzer line.
-func (a *EntryTypeAnalyzer) PendingCount(do *dataoperations.DataOperations, claimTTL time.Duration) (int, error) {
+func (a *EntryTypeAnalyzer) PendingCount(do dataoperations.Store, claimTTL time.Duration) (int, error) {
 	return do.CountEntriesPendingEntryTypeAnalysis(claimTTL)
 }
 
-func (a *EntryTypeAnalyzer) InFlightCount(do *dataoperations.DataOperations, claimTTL time.Duration) (int, error) {
+func (a *EntryTypeAnalyzer) InFlightCount(do dataoperations.Store, claimTTL time.Duration) (int, error) {
 	return do.CountEntriesInFlightEntryTypeAnalysis(claimTTL)
 }
 
@@ -110,7 +110,7 @@ func (a *EntryTypeAnalyzer) InFlightCount(do *dataoperations.DataOperations, cla
 //
 // The entry-type list is hardcoded (see availableEntryTypes), so
 // there's no Mongo lookup and no admin-managed schema to drift.
-func (a *EntryTypeAnalyzer) Process(ctx context.Context, do *dataoperations.DataOperations, e *models.Entry) error {
+func (a *EntryTypeAnalyzer) Process(ctx context.Context, do dataoperations.Store, e *models.Entry) error {
 	snap := a.snapshot()
 	if !snap.Enabled || snap.APIKey == "" {
 		// Race: AI was flipped off between the worker's snapshot read

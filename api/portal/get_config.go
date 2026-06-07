@@ -45,7 +45,7 @@ type configResponse struct {
 //	@Produce	json
 //	@Success	200	{object}	configResponse
 //	@Router		/api/portal/config [get]
-func GetConfigHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func GetConfigHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		s, err := do.GetSettings()
 		if err != nil {

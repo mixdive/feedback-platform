@@ -28,7 +28,7 @@ import (
 //	@Success	200		{object}	changelogItem
 //	@Failure	404		{object}	response.ApiError
 //	@Router		/api/portal/changelog/{slug} [get]
-func GetChangelogReleaseHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func GetChangelogReleaseHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		slug := c.Param("slug")
 		if slug == "" {
@@ -66,7 +66,7 @@ func GetChangelogReleaseHandler(do *dataoperations.DataOperations) gin.HandlerFu
 
 // resolveChangelogRelease looks up a release by version name first,
 // then by ID. Returns (nil, nil) when neither matches.
-func resolveChangelogRelease(do *dataoperations.DataOperations, slug string) (*models.Release, error) {
+func resolveChangelogRelease(do dataoperations.Store, slug string) (*models.Release, error) {
 	if r, err := do.FindReleaseByVersionName(slug); err != nil || r != nil {
 		return r, err
 	}

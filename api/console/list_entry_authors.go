@@ -30,7 +30,7 @@ type entryAuthorListResponse struct {
 //	@Success	200	{object}	entryAuthorListResponse
 //	@Failure	500	{object}	response.ApiError
 //	@Router		/api/console/entry-author [get]
-func ListEntryAuthorsHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func ListEntryAuthorsHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ids, err := do.ListEntryAuthorIDs()
 		if err != nil {

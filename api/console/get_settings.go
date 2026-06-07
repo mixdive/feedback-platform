@@ -232,7 +232,7 @@ func buildIntegrationsPayload(in models.IntegrationsSettings) integrationsSettin
 //	@Produce	json
 //	@Success	200	{object}	settingsResponse
 //	@Router		/api/console/settings [get]
-func GetSettingsHandler(do *dataoperations.DataOperations, store *storage.Holder) gin.HandlerFunc {
+func GetSettingsHandler(do dataoperations.Store, store *storage.Holder) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		s, err := do.GetSettings()
 		if err != nil || s == nil {

@@ -31,7 +31,7 @@ type createEntryTopicRequest struct {
 //	@Failure	400		{object}	response.ApiError
 //	@Failure	409		{object}	response.ApiError
 //	@Router		/api/console/entry-topic [post]
-func CreateEntryTopicHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func CreateEntryTopicHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req createEntryTopicRequest
 		if err := c.ShouldBindJSON(&req); err != nil {

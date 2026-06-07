@@ -35,7 +35,7 @@ type updateEntryRequest struct {
 //	@Success	200		{object}	entryResponse
 //	@Failure	404		{object}	response.ApiError
 //	@Router		/api/console/entry/{id} [patch]
-func UpdateEntryHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func UpdateEntryHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 		var req updateEntryRequest
@@ -194,7 +194,7 @@ func UpdateEntryHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
 // recordAdminActivity is the per-handler shortcut for admin/editor
 // metadata mutations. Caller passes Type + payload columns; we stamp
 // Source=admin and the calling user's ID.
-func recordAdminActivity(do *dataoperations.DataOperations, entryID, actorID string, t models.ActivityType, from, to, target string) error {
+func recordAdminActivity(do dataoperations.Store, entryID, actorID string, t models.ActivityType, from, to, target string) error {
 	a := models.NewActivity()
 	a.EntryID = entryID
 	a.Type = t

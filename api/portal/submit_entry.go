@@ -35,7 +35,7 @@ type submitEntryRequest struct {
 //	@Success	201		{object}	entryResponse
 //	@Failure	400		{object}	response.ApiError
 //	@Router		/api/portal/entry [post]
-func SubmitEntryHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func SubmitEntryHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req submitEntryRequest
 		if err := c.ShouldBindJSON(&req); err != nil {

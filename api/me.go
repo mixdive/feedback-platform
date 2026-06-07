@@ -51,14 +51,14 @@ type userPayload struct {
 // custom-login handler can build the same payload without duplicating
 // the quota lookup. Falls back to the default max when settings are
 // missing — never blocks login on a settings read.
-func NewUserPayloadWithQuota(do *dataoperations.DataOperations, u *models.User) userPayload {
+func NewUserPayloadWithQuota(do dataoperations.Store, u *models.User) userPayload {
 	out := newUserPayload(u)
 	out.VoteQuota = computeVoteQuota(do, u)
 	out.FeatureRequestQuota = computeFeatureRequestQuota(do, u)
 	return out
 }
 
-func computeVoteQuota(do *dataoperations.DataOperations, u *models.User) voteQuotaPayload {
+func computeVoteQuota(do dataoperations.Store, u *models.User) voteQuotaPayload {
 	if u.HasConsoleAccess() {
 		return voteQuotaPayload{Unlimited: true}
 	}
@@ -69,7 +69,7 @@ func computeVoteQuota(do *dataoperations.DataOperations, u *models.User) voteQuo
 	return voteQuotaPayload{Used: u.VotesSpent, Max: max}
 }
 
-func computeFeatureRequestQuota(do *dataoperations.DataOperations, u *models.User) featureRequestQuotaPayload {
+func computeFeatureRequestQuota(do dataoperations.Store, u *models.User) featureRequestQuotaPayload {
 	if u.HasConsoleAccess() {
 		return featureRequestQuotaPayload{Unlimited: true}
 	}
@@ -131,7 +131,7 @@ type meResponse struct {
 //	@Success	200	{object}	meResponse
 //	@Failure	401	{object}	response.ApiError
 //	@Router		/api/me [get]
-func MeHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func MeHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		u := middlewares.CurrentUser(c)
 		if u == nil {

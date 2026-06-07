@@ -24,7 +24,7 @@ type healthResponse struct {
 //	@Success	200	{object}	healthResponse
 //	@Failure	503	{object}	response.ApiError
 //	@Router		/health [get]
-func HealthHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func HealthHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if _, err := do.GetSettings(); err != nil {
 			response.UnderMaintenance(c)

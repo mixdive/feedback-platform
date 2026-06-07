@@ -24,7 +24,7 @@ import (
 //	@Failure	401	{object}	response.ApiError
 //	@Failure	404	{object}	response.ApiError
 //	@Router		/api/portal/entry/{id}/vote [post]
-func AddVoteHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func AddVoteHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		u := middlewares.CurrentUser(c)
 		id := c.Param("id")

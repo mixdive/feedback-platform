@@ -24,7 +24,7 @@ import (
 // Already-registered routes (/api, /swagger, /health) are not overridden.
 // Unknown /api or /swagger paths return a JSON 404 instead of the SPA HTML
 // so API clients aren't confused.
-func Mount(r *gin.Engine, do *dataoperations.DataOperations) error {
+func Mount(r *gin.Engine, do dataoperations.Store) error {
 	consoleFS, err := fs.Sub(spaFS, "console/dist")
 	if err != nil {
 		return err
@@ -78,7 +78,7 @@ func Mount(r *gin.Engine, do *dataoperations.DataOperations) error {
 // setupCompleted is a fail-open check: any error reading settings (e.g.,
 // Mongo briefly unavailable) is treated as "not completed" so the user is
 // directed to the setup form rather than a blank portal.
-func setupCompleted(do *dataoperations.DataOperations) bool {
+func setupCompleted(do dataoperations.Store) bool {
 	s, err := do.GetSettings()
 	if err != nil || s == nil {
 		return false

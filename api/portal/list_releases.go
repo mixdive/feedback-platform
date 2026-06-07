@@ -47,7 +47,7 @@ type changelogListResponse struct {
 //	@Produce	json
 //	@Success	200	{object}	changelogListResponse
 //	@Router		/api/portal/changelog [get]
-func ListChangelogHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func ListChangelogHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		releases, err := do.ListReleases()
 		if err != nil {

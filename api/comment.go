@@ -74,7 +74,7 @@ func BuildCommentResponse(c models.Comment, authors map[string]EntryCreator, tea
 // IDs with Console access), both keyed by user ID. The query is inlined
 // rather than delegating to LoadEntryCreators so the roles needed for the
 // team set come back in the same single round trip.
-func LoadCommentAuthors(do *dataoperations.DataOperations, comments []models.Comment) (map[string]EntryCreator, map[string]bool, error) {
+func LoadCommentAuthors(do dataoperations.Store, comments []models.Comment) (map[string]EntryCreator, map[string]bool, error) {
 	uniq := make([]string, 0, len(comments))
 	seen := map[string]struct{}{}
 	for _, c := range comments {

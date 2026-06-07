@@ -35,7 +35,7 @@ const signedURLTTL = 15 * time.Minute
 //	@Success	200
 //	@Failure	404	{object}	response.ApiError
 //	@Router		/api/files/{id} [get]
-func GetFileHandler(do *dataoperations.DataOperations, store storage.Storage) gin.HandlerFunc {
+func GetFileHandler(do dataoperations.Store, store storage.Storage) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		name := c.Param("id")
 		id := name

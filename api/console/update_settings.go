@@ -83,7 +83,7 @@ type updateSettingsRequest struct {
 //	@Param		request	body		updateSettingsRequest	true	"Patch"
 //	@Success	200		{object}	settingsResponse
 //	@Router		/api/console/settings [patch]
-func UpdateSettingsHandler(do *dataoperations.DataOperations, store *storage.Holder) gin.HandlerFunc {
+func UpdateSettingsHandler(do dataoperations.Store, store *storage.Holder) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req updateSettingsRequest
 		if err := c.ShouldBindJSON(&req); err != nil {

@@ -43,7 +43,7 @@ type loginResponse struct {
 //	@Failure	400		{object}	response.ApiError
 //	@Failure	401		{object}	response.ApiError
 //	@Router		/api/login [post]
-func LoginHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func LoginHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req loginRequest
 		if err := c.ShouldBindJSON(&req); err != nil {

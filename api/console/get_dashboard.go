@@ -57,7 +57,7 @@ type dashboardResponse struct {
 //	@Produce	json
 //	@Success	200	{object}	dashboardResponse
 //	@Router		/api/console/dashboard [get]
-func GetDashboardHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func GetDashboardHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		stats, err := do.GetDashboardStats()
 		if err != nil {

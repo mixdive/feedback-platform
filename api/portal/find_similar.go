@@ -46,7 +46,7 @@ type findSimilarResponse struct {
 //	@Success	200		{object}	findSimilarResponse
 //	@Failure	400		{object}	response.ApiError
 //	@Router		/api/portal/entry/find-similar [post]
-func FindSimilarHandler(do *dataoperations.DataOperations, worker *aianalyzer.Worker) gin.HandlerFunc {
+func FindSimilarHandler(do dataoperations.Store, worker *aianalyzer.Worker) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req findSimilarRequest
 		if err := c.ShouldBindJSON(&req); err != nil {

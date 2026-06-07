@@ -40,7 +40,7 @@ type EntryRelationResponse struct {
 // the slim peer projection, keyed by ID. Missing IDs (peer deleted,
 // never existed) are absent from the map; the caller silently drops
 // orphan relations from the wire payload.
-func LoadEntryRelationPeers(do *dataoperations.DataOperations, ids []string) (map[string]EntryRelationPeer, error) {
+func LoadEntryRelationPeers(do dataoperations.Store, ids []string) (map[string]EntryRelationPeer, error) {
 	uniq := map[string]struct{}{}
 	for _, id := range ids {
 		if id == "" {
@@ -111,7 +111,7 @@ func validateRelationType(t string) (models.EntryRelationType, bool) {
 // the given ID and writes it to c. Centralizes the load-and-respond
 // pattern shared by the relation add/remove handlers — both mutate
 // the entry then return its fresh detail view.
-func writeEntryDetailResponse(c *gin.Context, do *dataoperations.DataOperations, id string) {
+func writeEntryDetailResponse(c *gin.Context, do dataoperations.Store, id string) {
 	updated, err := do.FindEntryByID(id)
 	if err != nil {
 		response.SystemError(c, err)
@@ -161,7 +161,7 @@ func writeEntryDetailResponse(c *gin.Context, do *dataoperations.DataOperations,
 // One Mongo round-trip per peer in v0.1 — pilot dataset is small. A
 // future optimization is a single ListByIDs call once we add it to
 // dataoperations.
-func resolveRelationsForEntry(do *dataoperations.DataOperations, e models.Entry) ([]EntryRelationResponse, error) {
+func resolveRelationsForEntry(do dataoperations.Store, e models.Entry) ([]EntryRelationResponse, error) {
 	if len(e.Relations) == 0 {
 		return []EntryRelationResponse{}, nil
 	}

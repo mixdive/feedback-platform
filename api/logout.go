@@ -17,7 +17,7 @@ import (
 //	@Tags		Auth
 //	@Success	204
 //	@Router		/api/logout [post]
-func LogoutHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func LogoutHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := middlewares.ReadSessionToken(c)
 		if token != "" {

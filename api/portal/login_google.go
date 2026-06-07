@@ -48,7 +48,7 @@ type loginGoogleResponse struct {
 //	@Failure	401		{object}	response.ApiError
 //	@Failure	503		{object}	response.ApiError
 //	@Router		/api/portal/auth/google [post]
-func LoginGoogleHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func LoginGoogleHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		s, err := do.GetSettings()
 		if err != nil || s == nil {

@@ -34,7 +34,7 @@ type updateMyProfileRequest struct {
 //	@Success	200		{object}	myProfileResponse
 //	@Failure	401		{object}	response.ApiError
 //	@Router		/api/console/me [patch]
-func UpdateMyProfileHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func UpdateMyProfileHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		u := middlewares.CurrentUser(c)
 		if u == nil {

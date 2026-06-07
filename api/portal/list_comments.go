@@ -20,7 +20,7 @@ import (
 //	@Success	200	{object}	api.CommentListResponse
 //	@Failure	404	{object}	response.ApiError
 //	@Router		/api/portal/entry/{id}/comment [get]
-func ListCommentsHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func ListCommentsHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 		entry, err := do.FindEntryByID(id)

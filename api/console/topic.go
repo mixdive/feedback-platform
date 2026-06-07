@@ -44,7 +44,7 @@ func BuildEntryTopic(t models.EntryTopic) EntryTopicResponse {
 // topicIDs into an EntryTopicResponse map keyed by topic ID.
 // Missing topics are absent from the map — the caller silently
 // drops unknown IDs.
-func LoadEntryTopics(do *dataoperations.DataOperations, topicIDs []string) (map[string]EntryTopicResponse, error) {
+func LoadEntryTopics(do dataoperations.Store, topicIDs []string) (map[string]EntryTopicResponse, error) {
 	uniq := map[string]struct{}{}
 	for _, id := range topicIDs {
 		if id == "" {
@@ -89,7 +89,7 @@ func projectEntryTopics(topicIDs []string, topics map[string]EntryTopicResponse)
 // simply has no topics. Every non-empty ID must reference an
 // existing topic; duplicates are de-duplicated. We return an error
 // on the first unknown ID so the handler maps it to a 400.
-func resolveTopicIDs(do *dataoperations.DataOperations, ids []string) ([]string, error) {
+func resolveTopicIDs(do dataoperations.Store, ids []string) ([]string, error) {
 	if len(ids) == 0 {
 		return []string{}, nil
 	}
@@ -122,7 +122,7 @@ func resolveTopicIDs(do *dataoperations.DataOperations, ids []string) ([]string,
 // findTopicOrNotFound is the pattern used by the update/delete
 // handlers to look up an existing topic. Returns (nil, nil) on a
 // clean not-found.
-func findTopicOrNotFound(do *dataoperations.DataOperations, id string) (*models.EntryTopic, error) {
+func findTopicOrNotFound(do dataoperations.Store, id string) (*models.EntryTopic, error) {
 	if id == "" {
 		return nil, errors.New("Topic id is required.")
 	}

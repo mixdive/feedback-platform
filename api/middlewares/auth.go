@@ -16,7 +16,7 @@ const userContextKey = "user"
 // DataOperations, and stashes the user on the gin context. It never aborts
 // — RequireUser/RequireAdmin do that. This split lets the same middleware
 // run on both anonymous-allowed and auth-only routes.
-func AttachUserMiddleware(do *dataoperations.DataOperations) gin.HandlerFunc {
+func AttachUserMiddleware(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := ReadSessionToken(c)
 		if token == "" {

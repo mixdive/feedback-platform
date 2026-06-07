@@ -33,7 +33,7 @@ type releaseListResponse struct {
 //	@Produce	json
 //	@Success	200	{object}	releaseListResponse
 //	@Router		/api/console/release [get]
-func ListReleasesHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func ListReleasesHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		releases, err := do.ListReleases()
 		if err != nil {

@@ -21,7 +21,7 @@ import (
 //	@Success	204
 //	@Failure	404	{object}	response.ApiError
 //	@Router		/api/console/entry-topic/{id} [delete]
-func DeleteEntryTopicHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func DeleteEntryTopicHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 		existing, err := findTopicOrNotFound(do, id)

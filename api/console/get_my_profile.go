@@ -61,7 +61,7 @@ func newMyProfileResponse(u *models.User) myProfileResponse {
 //	@Success	200	{object}	myProfileResponse
 //	@Failure	401	{object}	response.ApiError
 //	@Router		/api/console/me [get]
-func GetMyProfileHandler(_ *dataoperations.DataOperations) gin.HandlerFunc {
+func GetMyProfileHandler(_ dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		u := middlewares.CurrentUser(c)
 		if u == nil {

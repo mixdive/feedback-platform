@@ -215,7 +215,7 @@ type listEntriesQuery struct {
 //	@Param		request	query		listEntriesQuery	false	"Filters"
 //	@Success	200		{object}	entryListResponse
 //	@Router		/api/console/entry [get]
-func ListEntriesHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func ListEntriesHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var request listEntriesQuery
 		if err := c.BindQuery(&request); err != nil {

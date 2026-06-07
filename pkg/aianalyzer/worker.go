@@ -56,7 +56,7 @@ type Stats struct {
 // (what's pending, what's in flight, what's done) lives in Mongo. This
 // is what makes the design Cloud-Run-scale-to-N safe.
 type Worker struct {
-	do           *dataoperations.DataOperations
+	do           dataoperations.Store
 	registry     map[string]Analyzer
 	pollInterval time.Duration
 	claimTTL     time.Duration
@@ -70,7 +70,7 @@ type Worker struct {
 
 // NewWorker constructs a Worker with default poll interval and claim
 // TTL. Analyzers are added with Register before Start.
-func NewWorker(do *dataoperations.DataOperations) *Worker {
+func NewWorker(do dataoperations.Store) *Worker {
 	return &Worker{
 		do:           do,
 		registry:     make(map[string]Analyzer),

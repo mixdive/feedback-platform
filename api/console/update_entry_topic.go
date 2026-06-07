@@ -34,7 +34,7 @@ type updateEntryTopicRequest struct {
 //	@Failure	404		{object}	response.ApiError
 //	@Failure	409		{object}	response.ApiError
 //	@Router		/api/console/entry-topic/{id} [patch]
-func UpdateEntryTopicHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func UpdateEntryTopicHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 		existing, err := findTopicOrNotFound(do, id)

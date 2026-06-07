@@ -32,7 +32,7 @@ type updateCommentRequest struct {
 //	@Success	200			{object}	api.CommentResponse
 //	@Failure	404			{object}	response.ApiError
 //	@Router		/api/console/entry/{id}/comment/{commentId} [patch]
-func UpdateCommentHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func UpdateCommentHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		entryID := c.Param("id")
 		commentID := c.Param("commentId")

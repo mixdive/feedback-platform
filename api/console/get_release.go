@@ -37,7 +37,7 @@ type releaseEntrySummary struct {
 //	@Success	200	{object}	releaseDetailResponse
 //	@Failure	404	{object}	response.ApiError
 //	@Router		/api/console/release/{id} [get]
-func GetReleaseHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func GetReleaseHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 		r, err := findReleaseOrNotFound(do, id)

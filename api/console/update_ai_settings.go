@@ -45,7 +45,7 @@ type updateAISettingsRequest struct {
 //	@Success	200		{object}	settingsResponse
 //	@Failure	400		{object}	response.ApiError
 //	@Router		/api/console/settings/ai [patch]
-func UpdateAISettingsHandler(do *dataoperations.DataOperations, worker *aianalyzer.Worker, store *storage.Holder) gin.HandlerFunc {
+func UpdateAISettingsHandler(do dataoperations.Store, worker *aianalyzer.Worker, store *storage.Holder) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req updateAISettingsRequest
 		if err := c.ShouldBindJSON(&req); err != nil {

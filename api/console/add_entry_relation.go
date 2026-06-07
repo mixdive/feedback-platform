@@ -38,7 +38,7 @@ type addEntryRelationRequest struct {
 //	@Failure	400		{object}	response.ApiError
 //	@Failure	404		{object}	response.ApiError
 //	@Router		/api/console/entry/{id}/relation [post]
-func AddEntryRelationHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func AddEntryRelationHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 		var req addEntryRelationRequest

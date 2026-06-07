@@ -57,7 +57,7 @@ type activityListResponse struct {
 //	@Success	200	{object}	activityListResponse
 //	@Failure	404	{object}	response.ApiError
 //	@Router		/api/console/entry/{id}/activity [get]
-func ListActivitiesHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func ListActivitiesHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 		entry, err := do.FindEntryByID(id)

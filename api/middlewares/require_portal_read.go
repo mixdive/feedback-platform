@@ -15,7 +15,7 @@ import (
 // RequirePortalReadAccessMiddleware gates Portal read endpoints.
 // Authenticated visitors pass; everyone else gets 401. Portal access is
 // always authenticated — there is no anonymous read path.
-func RequirePortalReadAccessMiddleware(do *dataoperations.DataOperations) gin.HandlerFunc {
+func RequirePortalReadAccessMiddleware(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if CurrentUser(c) != nil {
 			c.Next()
@@ -28,7 +28,7 @@ func RequirePortalReadAccessMiddleware(do *dataoperations.DataOperations) gin.Ha
 // RequirePortalWriteAccessMiddleware gates Portal write endpoints (entry
 // submission + voting). When custom auth is on the visitor must be
 // authenticated; otherwise writes stay anonymous (v0.1 behavior).
-func RequirePortalWriteAccessMiddleware(do *dataoperations.DataOperations) gin.HandlerFunc {
+func RequirePortalWriteAccessMiddleware(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if CurrentUser(c) != nil {
 			c.Next()

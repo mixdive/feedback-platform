@@ -15,7 +15,7 @@ import (
 // not have to know about the feature flag. Reads / deletes are
 // intentionally NOT gated — links to previously-uploaded blobs keep
 // working until the admin deletes them explicitly.
-func RequireUploadsEnabledMiddleware(do *dataoperations.DataOperations) gin.HandlerFunc {
+func RequireUploadsEnabledMiddleware(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		s, err := do.GetSettings()
 		if err != nil {

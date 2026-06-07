@@ -46,7 +46,7 @@ type createReleaseRequest struct {
 //	@Failure	400		{object}	response.ApiError
 //	@Failure	409		{object}	response.ApiError
 //	@Router		/api/console/release [post]
-func CreateReleaseHandler(do *dataoperations.DataOperations) gin.HandlerFunc {
+func CreateReleaseHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req createReleaseRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
