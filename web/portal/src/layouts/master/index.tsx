@@ -41,6 +41,35 @@ export default function MasterLayout() {
     document.title = config?.projectName?.trim() || 'Mixdive'
   }, [config?.projectName])
 
+  // Drive the browser-tab icon from the uploaded org logo. index.html ships
+  // several bundled Mixdive icon links (svg + png + apple-touch); when a custom
+  // logo exists we drop them and install a single logo-backed icon, otherwise
+  // the browser may keep preferring the bundled SVG. No logo → defaults stay.
+  useEffect(() => {
+    const logoUrl = config?.logoUrl?.trim()
+    if (!logoUrl) return
+    const head = document.head
+    head
+      .querySelectorAll(
+        'link[rel~="icon"]:not([data-portal-favicon]), link[rel="apple-touch-icon"]:not([data-portal-favicon])',
+      )
+      .forEach((el) => el.remove())
+    const ensure = (rel: string) => {
+      let el = head.querySelector<HTMLLinkElement>(
+        `link[data-portal-favicon][rel="${rel}"]`,
+      )
+      if (!el) {
+        el = document.createElement('link')
+        el.setAttribute('rel', rel)
+        el.setAttribute('data-portal-favicon', '')
+        head.appendChild(el)
+      }
+      el.href = logoUrl
+    }
+    ensure('icon')
+    ensure('apple-touch-icon')
+  }, [config?.logoUrl])
+
   // Exchange the `?auth.custom=<jwt>` callback for a session before doing
   // anything else. Runs exactly once — exchangedRef guards re-entry from
   // React strict mode and from the URL-cleanup useEffect.
