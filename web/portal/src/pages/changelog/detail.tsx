@@ -5,6 +5,7 @@ import { ArrowLeft, ChevronRight, FileText, Link as LinkIcon } from 'lucide-reac
 import { useTranslation } from 'react-i18next'
 
 import Markdown from '@/components/markdown'
+import StatusBadge from '@/components/status-badge'
 import { API } from '@/services/api'
 import { message } from '@/utils/helpers'
 
@@ -156,6 +157,9 @@ export default function ChangelogDetailPage() {
                       {plainPreview(e.description)}
                     </p>
                   )}
+                </div>
+                <div className="mt-0.5 shrink-0">
+                  <StatusBadge status={e.status} />
                 </div>
                 <ChevronRight className="size-4 shrink-0 text-zinc-400" />
               </Link>

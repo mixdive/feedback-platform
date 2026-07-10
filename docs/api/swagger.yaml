@@ -588,6 +588,8 @@ definitions:
         type: string
       id:
         type: string
+      status:
+        $ref: '#/definitions/EntryStatus'
       title:
         type: string
     type: object

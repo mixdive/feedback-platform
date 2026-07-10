@@ -3100,6 +3100,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "status": {
+                    "$ref": "#/definitions/EntryStatus"
+                },
                 "title": {
                     "type": "string"
                 }

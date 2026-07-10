@@ -14,9 +14,10 @@ import (
 // description preview). Internal entries never appear here — the
 // upstream query filters them out.
 type changelogEntrySummary struct {
-	ID          string `json:"id"`
-	Title       string `json:"title"`
-	Description string `json:"description,omitempty"`
+	ID          string                  `json:"id"`
+	Title       string                  `json:"title"`
+	Description string                  `json:"description,omitempty"`
+	Status      api.EntryStatusResponse `json:"status"`
 } //@name PortalChangelogEntry
 
 // changelogItem is one release card on the Portal changelog page.
@@ -67,6 +68,7 @@ func ListChangelogHandler(do dataoperations.Store) gin.HandlerFunc {
 					ID:          e.ID,
 					Title:       e.Title,
 					Description: e.Description,
+					Status:      api.BuildEntryStatus(e.Status),
 				})
 			}
 			out = append(out, changelogItem{

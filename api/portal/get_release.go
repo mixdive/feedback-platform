@@ -55,6 +55,7 @@ func GetChangelogReleaseHandler(do dataoperations.Store) gin.HandlerFunc {
 				ID:          e.ID,
 				Title:       e.Title,
 				Description: e.Description,
+				Status:      api.BuildEntryStatus(e.Status),
 			})
 		}
 		response.Success(c, changelogItem{

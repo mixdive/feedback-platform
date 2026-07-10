@@ -103,6 +103,7 @@ export type ApiChangelogEntry = {
   id: string
   title: string
   description?: string
+  status: ApiEntryStatus
 }
 
 export type ApiChangelogItem = ApiRelease & {
