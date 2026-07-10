@@ -10,6 +10,7 @@ import FeatureRequestsPage from '@/pages/feature-requests'
 import InboxPage from '@/pages/inbox'
 import LoginPage from '@/pages/login'
 import ReleasesPage from '@/pages/releases'
+import ReleaseDetailPage from '@/pages/releases/detail'
 import SettingsLayout from '@/pages/settings'
 import SupportPage from '@/pages/support'
 import AdministratorsSettingsPage from '@/pages/settings/administrators'
@@ -41,6 +42,7 @@ export const router = createBrowserRouter(
             { path: 'support', element: <SupportPage /> },
             { path: 'topics', element: <TopicsPage /> },
             { path: 'releases', element: <ReleasesPage /> },
+            { path: 'releases/:id', element: <ReleaseDetailPage /> },
             { path: 'users', element: <UsersPage /> },
             {
               path: 'settings',
