@@ -429,6 +429,9 @@ func (r *Repo) filterEntries(f dataoperations.EntryListFilter) []models.Entry {
 		if f.TopicID != "" && !contains(e.TopicIDs, f.TopicID) {
 			continue
 		}
+		if f.ReleaseID != "" && e.ReleaseID != f.ReleaseID {
+			continue
+		}
 		out = append(out, e)
 	}
 	return out

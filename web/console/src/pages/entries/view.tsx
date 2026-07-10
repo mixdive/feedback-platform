@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { CheckCircle2, ChevronUp, CircleDot, Globe, Search, X } from 'lucide-react'
@@ -42,9 +42,17 @@ function creatorLabel(c?: ApiEntryCreator): string {
 export type EntriesViewProps = {
   pageTitle: string
   lockedEntryType?: ApiEntryTypeValue
+  // Enables the Release filter dropdown. Off by default so the Support
+  // screen (which shares this view) doesn't show it; All Feedback,
+  // Feature Requests, and Bugs opt in.
+  enableReleaseFilter?: boolean
 }
 
-export default function EntriesView({ pageTitle, lockedEntryType }: EntriesViewProps) {
+export default function EntriesView({
+  pageTitle,
+  lockedEntryType,
+  enableReleaseFilter,
+}: EntriesViewProps) {
   const [searchParams, setSearchParams] = useSearchParams()
 
   // The detail page reads location.state.from to pick its back-link target,
@@ -58,29 +66,54 @@ export default function EntriesView({ pageTitle, lockedEntryType }: EntriesViewP
       ? 'support'
       : undefined
 
-  // Sort lives in the URL so the default is unambiguous on first
-  // visit (no `?sort=` => 'new' = newest first), survives refresh,
-  // and is visible in the address bar.
-  const sortParam = searchParams.get('sort')
-  const sort: Sort = sortParam === 'top' ? 'top' : 'new'
-  const setSort = (next: Sort) => {
-    const sp = new URLSearchParams(searchParams)
-    if (next === 'new') sp.delete('sort')
-    else sp.set('sort', next)
-    setSearchParams(sp, { replace: true })
+  // Every filter lives in the URL so a filtered view is shareable,
+  // survives refresh, and can be deep-linked to from elsewhere in the
+  // Console — the Releases and Topics pages link here with a preset
+  // releaseId / topicId. `sort` defaults to 'new' when absent.
+  const setParam = (key: string, value: string) => {
+    setSearchParams(
+      (prev) => {
+        const sp = new URLSearchParams(prev)
+        if (!value) sp.delete(key)
+        else sp.set(key, value)
+        return sp
+      },
+      { replace: true },
+    )
   }
-  const [searchInput, setSearchInput] = useState('')
-  const [search, setSearch] = useState('')
+
+  const sort: Sort = searchParams.get('sort') === 'top' ? 'top' : 'new'
+  const setSort = (next: Sort) => setParam('sort', next === 'new' ? '' : next)
+  const search = searchParams.get('q') ?? ''
+  const filterEntryType = (searchParams.get('type') ?? '') as ApiEntryTypeValue | ''
+  const filterStatus = (searchParams.get('status') ?? '') as ApiEntryStatusValue | ''
+  const filterAuthorId = searchParams.get('author') ?? ''
+  const filterTopicId = searchParams.get('topicId') ?? ''
+  const filterReleaseId = searchParams.get('releaseId') ?? ''
+
+  // The search box keeps responsive local state and writes its trimmed
+  // value to `?q=` after a 250ms debounce. Seeded from the URL on mount
+  // so a shared link pre-fills the box.
+  const [searchInput, setSearchInput] = useState(search)
+  // Route the debounced write through a latest-ref so it reads the
+  // freshest URL params when the timer fires — without this, a filter
+  // changed within the debounce window would be clobbered by a
+  // stale-closure `q` write (setSearchParams's functional base is bound
+  // to the render it was created in).
+  const setParamRef = useRef(setParam)
   useEffect(() => {
-    const t = setTimeout(() => setSearch(searchInput.trim()), 250)
+    setParamRef.current = setParam
+  })
+  useEffect(() => {
+    const t = setTimeout(() => setParamRef.current('q', searchInput.trim()), 250)
     return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchInput])
-  const [filterEntryType, setFilterEntryType] = useState<ApiEntryTypeValue | ''>('')
-  const [filterStatus, setFilterStatus] = useState<ApiEntryStatusValue | ''>('')
-  const [filterAuthorId, setFilterAuthorId] = useState('')
-  const [filterTopicId, setFilterTopicId] = useState('')
 
   const effectiveEntryType: ApiEntryTypeValue | '' = lockedEntryType ?? filterEntryType
+  // Release filter only applies on screens that opted in; ignore any
+  // stray ?releaseId on the Support screen.
+  const effectiveReleaseId = enableReleaseFilter ? filterReleaseId : ''
 
   const { data, isLoading, error } = useQuery({
     queryKey: [
@@ -93,6 +126,7 @@ export default function EntriesView({ pageTitle, lockedEntryType }: EntriesViewP
         filterStatus,
         filterAuthorId,
         filterTopicId,
+        filterReleaseId: effectiveReleaseId,
       },
     ],
     queryFn: () =>
@@ -103,6 +137,7 @@ export default function EntriesView({ pageTitle, lockedEntryType }: EntriesViewP
         status: filterStatus || undefined,
         authorId: filterAuthorId || undefined,
         topicId: filterTopicId || undefined,
+        releaseId: effectiveReleaseId || undefined,
         limit: 25,
       }),
   })
@@ -119,6 +154,13 @@ export default function EntriesView({ pageTitle, lockedEntryType }: EntriesViewP
   })
   const topics = topicsData?.data
 
+  const { data: releasesData } = useQuery({
+    queryKey: ['console', 'releases'],
+    queryFn: () => API().console.listReleases(),
+    enabled: enableReleaseFilter,
+  })
+  const releases = releasesData?.data
+
   const entryTypeOptions: FilterOption[] = [
     { id: '', label: 'All entry types' },
     ...ENTRY_TYPES.map((t) => ({ id: t.value, label: t.title })),
@@ -134,6 +176,19 @@ export default function EntriesView({ pageTitle, lockedEntryType }: EntriesViewP
       label: u.name || u.username || 'Anonymous',
     })) ?? []),
   ]
+  const releaseOptions: FilterOption[] = [
+    { id: '', label: 'All releases' },
+    ...(releases?.map((r) => ({
+      id: r.id,
+      label: r.versionName,
+      hint: r.title || undefined,
+    })) ?? []),
+  ]
+  // Surface the selected version in the trigger (like Sort) so a
+  // deep-link from the Releases page reads "Release: v1.2.0" at a glance.
+  const activeReleaseLabel = releases?.find(
+    (r) => r.id === effectiveReleaseId,
+  )?.versionName
   const sortOptions: FilterOption[] = [
     { id: 'new', label: 'Newest' },
     { id: 'top', label: 'Most votes' },
@@ -176,33 +231,43 @@ export default function EntriesView({ pageTitle, lockedEntryType }: EntriesViewP
               label="Author"
               options={authorOptions}
               value={filterAuthorId}
-              onChange={setFilterAuthorId}
+              onChange={(id) => setParam('author', id)}
             />
             {!lockedEntryType && (
               <FilterMenu
                 label="Entry Types"
                 options={entryTypeOptions}
                 value={filterEntryType}
-                onChange={(id) => setFilterEntryType(id as ApiEntryTypeValue | '')}
+                onChange={(id) => setParam('type', id)}
               />
             )}
             <FilterMenu
               label="Statuses"
               options={statusOptions}
               value={filterStatus}
-              onChange={(id) => setFilterStatus(id as ApiEntryStatusValue | '')}
+              onChange={(id) => setParam('status', id)}
             />
             <div className="flex items-center gap-2">
               <span className="text-sm text-zinc-600 dark:text-zinc-300">Topic</span>
               <TopicSelect
                 topics={topics}
                 value={filterTopicId}
-                onChange={setFilterTopicId}
+                onChange={(id) => setParam('topicId', id)}
                 placeholder="Filter"
                 align="right"
                 emptyLabel="All topics"
               />
             </div>
+            {enableReleaseFilter && (
+              <FilterMenu
+                label={
+                  activeReleaseLabel ? `Release: ${activeReleaseLabel}` : 'Release'
+                }
+                options={releaseOptions}
+                value={effectiveReleaseId}
+                onChange={(id) => setParam('releaseId', id)}
+              />
+            )}
             <FilterMenu
               label={`Sort: ${activeSortLabel}`}
               options={sortOptions}

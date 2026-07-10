@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
@@ -177,9 +178,19 @@ export default function ReleasesPage() {
                   </div>
                 </div>
                 <EntryTypeCountChips counts={r.entryTypeCounts} />
-                <span className="text-xs tabular-nums text-zinc-500 shrink-0 min-w-[4rem] text-right">
-                  {r.entryCount} {r.entryCount === 1 ? 'entry' : 'entries'}
-                </span>
+                {r.entryCount > 0 ? (
+                  <Link
+                    to={`/entry?releaseId=${r.id}`}
+                    title={`View entries in ${r.versionName}`}
+                    className="text-xs tabular-nums text-sky-700 dark:text-sky-300 hover:underline shrink-0 min-w-[4rem] text-right"
+                  >
+                    {r.entryCount} {r.entryCount === 1 ? 'entry' : 'entries'}
+                  </Link>
+                ) : (
+                  <span className="text-xs tabular-nums text-zinc-500 shrink-0 min-w-[4rem] text-right">
+                    0 entries
+                  </span>
+                )}
                 {isAdmin && (
                   <div className="flex shrink-0 gap-1">
                     <button

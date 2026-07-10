@@ -123,6 +123,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "name": "releaseId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "example": "dark mode",
                         "name": "search",
                         "in": "query"

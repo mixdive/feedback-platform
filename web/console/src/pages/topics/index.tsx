@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Pencil, Plus, Sparkles, Trash2 } from 'lucide-react'
@@ -157,9 +158,19 @@ export default function TopicsPage() {
                   </span>
                 )}
                 <EntryTypeCountChips counts={t.entryTypeCounts} />
-                <span className="text-xs tabular-nums text-zinc-500 shrink-0 min-w-[4rem] text-right">
-                  {t.entryCount} {t.entryCount === 1 ? 'entry' : 'entries'}
-                </span>
+                {t.entryCount > 0 ? (
+                  <Link
+                    to={`/entry?topicId=${t.id}`}
+                    title={`View entries in ${t.title}`}
+                    className="text-xs tabular-nums text-sky-700 dark:text-sky-300 hover:underline shrink-0 min-w-[4rem] text-right"
+                  >
+                    {t.entryCount} {t.entryCount === 1 ? 'entry' : 'entries'}
+                  </Link>
+                ) : (
+                  <span className="text-xs tabular-nums text-zinc-500 shrink-0 min-w-[4rem] text-right">
+                    0 entries
+                  </span>
+                )}
                 {isAdmin && (
                   <div className="flex shrink-0 gap-1">
                     <button

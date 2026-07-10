@@ -43,6 +43,7 @@ type EntryListFilter struct {
 	Status         models.EntryStatus
 	OpenOnly       bool
 	TopicID        string
+	ReleaseID      string
 }
 
 // ListEntries runs a paginated query against the entries collection.
@@ -117,6 +118,11 @@ func entryFilter(f EntryListFilter) bson.M {
 	if f.TopicID != "" {
 		clauses = append(clauses, bson.M{"topicids": f.TopicID})
 	}
+	// Release is a single-value reference on the entry (releaseid);
+	// the Console filter matches entries attached to one release.
+	if f.ReleaseID != "" {
+		clauses = append(clauses, bson.M{"releaseid": f.ReleaseID})
+	}
 	switch len(clauses) {
 	case 0:
 		return bson.M{}
@@ -186,7 +192,7 @@ func (do *DataOperations) CountEntriesByUserAndEntryType() (map[string]UserEntry
 	}
 	type row struct {
 		ID struct {
-			UserID       string `bson:"userid"`
+			UserID    string `bson:"userid"`
 			EntryType string `bson:"entrytype"`
 		} `bson:"_id"`
 		Count int `bson:"count"`

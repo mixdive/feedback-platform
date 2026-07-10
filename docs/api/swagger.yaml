@@ -1295,6 +1295,9 @@ paths:
         in: query
         name: page
         type: integer
+      - in: query
+        name: releaseId
+        type: string
       - example: dark mode
         in: query
         name: search

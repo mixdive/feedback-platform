@@ -30,29 +30,29 @@ import (
 // never include these fields — AI provenance is an internal admin
 // signal.
 type entryResponse struct {
-	ID                   string                  `json:"id"`
-	Title                string                  `json:"title"`
-	Description          string                  `json:"description,omitempty"`
-	VoteCount            int                     `json:"voteCount"`
-	IsVoted              bool                    `json:"isVoted"`
-	CommentCount         int                     `json:"commentCount"`
-	Source               string                  `json:"source"`
-	IsInternal           bool                    `json:"isInternal"`
-	Creator              *api.EntryCreator       `json:"creator,omitempty"`
-	EntryType            *api.EntryTypeResponse  `json:"entryType,omitempty"`
-	EntryTypeAppliedByAI bool                    `json:"entryTypeAppliedByAI"`
+	ID                   string                 `json:"id"`
+	Title                string                 `json:"title"`
+	Description          string                 `json:"description,omitempty"`
+	VoteCount            int                    `json:"voteCount"`
+	IsVoted              bool                   `json:"isVoted"`
+	CommentCount         int                    `json:"commentCount"`
+	Source               string                 `json:"source"`
+	IsInternal           bool                   `json:"isInternal"`
+	Creator              *api.EntryCreator      `json:"creator,omitempty"`
+	EntryType            *api.EntryTypeResponse `json:"entryType,omitempty"`
+	EntryTypeAppliedByAI bool                   `json:"entryTypeAppliedByAI"`
 	// Suggested entry type (populated when the AI analyzer ran),
 	// for the "Apply suggestion" badge on the Console detail sidebar.
-	SuggestedEntryType       *api.EntryTypeResponse  `json:"suggestedEntryType,omitempty"`
-	SuggestedEntryTypeReason string                  `json:"suggestedEntryTypeReason,omitempty"`
-	Status                   api.EntryStatusResponse `json:"status"`
-	Topics                   []EntryTopicResponse    `json:"topics"`
-	AITopicIDs               []string                `json:"aiTopicIds"`
-	Relations                []EntryRelationResponse `json:"relations"`
-	Release                  *api.ReleaseResponse    `json:"release,omitempty"`
+	SuggestedEntryType       *api.EntryTypeResponse   `json:"suggestedEntryType,omitempty"`
+	SuggestedEntryTypeReason string                   `json:"suggestedEntryTypeReason,omitempty"`
+	Status                   api.EntryStatusResponse  `json:"status"`
+	Topics                   []EntryTopicResponse     `json:"topics"`
+	AITopicIDs               []string                 `json:"aiTopicIds"`
+	Relations                []EntryRelationResponse  `json:"relations"`
+	Release                  *api.ReleaseResponse     `json:"release,omitempty"`
 	GitHubIssue              *api.GitHubIssueResponse `json:"githubIssue,omitempty"`
-	CreatedAt                string                  `json:"createdAt"`
-	UpdatedAt                string                  `json:"updatedAt"`
+	CreatedAt                string                   `json:"createdAt"`
+	UpdatedAt                string                   `json:"updatedAt"`
 } //@name Entry
 
 // listMeta is the pagination block returned with every list endpoint.
@@ -196,14 +196,15 @@ func entryToResponse(
 // ("new","evaluation","in-progress","completed","cancelled"). Empty
 // string means "no restriction".
 type listEntriesQuery struct {
-	Search       string `form:"search"                       example:"dark mode"`
-	Sort         string `form:"sort"        enums:"top,new"  example:"new"`
-	Page         int    `form:"page"                         example:"1"`
-	Limit        int    `form:"limit"                        example:"25"`
+	Search    string `form:"search"                       example:"dark mode"`
+	Sort      string `form:"sort"        enums:"top,new"  example:"new"`
+	Page      int    `form:"page"                         example:"1"`
+	Limit     int    `form:"limit"                        example:"25"`
 	EntryType string `form:"entryType" enums:"feature-request,bug,support,other" example:"bug"`
-	Status       string `form:"status"       enums:"new,evaluation,in-progress,completed,cancelled" example:"new"`
-	AuthorID     string `form:"authorId"`
-	TopicID      string `form:"topicId"`
+	Status    string `form:"status"       enums:"new,evaluation,in-progress,completed,cancelled" example:"new"`
+	AuthorID  string `form:"authorId"`
+	TopicID   string `form:"topicId"`
+	ReleaseID string `form:"releaseId"`
 }
 
 // ListEntriesHandler returns a paginated entry list (admin view).
@@ -223,12 +224,13 @@ func ListEntriesHandler(do dataoperations.Store) gin.HandlerFunc {
 			return
 		}
 		filter := dataoperations.EntryListFilter{
-			Search:  request.Search,
-			Sort:    request.Sort,
-			Page:    request.Page,
-			Limit:   request.Limit,
-			OwnerID: request.AuthorID,
-			TopicID: request.TopicID,
+			Search:    request.Search,
+			Sort:      request.Sort,
+			Page:      request.Page,
+			Limit:     request.Limit,
+			OwnerID:   request.AuthorID,
+			TopicID:   request.TopicID,
+			ReleaseID: request.ReleaseID,
 		}
 		if request.EntryType != "" {
 			ft, err := resolveEntryType(request.EntryType)

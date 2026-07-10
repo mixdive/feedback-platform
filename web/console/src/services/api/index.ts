@@ -650,6 +650,7 @@ export const API = () => ({
         status?: ApiEntryStatusValue
         authorId?: string
         topicId?: string
+        releaseId?: string
       } = {},
     ) => request<ApiEntryListResponse>('GET', '/api/console/entry' + qs(params)),
     getEntry: (id: string) => request<ApiEntry>('GET', `/api/console/entry/${id}`),
