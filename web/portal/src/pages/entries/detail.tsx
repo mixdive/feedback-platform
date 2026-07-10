@@ -1,6 +1,6 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ArrowLeft, ChevronUp, Loader2 } from 'lucide-react'
+import { ArrowLeft, ChevronUp, ExternalLink, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import dayjs from 'dayjs'
 import clsx from 'clsx'
@@ -14,6 +14,7 @@ import { authResolved } from '@/store'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { entryStatusInfo } from '@/utils/entry-status'
 import { message } from '@/utils/helpers'
+import { useDocumentTitle } from '@/utils/use-document-title'
 
 function creatorLabel(c: ApiEntryCreator | undefined, fallback: string): string {
   if (!c) return fallback
@@ -33,6 +34,9 @@ export default function EntryDetailPage() {
     queryFn: () => API().portal.getEntry(id),
     enabled: !!id,
   })
+
+  // Reflect the entry title in the browser tab while this page is open.
+  useDocumentTitle(entry?.title)
 
   const voteMut = useMutation({
     mutationFn: () => API().portal.addVote(id),
@@ -69,6 +73,10 @@ export default function EntryDetailPage() {
   }
 
   const isMine = !!me && entry.creator?.id === me.id
+  // Team members (admin or editor) can jump straight to this entry in the
+  // Console. End users never see the link — it's Console access, not authorship.
+  const isConsoleUser =
+    !!me && me.roles.some((r) => r === 'admin' || r === 'editor')
   const isClosed = entryStatusInfo(entry.status?.value as ApiEntryStatusValue | undefined).closed
 
   return (
@@ -148,16 +156,34 @@ export default function EntryDetailPage() {
           <Comments entryId={entry.id} count={entry.commentCount} />
         </div>
 
-        <Sidebar entry={entry} isMine={isMine} />
+        <Sidebar entry={entry} isMine={isMine} isConsoleUser={isConsoleUser} />
       </div>
     </div>
   )
 }
 
-function Sidebar({ entry, isMine }: { entry: ApiEntry; isMine: boolean }) {
+function Sidebar({
+  entry,
+  isMine,
+  isConsoleUser,
+}: {
+  entry: ApiEntry
+  isMine: boolean
+  isConsoleUser: boolean
+}) {
   const { t } = useTranslation()
   return (
     <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
+      {isConsoleUser && (
+        <a
+          href={`/console/entry/${entry.id}`}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-zinc-300 bg-white px-3 h-9 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+        >
+          <ExternalLink className="size-4" />
+          {t('entryDetail.openInConsole')}
+        </a>
+      )}
+
       <Section title={t('entryDetail.sectionStatus')}>
         <StatusBadge status={entry.status} />
       </Section>

@@ -24,6 +24,7 @@ import {
   type ApiRelease,
 } from '@/services/api'
 import { message } from '@/utils/helpers'
+import { useDocumentTitle } from '@/utils/use-document-title'
 
 function creatorLabel(c?: ApiEntryCreator): string {
   if (!c) return 'Anonymous'
@@ -56,6 +57,9 @@ export default function EntryDetailPage() {
 
   const [activeTab, setActiveTab] = useState<'activity' | 'relations'>('activity')
   const [isMerging, setIsMerging] = useState(false)
+
+  // Reflect the entry title in the browser tab while this page is open.
+  useDocumentTitle(entry?.title)
 
   const { data: topicsData } = useQuery({
     queryKey: ['console', 'entry-topics'],
@@ -332,6 +336,32 @@ function Sidebar({
   )
   return (
     <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
+      <div>
+        {entry.isInternal ? (
+          <span
+            title="Internal — not visible on the Portal"
+            aria-disabled="true"
+            className="inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-md border border-zinc-200 px-3 h-9 text-sm font-medium text-zinc-400 dark:border-zinc-800 dark:text-zinc-600"
+          >
+            <ExternalLink className="size-4" />
+            View on portal
+          </span>
+        ) : (
+          <a
+            href={`/entry/${entry.id}`}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-zinc-300 bg-white px-3 h-9 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+          >
+            <ExternalLink className="size-4" />
+            View on portal
+          </a>
+        )}
+        {entry.isInternal && (
+          <p className="mt-1.5 text-xs text-zinc-500">
+            Internal — not visible on the Portal.
+          </p>
+        )}
+      </div>
+
       <Section title="Visibility">
         <div
           role="group"
