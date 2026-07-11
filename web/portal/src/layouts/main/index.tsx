@@ -41,8 +41,8 @@ export default function MainLayout() {
   }
 
   const initial =
-    user?.name?.[0]?.toUpperCase() ??
     user?.username?.[0]?.toUpperCase() ??
+    user?.name?.[0]?.toUpperCase() ??
     user?.email?.[0]?.toUpperCase() ??
     '?'
 
@@ -156,7 +156,7 @@ export default function MainLayout() {
                 </div>
               )}
               <div className="hidden sm:block text-sm text-zinc-700 dark:text-zinc-200">
-                {user.name || user.username || user.email || t('common.signedIn')}
+                {user.username || user.name || user.email || t('common.signedIn')}
               </div>
               <button
                 type="button"

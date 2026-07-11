@@ -53,14 +53,15 @@ func ListEntryAuthorsHandler(do dataoperations.Store) gin.HandlerFunc {
 	}
 }
 
-// authorLabel is the sort key — name first, then username, then ID. Keeps
-// the dropdown order stable across requests.
+// authorLabel is the sort key — username first, then name, then ID,
+// matching the display precedence in the React apps' user-display helper.
+// Keeps the dropdown order stable across requests.
 func authorLabel(u api.EntryCreator) string {
-	if u.Name != "" {
-		return u.Name
-	}
 	if u.Username != "" {
 		return u.Username
+	}
+	if u.Name != "" {
+		return u.Name
 	}
 	return u.ID
 }

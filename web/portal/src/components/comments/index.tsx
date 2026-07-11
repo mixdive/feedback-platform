@@ -7,15 +7,11 @@ import dayjs from 'dayjs'
 import Button from '@/components/button'
 import Markdown from '@/components/markdown'
 import MarkdownEditor from '@/components/markdown-editor'
-import { API, type ApiComment, type ApiEntryCreator } from '@/services/api'
+import { API, type ApiComment } from '@/services/api'
 import { useAppSelector } from '@/store/hooks'
 import { useSiteConfig } from '@/store/site/hooks'
 import { message } from '@/utils/helpers'
-
-function authorLabel(a: ApiEntryCreator | undefined, fallback: string): string {
-  if (!a) return fallback
-  return a.name || a.username || fallback
-}
+import { userDisplayName, userInitial } from '@/utils/user-display'
 
 interface Props {
   entryId: string
@@ -110,7 +106,7 @@ export default function Comments({ entryId, count }: Props) {
 function CommentItem({ comment }: { comment: ApiComment }) {
   const { t } = useTranslation()
   const author = comment.author
-  const initial = (author?.name || author?.username || '?')[0]?.toUpperCase() ?? '?'
+  const initial = userInitial(author)
   return (
     <li className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
       <div className="flex items-start gap-3">
@@ -128,7 +124,7 @@ function CommentItem({ comment }: { comment: ApiComment }) {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
             <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
-              {authorLabel(author, t('common.unknown'))}
+              {userDisplayName(author, t('common.unknown'))}
             </span>
             {comment.authorIsTeam && (
               <span className="inline-flex items-center gap-1 rounded bg-indigo-100 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-200">

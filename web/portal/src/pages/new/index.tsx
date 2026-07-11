@@ -23,7 +23,6 @@ import {
   API,
   type ApiEntry,
   type ApiEntryTypeValue,
-  type ApiEntryCreator,
   type ApiFindSimilarMatch,
 } from '@/services/api'
 import { authResolved } from '@/store'
@@ -31,6 +30,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { useSiteConfig } from '@/store/site/hooks'
 import { message } from '@/utils/helpers'
 import { entryTypeInfo } from '@/utils/entry-type'
+import { userDisplayName } from '@/utils/user-display'
 
 type AllowedNewType = 'feature-request' | 'bug'
 
@@ -43,10 +43,6 @@ const TITLE_MAX = 100
 // counted as its own step.
 type Phase = 'title' | 'matches' | 'form'
 
-function creatorLabel(c: ApiEntryCreator | undefined, fallback: string): string {
-  if (!c) return fallback
-  return c.name || c.username || fallback
-}
 
 // DEFAULT_TEMPLATE_LANGUAGE mirrors the backend's
 // models.DefaultTemplateLanguage — when the visitor's active language
@@ -315,7 +311,7 @@ export default function NewEntryPage() {
                         {entry.commentCount}
                       </span>
                       <span>·</span>
-                      <span>{t('common.byUser', { name: creatorLabel(entry.creator, t('common.anonymous')) })}</span>
+                      <span>{t('common.byUser', { name: userDisplayName(entry.creator, t('common.anonymous')) })}</span>
                       <span>·</span>
                       <span>{dayjs(entry.createdAt).format('LL')}</span>
                     </div>

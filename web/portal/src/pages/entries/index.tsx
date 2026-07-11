@@ -21,7 +21,6 @@ import ReleaseBadge from '@/components/release-badge'
 import StatusBadge from '@/components/status-badge'
 import {
   API,
-  type ApiEntryCreator,
   type ApiEntryStatusValue,
   type ApiEntryTypeValue,
 } from '@/services/api'
@@ -30,14 +29,10 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { useSiteConfig } from '@/store/site/hooks'
 import { entryStatusInfo } from '@/utils/entry-status'
 import { message } from '@/utils/helpers'
+import { userDisplayName } from '@/utils/user-display'
 
 type Tab = 'all' | 'feature-request' | 'bug' | 'mine'
 type Sort = 'top' | 'new'
-
-function creatorLabel(c: ApiEntryCreator | undefined, fallback: string): string {
-  if (!c) return fallback
-  return c.name || c.username || fallback
-}
 
 export default function EntriesPage() {
   const { t } = useTranslation()
@@ -243,7 +238,7 @@ export default function EntriesPage() {
                   )}
                   <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-500">
                     <span className="text-zinc-700 dark:text-zinc-300">
-                      {t('common.byUser', { name: creatorLabel(f.creator, t('common.anonymous')) })}
+                      {t('common.byUser', { name: userDisplayName(f.creator, t('common.anonymous')) })}
                     </span>
                     <span>·</span>
                     <span>{dayjs(f.createdAt).format('LL')}</span>

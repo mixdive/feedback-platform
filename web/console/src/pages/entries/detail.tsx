@@ -25,11 +25,7 @@ import {
 } from '@/services/api'
 import { message } from '@/utils/helpers'
 import { useDocumentTitle } from '@/utils/use-document-title'
-
-function creatorLabel(c?: ApiEntryCreator): string {
-  if (!c) return 'Anonymous'
-  return c.name || c.username || 'Anonymous'
-}
+import { userDisplayName, userInitial } from '@/utils/user-display'
 
 export default function EntryDetailPage() {
   const { id = '' } = useParams<{ id: string }>()
@@ -571,7 +567,7 @@ function CreatorBlock({ creator }: { creator?: ApiEntryCreator }) {
   if (!creator) {
     return <span className="text-sm text-zinc-500">Anonymous</span>
   }
-  const initial = (creator.name || creator.username || '?')[0]?.toUpperCase() ?? '?'
+  const initial = userInitial(creator)
   return (
     <div className="flex items-center gap-2">
       {creator.imageUrl ? (
@@ -583,10 +579,10 @@ function CreatorBlock({ creator }: { creator?: ApiEntryCreator }) {
       )}
       <div className="min-w-0 text-sm">
         <div className="truncate text-zinc-800 dark:text-zinc-200">
-          {creatorLabel(creator)}
+          {userDisplayName(creator, 'Anonymous')}
         </div>
         {creator.username && creator.name && (
-          <div className="truncate text-xs text-zinc-500">@{creator.username}</div>
+          <div className="truncate text-xs text-zinc-500">{creator.name}</div>
         )}
       </div>
     </div>

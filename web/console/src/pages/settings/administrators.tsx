@@ -22,7 +22,7 @@ type EditableRole = 'admin' | 'editor'
 const editableRoles: EditableRole[] = ['admin', 'editor']
 
 function displayLabel(u: { email: string; name?: string; username?: string }): string {
-  return u.name || u.username || u.email || '—'
+  return u.username || u.name || u.email || '—'
 }
 
 export default function AdministratorsSettingsPage() {

@@ -3,13 +3,9 @@ import { Lock, MessageSquare, Globe, ShieldCheck } from 'lucide-react'
 import dayjs from 'dayjs'
 
 import Markdown from '@/components/markdown'
-import { API, type ApiComment, type ApiEntryCreator } from '@/services/api'
+import { API, type ApiComment } from '@/services/api'
 import { message } from '@/utils/helpers'
-
-function authorLabel(a?: ApiEntryCreator): string {
-  if (!a) return 'Unknown'
-  return a.name || a.username || 'Unknown'
-}
+import { userDisplayName, userInitial } from '@/utils/user-display'
 
 interface Props {
   entryId: string
@@ -78,7 +74,7 @@ interface CommentItemProps {
 
 function CommentItem({ comment, onToggleInternal, isUpdating }: CommentItemProps) {
   const author = comment.author
-  const initial = (author?.name || author?.username || '?')[0]?.toUpperCase() ?? '?'
+  const initial = userInitial(author)
   const isInternal = comment.isInternal
   return (
     <li className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
@@ -97,7 +93,7 @@ function CommentItem({ comment, onToggleInternal, isUpdating }: CommentItemProps
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
             <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
-              {authorLabel(author)}
+              {userDisplayName(author, 'Unknown')}
             </span>
             {comment.authorIsTeam && (
               <span className="inline-flex items-center gap-1 rounded bg-indigo-100 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-200">

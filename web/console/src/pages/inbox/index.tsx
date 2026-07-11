@@ -11,18 +11,13 @@ import ReleaseBadge from '@/components/release-badge'
 import TopicBadge from '@/components/topic-badge'
 import {
   API,
-  type ApiEntryCreator,
   type ApiEntryStatusValue,
 } from '@/services/api'
 import { ENTRY_STATUSES } from '@/utils/entry-status'
 import { message } from '@/utils/helpers'
+import { userDisplayName } from '@/utils/user-display'
 
 dayjs.extend(relativeTime)
-
-function creatorLabel(c?: ApiEntryCreator): string {
-  if (!c) return 'Anonymous'
-  return c.name || c.username || 'Anonymous'
-}
 
 // Inbox scope is hardcoded: every entry whose status is "new",
 // regardless of category. The list is triage-ordered (newest first).
@@ -139,7 +134,7 @@ export default function InboxPage() {
                   <span>
                     opened {dayjs(f.createdAt).fromNow()} by{' '}
                     <span className="text-zinc-700 dark:text-zinc-300">
-                      {creatorLabel(f.creator)}
+                      {userDisplayName(f.creator, 'Anonymous')}
                     </span>
                   </span>
                 </div>

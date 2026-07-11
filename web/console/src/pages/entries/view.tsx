@@ -17,20 +17,15 @@ import TopicSelect from '@/components/topic-select'
 import {
   API,
   type ApiEntryTypeValue,
-  type ApiEntryCreator,
   type ApiEntryStatusValue,
 } from '@/services/api'
 import { ENTRY_TYPES } from '@/utils/entry-type'
 import { ENTRY_STATUSES, entryStatusInfo } from '@/utils/entry-status'
+import { userDisplayName } from '@/utils/user-display'
 
 dayjs.extend(relativeTime)
 
 type Sort = 'new' | 'top'
-
-function creatorLabel(c?: ApiEntryCreator): string {
-  if (!c) return 'Anonymous'
-  return c.name || c.username || 'Anonymous'
-}
 
 // EntriesView is the shared entries-list surface used by four pages:
 // All Feedback (no lock), Feature Requests
@@ -173,7 +168,7 @@ export default function EntriesView({
     { id: '', label: 'All authors' },
     ...(authors?.map((u) => ({
       id: u.id,
-      label: u.name || u.username || 'Anonymous',
+      label: userDisplayName(u, 'Anonymous'),
     })) ?? []),
   ]
   const releaseOptions: FilterOption[] = [
@@ -377,7 +372,7 @@ export default function EntriesView({
                         {isClosed ? 'closed' : 'opened'}{' '}
                         {dayjs(f.createdAt).fromNow()} by{' '}
                         <span className="text-zinc-700 dark:text-zinc-300">
-                          {creatorLabel(f.creator)}
+                          {userDisplayName(f.creator, 'Anonymous')}
                         </span>
                       </span>
                     </div>

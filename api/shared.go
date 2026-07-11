@@ -19,9 +19,9 @@ import (
 // longer exists.
 //
 // Email is deliberately absent from the wire shape — entry cards must
-// not reveal someone else's address. Frontends fall back name → username →
-// "Anonymous". Sensitive fields (PasswordHash, Keys, Roles) never leave
-// the server.
+// not reveal someone else's address. Frontends fall back username → name →
+// "Anonymous" (see web/{console,portal}/src/utils/user-display.ts).
+// Sensitive fields (PasswordHash, Keys, Roles) never leave the server.
 type EntryCreator struct {
 	ID       string `json:"id"`
 	Name     string `json:"name,omitempty"`
@@ -29,11 +29,14 @@ type EntryCreator struct {
 	ImageURL string `json:"imageUrl,omitempty"`
 } //@name EntryCreator
 
-// BuildEntryCreator collapses the user's accounts (Email first, then
-// Custom) into the wire shape, mirroring the precedence used by /api/me.
+// BuildEntryCreator collapses the user's accounts (Email, then Custom,
+// then Google) into the wire shape, mirroring the precedence used by
+// /api/me. Each field is filled from the first account that carries it,
+// so a user whose Name lives on one account and Username on another
+// surfaces both — the frontend then picks which to display.
 func BuildEntryCreator(u models.User) EntryCreator {
 	out := EntryCreator{ID: u.ID}
-	if a, ok := u.EmailAccount(); ok {
+	fill := func(a models.UserAccount) {
 		if out.Name == "" {
 			out.Name = a.Name
 		}
@@ -44,16 +47,14 @@ func BuildEntryCreator(u models.User) EntryCreator {
 			out.ImageURL = a.ImageURL
 		}
 	}
+	if a, ok := u.EmailAccount(); ok {
+		fill(a)
+	}
 	if a, ok := u.CustomAccount(); ok {
-		if out.Name == "" {
-			out.Name = a.Name
-		}
-		if out.Username == "" {
-			out.Username = a.Username
-		}
-		if out.ImageURL == "" {
-			out.ImageURL = a.ImageURL
-		}
+		fill(a)
+	}
+	if a, ok := u.GoogleAccount(); ok {
+		fill(a)
 	}
 	return out
 }

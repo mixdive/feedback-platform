@@ -28,13 +28,13 @@ import {
   type ApiActivity,
   type ApiActivityType,
   type ApiComment,
-  type ApiEntryCreator,
   type ApiEntryTopic,
   type ApiRelease,
 } from '@/services/api'
 import { entryStatusInfo } from '@/utils/entry-status'
 import { entryTypeInfo } from '@/utils/entry-type'
 import { activityInfo } from '@/utils/activity'
+import { userDisplayName, userInitial } from '@/utils/user-display'
 import { message } from '@/utils/helpers'
 
 // ACTIVITY_ICONS maps the icon string in `activityInfo()` to its
@@ -162,13 +162,6 @@ export default function Timeline({ entryId, count, topics, releases }: Props) {
   )
 }
 
-// authorLabel collapses the User projection into the single string we
-// surface on each row. Same precedence as the comments author label.
-function authorLabel(a?: ApiEntryCreator): string {
-  if (!a) return 'Anonymous'
-  return a.name || a.username || 'Anonymous'
-}
-
 function CommentItem({
   comment,
   onToggleInternal,
@@ -179,7 +172,7 @@ function CommentItem({
   isUpdating: boolean
 }) {
   const author = comment.author
-  const initial = (author?.name || author?.username || '?')[0]?.toUpperCase() ?? '?'
+  const initial = userInitial(author)
   const isInternal = comment.isInternal
   return (
     <li className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
@@ -198,7 +191,7 @@ function CommentItem({
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
             <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
-              {authorLabel(author)}
+              {userDisplayName(author, 'Anonymous')}
             </span>
             <span className="text-xs text-zinc-500" title={comment.createdAt}>
               {dayjs(comment.createdAt).format('MMM D, YYYY · h:mm A')}
@@ -258,7 +251,7 @@ function ActivityItem({
   const isAI = activity.source === 'ai'
   const actor = activity.actor
   const actorName =
-    isAI ? 'AI' : actor ? authorLabel(actor) : activity.source === 'admin' ? 'An admin' : 'Someone'
+    isAI ? 'AI' : actor ? userDisplayName(actor, 'Anonymous') : activity.source === 'admin' ? 'An admin' : 'Someone'
   return (
     <li className="flex items-start gap-3 rounded-lg border border-transparent px-2 py-1.5 hover:border-zinc-200 dark:hover:border-zinc-800">
       <div

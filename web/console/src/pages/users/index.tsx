@@ -222,7 +222,7 @@ export default function UsersPage() {
 }
 
 function UserRow({ user }: { user: ApiUserRow }) {
-  const display = user.name?.trim() || user.username?.trim() || user.email || '—'
+  const display = user.username?.trim() || user.name?.trim() || user.email || '—'
   const sub =
     user.name && user.email && user.name !== user.email ? user.email : ''
   return (

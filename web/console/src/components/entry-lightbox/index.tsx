@@ -8,13 +8,9 @@ import EntryTypeBadge from '@/components/entry-type-badge'
 import Comments from '@/components/comments'
 import Markdown from '@/components/markdown'
 import StatusBadge from '@/components/status-badge'
-import { API, type ApiEntryCreator } from '@/services/api'
+import { API } from '@/services/api'
 import { message } from '@/utils/helpers'
-
-function creatorLabel(c?: ApiEntryCreator): string {
-  if (!c) return 'Anonymous'
-  return c.name || c.username || 'Anonymous'
-}
+import { userDisplayName } from '@/utils/user-display'
 
 interface Props {
   entryId: string | null
@@ -106,7 +102,7 @@ export default function EntryLightbox({ entryId, onClose }: Props) {
                       <span className="text-xs text-zinc-500">
                         by{' '}
                         <span className="text-zinc-700 dark:text-zinc-300">
-                          {creatorLabel(entry.creator)}
+                          {userDisplayName(entry.creator, 'Anonymous')}
                         </span>{' '}
                         · {dayjs(entry.createdAt).format('MMM D, YYYY')}
                       </span>

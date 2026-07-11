@@ -15,11 +15,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { entryStatusInfo } from '@/utils/entry-status'
 import { message } from '@/utils/helpers'
 import { useDocumentTitle } from '@/utils/use-document-title'
-
-function creatorLabel(c: ApiEntryCreator | undefined, fallback: string): string {
-  if (!c) return fallback
-  return c.name || c.username || fallback
-}
+import { userDisplayName, userInitial } from '@/utils/user-display'
 
 export default function EntryDetailPage() {
   const { t } = useTranslation()
@@ -264,7 +260,7 @@ function CreatorBlock({
   if (!creator) {
     return <span className="text-sm text-zinc-500">{t('common.anonymous')}</span>
   }
-  const initial = (creator.name || creator.username || '?')[0]?.toUpperCase() ?? '?'
+  const initial = userInitial(creator)
   return (
     <div className="flex items-center gap-2">
       {creator.imageUrl ? (
@@ -276,11 +272,11 @@ function CreatorBlock({
       )}
       <div className="min-w-0 text-sm">
         <div className="truncate text-zinc-800 dark:text-zinc-200">
-          {creatorLabel(creator, t('common.anonymous'))}
+          {userDisplayName(creator, t('common.anonymous'))}
           {isMine && <span className="ml-1 text-xs text-sky-600 dark:text-sky-400">{t('common.you')}</span>}
         </div>
         {creator.username && creator.name && (
-          <div className="truncate text-xs text-zinc-500">@{creator.username}</div>
+          <div className="truncate text-xs text-zinc-500">{creator.name}</div>
         )}
       </div>
     </div>
