@@ -128,6 +128,17 @@ func (b *builder) buildSettings() {
 			Token:       githubToken,
 			ConnectedAt: b.daysAgo(60),
 		},
+		Slack: models.SlackIntegration{
+			ClientID:        slackClientID,
+			ClientSecret:    slackClientSecret,
+			WebhookURL:      slackWebhookURL,
+			ChannelName:     slackChannelName,
+			TeamName:        slackTeamName,
+			NotifyOnEntry:   true,
+			NotifyOnComment: true,
+			NotifyOnVote:    false,
+			ConnectedAt:     b.daysAgo(45),
+		},
 	}
 	s.SetupCompleted = true
 	b.d.settings = s

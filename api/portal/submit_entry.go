@@ -1,6 +1,8 @@
 package portal
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 
 	"github.com/mixdive/feedback-platform/api"
@@ -128,6 +130,17 @@ func SubmitEntryHandler(do dataoperations.Store) gin.HandlerFunc {
 				response.SystemError(c, err)
 				return
 			}
+		}
+		// Best-effort Slack notification for the new public entry.
+		// Internal entries (admin-authored notes) never leave the
+		// Console, so they never reach Slack either.
+		if !e.IsInternal {
+			msg := fmt.Sprintf(":sparkles: *New feedback* — %s\n_%s · by %s_",
+				slackEntryRef(c, e.ID, e.Title),
+				slackEntryTypeLabel(e.EntryType),
+				slackAuthorName(middlewares.CurrentUser(c)),
+			)
+			notifySlack(do, func(s models.SlackIntegration) bool { return s.NotifyOnEntry }, msg)
 		}
 		// AI analysis is poller-driven (pkg/aianalyzer.Worker) — an
 		// empty EntryTypeAnalysis.Status is picked up on the next

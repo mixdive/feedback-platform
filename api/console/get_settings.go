@@ -89,11 +89,43 @@ type githubIntegrationPayload struct {
 	Active       bool   `json:"active"`
 } //@name GitHubIntegration
 
+// slackIntegrationPayload is the admin-facing projection of
+// SlackIntegration. Secrets never travel: the ClientSecret and the
+// OAuth-derived WebhookURL / AccessToken are withheld — the wire carries
+// only HasClientSecret plus the non-secret ClientID (which pre-fills the
+// field and rides in every authorize URL anyway).
+//
+// AppConfigured (client id + secret present) gates the "Add to Slack"
+// button; Connected (a channel webhook is stored and not kill-switched)
+// gates the delivery. ChannelName / TeamName describe the connected
+// channel for display. NotifyOn* mirror the stored toggles. LastError*
+// surface the most recent best-effort delivery failure. RedirectUri is
+// computed per-request by the handler (it depends on the request host)
+// so the admin can copy the exact URL to register on their Slack App.
+type slackIntegrationPayload struct {
+	Disabled         bool   `json:"disabled"`
+	ClientId         string `json:"clientId,omitempty"`
+	HasClientSecret  bool   `json:"hasClientSecret"`
+	AppConfigured    bool   `json:"appConfigured"`
+	Connected        bool   `json:"connected"`
+	ChannelName      string `json:"channelName,omitempty"`
+	TeamName         string `json:"teamName,omitempty"`
+	NotifyOnEntry    bool   `json:"notifyOnEntry"`
+	NotifyOnComment  bool   `json:"notifyOnComment"`
+	NotifyOnVote     bool   `json:"notifyOnVote"`
+	ConnectedAt      string `json:"connectedAt,omitempty"`
+	ConnectedBy      string `json:"connectedBy,omitempty"`
+	LastErrorAt      string `json:"lastErrorAt,omitempty"`
+	LastErrorMessage string `json:"lastErrorMessage,omitempty"`
+	RedirectUri      string `json:"redirectUri,omitempty"`
+} //@name SlackIntegration
+
 // integrationsSettingsPayload groups every third-party integration's
-// projection. Adding a new integration (Slack, Linear, …) lands a
-// sibling field here.
+// projection. Adding a new integration (Linear, …) lands a sibling field
+// here.
 type integrationsSettingsPayload struct {
 	GitHub githubIntegrationPayload `json:"github"`
+	Slack  slackIntegrationPayload  `json:"slack"`
 } //@name IntegrationsSettings
 
 // uploadSettingsPayload is the admin-facing projection of UploadSettings.
@@ -220,6 +252,23 @@ func buildIntegrationsPayload(in models.IntegrationsSettings) integrationsSettin
 			ConnectedAt:  formatTimeOmitZero(in.GitHub.ConnectedAt),
 			ConnectedBy:  in.GitHub.ConnectedBy,
 			Active:       models.IsGitHubIntegrationActive(in.GitHub),
+		},
+		Slack: slackIntegrationPayload{
+			Disabled:         in.Slack.Disabled,
+			ClientId:         in.Slack.ClientID,
+			HasClientSecret:  in.Slack.ClientSecret != "",
+			AppConfigured:    models.IsSlackAppConfigured(in.Slack),
+			Connected:        models.IsSlackIntegrationActive(in.Slack),
+			ChannelName:      in.Slack.ChannelName,
+			TeamName:         in.Slack.TeamName,
+			NotifyOnEntry:    in.Slack.NotifyOnEntry,
+			NotifyOnComment:  in.Slack.NotifyOnComment,
+			NotifyOnVote:     in.Slack.NotifyOnVote,
+			ConnectedAt:      formatTimeOmitZero(in.Slack.ConnectedAt),
+			ConnectedBy:      in.Slack.ConnectedBy,
+			LastErrorAt:      formatTimeOmitZero(in.Slack.LastErrorAt),
+			LastErrorMessage: in.Slack.LastErrorMessage,
+			// RedirectUri is filled per-request by the handler.
 		},
 	}
 }

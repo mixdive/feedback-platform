@@ -1,6 +1,8 @@
 package portal
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 
 	"github.com/mixdive/feedback-platform/api"
@@ -66,6 +68,16 @@ func CreateCommentHandler(do dataoperations.Store) gin.HandlerFunc {
 		if err := do.IncrementEntryCommentCount(id, 1); err != nil {
 			response.SystemError(c, err)
 			return
+		}
+		// Best-effort Slack notification. Internal entries are
+		// Console-only, so their comments never reach Slack.
+		if !entry.IsInternal {
+			msg := fmt.Sprintf(":speech_balloon: *New comment* on %s by %s\n> %s",
+				slackEntryRef(c, entry.ID, entry.Title),
+				slackAuthorName(u),
+				slackExcerpt(req.Body, 240),
+			)
+			notifySlack(do, func(s models.SlackIntegration) bool { return s.NotifyOnComment }, msg)
 		}
 		authors := map[string]api.EntryCreator{u.ID: api.BuildEntryCreator(*u)}
 		team := map[string]bool{}

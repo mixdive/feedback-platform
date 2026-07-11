@@ -18,7 +18,23 @@ import (
 // types regardless of which endpoint it called.
 type integrationsResponse struct {
 	GitHub githubIntegrationPayload `json:"github"`
+	Slack  slackIntegrationPayload  `json:"slack"`
 } //@name IntegrationsResponse
+
+// respondIntegrations reloads the settings doc, projects the integration
+// state, stamps the per-request Slack redirect URI, and writes the
+// envelope. Every integration handler ends by calling this so the
+// response shape (and the redirect-URI derivation) stays in one place.
+func respondIntegrations(c *gin.Context, do dataoperations.Store) {
+	s, err := do.GetSettings()
+	if err != nil || s == nil {
+		response.SystemError(c, err)
+		return
+	}
+	payload := buildIntegrationsPayload(s.Integrations)
+	payload.Slack.RedirectUri = slackRedirectURI(c)
+	response.Success(c, integrationsResponse{GitHub: payload.GitHub, Slack: payload.Slack})
+}
 
 // GetIntegrationsHandler returns the current state of every configured
 // integration. Admin+editor — read-only consumers (entry detail page
@@ -33,13 +49,7 @@ type integrationsResponse struct {
 //	@Router		/api/console/integrations [get]
 func GetIntegrationsHandler(do dataoperations.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		s, err := do.GetSettings()
-		if err != nil || s == nil {
-			response.SystemError(c, err)
-			return
-		}
-		payload := buildIntegrationsPayload(s.Integrations)
-		response.Success(c, integrationsResponse{GitHub: payload.GitHub})
+		respondIntegrations(c, do)
 	}
 }
 
@@ -117,13 +127,7 @@ func UpdateGitHubIntegrationHandler(do dataoperations.Store) gin.HandlerFunc {
 			response.SystemError(c, err)
 			return
 		}
-		updated, err := do.GetSettings()
-		if err != nil || updated == nil {
-			response.SystemError(c, err)
-			return
-		}
-		payload := buildIntegrationsPayload(updated.Integrations)
-		response.Success(c, integrationsResponse{GitHub: payload.GitHub})
+		respondIntegrations(c, do)
 	}
 }
 
@@ -154,12 +158,6 @@ func DeleteGitHubIntegrationHandler(do dataoperations.Store) gin.HandlerFunc {
 			response.SystemError(c, err)
 			return
 		}
-		updated, err := do.GetSettings()
-		if err != nil || updated == nil {
-			response.SystemError(c, err)
-			return
-		}
-		payload := buildIntegrationsPayload(updated.Integrations)
-		response.Success(c, integrationsResponse{GitHub: payload.GitHub})
+		respondIntegrations(c, do)
 	}
 }

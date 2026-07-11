@@ -1,6 +1,8 @@
 package portal
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 
 	"github.com/mixdive/feedback-platform/api"
@@ -98,6 +100,21 @@ func AddVoteHandler(do dataoperations.Store) gin.HandlerFunc {
 		if err != nil || updated == nil {
 			response.SystemError(c, err)
 			return
+		}
+		// Best-effort Slack notification, only when a vote was ADDED
+		// (never on un-vote — a toggle-off isn't newsworthy) and never
+		// for internal entries.
+		if voted && !updated.IsInternal {
+			noun := "votes"
+			if updated.VoteCount == 1 {
+				noun = "vote"
+			}
+			msg := fmt.Sprintf(":thumbsup: *New vote* on %s — now %d %s",
+				slackEntryRef(c, updated.ID, updated.Title),
+				updated.VoteCount,
+				noun,
+			)
+			notifySlack(do, func(s models.SlackIntegration) bool { return s.NotifyOnVote }, msg)
 		}
 		creators, err := api.LoadEntryCreators(do, []string{updated.UserID})
 		if err != nil {

@@ -176,6 +176,26 @@ func newRouter(do dataoperations.Store, store *storage.Holder, worker *aianalyze
 			middlewares.RequireAdminMiddleware(),
 			console.DeleteGitHubIntegrationHandler(do),
 		)
+		cg.PUT("/integrations/slack",
+			middlewares.RequireAdminMiddleware(),
+			console.UpdateSlackIntegrationHandler(do),
+		)
+		// OAuth kickoff + callback are browser navigations (not XHR):
+		// the admin's session cookie is SameSite=Lax, so it rides the
+		// top-level GET redirect back from slack.com and RequireAdmin
+		// still resolves the user.
+		cg.GET("/integrations/slack/authorize",
+			middlewares.RequireAdminMiddleware(),
+			console.SlackAuthorizeHandler(do),
+		)
+		cg.GET("/integrations/slack/callback",
+			middlewares.RequireAdminMiddleware(),
+			console.SlackCallbackHandler(do),
+		)
+		cg.DELETE("/integrations/slack",
+			middlewares.RequireAdminMiddleware(),
+			console.DisconnectSlackIntegrationHandler(do),
+		)
 		cg.GET("/ai/queue",
 			middlewares.RequireAdminMiddleware(),
 			console.GetAIQueueHandler(worker),

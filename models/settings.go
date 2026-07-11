@@ -307,6 +307,7 @@ func generateJWTPrivateKey() (string, error) {
 // the parent. Zero value is the safe "no integrations configured" state.
 type IntegrationsSettings struct {
 	GitHub GitHubIntegration
+	Slack  SlackIntegration
 }
 
 // GitHubIntegration is the single-repo connection to GitHub. Single-tenant
@@ -342,6 +343,77 @@ type GitHubIntegration struct {
 // whether to surface the "Create on GitHub" affordance.
 func IsGitHubIntegrationActive(g GitHubIntegration) bool {
 	return !g.Disabled && g.Owner != "" && g.Repo != "" && g.Token != ""
+}
+
+// SlackIntegration is the connection to a single Slack channel via the
+// admin's own Slack App (bring-your-own-app OAuth, incoming-webhook
+// scope). Single-tenant per deployment, so one channel is enough —
+// multi-channel routing waits until a real customer asks.
+//
+// Two credential layers:
+//
+//  1. App credentials — ClientID / ClientSecret — come from the Slack
+//     App the admin created and are entered once on the Integrations
+//     page. They gate whether the "Add to Slack" button can run the
+//     OAuth flow (IsSlackAppConfigured). ClientSecret is stored
+//     cleartext for the same reason AISettings.APIKey is (the "only
+//     MONGO_URI" rule rules out app-level encryption); ClientID is not a
+//     secret (it rides in every authorize URL) so it round-trips on the
+//     wire to pre-fill the field.
+//
+//  2. Connection — WebhookURL / ChannelName / TeamName / AccessToken —
+//     is populated by the OAuth callback after the admin picks a channel
+//     in Slack. WebhookURL is the delivery target (a normal Slack
+//     Incoming Webhook that already encodes the chosen channel); posting
+//     is unchanged from before OAuth. ChannelName / TeamName are for
+//     display ("#product-feedback · Acme"). AccessToken is the bot token
+//     kept solely so Disconnect can call auth.revoke upstream.
+//
+// Disabled follows the inverse-bool pattern so the zero value reads as
+// "enabled but unconfigured" — no messages fire until WebhookURL is set,
+// regardless of Disabled. Disabled is a separate kill-switch for admins
+// who want to keep the connection but temporarily mute Slack.
+//
+// NotifyOnEntry / NotifyOnComment / NotifyOnVote are the per-event
+// toggles. A connected integration with every toggle off is inert —
+// legal, just silent. Each portal notifier checks IsSlackIntegrationActive
+// AND its own toggle before firing.
+//
+// ConnectedAt / ConnectedBy record when and by whom the channel was last
+// connected. LastErrorAt / LastErrorMessage capture the most recent
+// best-effort delivery failure; runtime posts are fire-and-forget in a
+// goroutine, so this is the only place a failed notification surfaces.
+// WebhookURL / ClientSecret / AccessToken are never returned on the wire.
+type SlackIntegration struct {
+	Disabled         bool
+	ClientID         string
+	ClientSecret     string
+	WebhookURL       string
+	ChannelName      string
+	TeamName         string
+	AccessToken      string
+	NotifyOnEntry    bool
+	NotifyOnComment  bool
+	NotifyOnVote     bool
+	ConnectedAt      time.Time
+	ConnectedBy      string
+	LastErrorAt      time.Time
+	LastErrorMessage string
+}
+
+// IsSlackIntegrationActive reports whether the Slack integration is
+// connected to a channel and not kill-switched. The portal notifiers
+// gate on this before firing; the per-event NotifyOn* toggle is a
+// second, independent check layered on top.
+func IsSlackIntegrationActive(s SlackIntegration) bool {
+	return !s.Disabled && s.WebhookURL != ""
+}
+
+// IsSlackAppConfigured reports whether the admin has supplied their Slack
+// App credentials — the precondition for running the "Add to Slack"
+// OAuth flow. Independent of whether a channel is connected yet.
+func IsSlackAppConfigured(s SlackIntegration) bool {
+	return s.ClientID != "" && s.ClientSecret != ""
 }
 
 // AISettings groups every AI-analyzer knob on the singleton settings

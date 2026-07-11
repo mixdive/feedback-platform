@@ -540,11 +540,15 @@ definitions:
     properties:
       github:
         $ref: '#/definitions/GitHubIntegration'
+      slack:
+        $ref: '#/definitions/SlackIntegration'
     type: object
   IntegrationsSettings:
     properties:
       github:
         $ref: '#/definitions/GitHubIntegration'
+      slack:
+        $ref: '#/definitions/SlackIntegration'
     type: object
   ListMeta:
     properties:
@@ -747,6 +751,39 @@ definitions:
     properties:
       completed:
         type: boolean
+    type: object
+  SlackIntegration:
+    properties:
+      appConfigured:
+        type: boolean
+      channelName:
+        type: string
+      clientId:
+        type: string
+      connected:
+        type: boolean
+      connectedAt:
+        type: string
+      connectedBy:
+        type: string
+      disabled:
+        type: boolean
+      hasClientSecret:
+        type: boolean
+      lastErrorAt:
+        type: string
+      lastErrorMessage:
+        type: string
+      notifyOnComment:
+        type: boolean
+      notifyOnEntry:
+        type: boolean
+      notifyOnVote:
+        type: boolean
+      redirectUri:
+        type: string
+      teamName:
+        type: string
     type: object
   SupportRequestSettings:
     properties:
@@ -1091,6 +1128,21 @@ definitions:
         type: string
       uploads:
         $ref: '#/definitions/consoleUpdateUploadsSettings'
+    type: object
+  consoleUpdateSlackIntegrationRequest:
+    properties:
+      clientId:
+        example: "1234567890.1234567890"
+        type: string
+      clientSecret:
+        example: abc123...
+        type: string
+      notifyOnComment:
+        type: boolean
+      notifyOnEntry:
+        type: boolean
+      notifyOnVote:
+        type: boolean
     type: object
   consoleUpdateSupportRequestSettings:
     properties:
@@ -1784,6 +1836,71 @@ paths:
           schema:
             $ref: '#/definitions/Error'
       summary: Connect or update the GitHub integration (admin)
+      tags:
+      - Console
+  /api/console/integrations/slack:
+    delete:
+      operationId: console-delete-slack-integration
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/IntegrationsResponse'
+      summary: Disconnect and remove the Slack integration (admin)
+      tags:
+      - Console
+    put:
+      consumes:
+      - application/json
+      operationId: console-update-slack-integration
+      parameters:
+      - description: Slack App credentials and event toggles
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/consoleUpdateSlackIntegrationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/IntegrationsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Save Slack App credentials and event toggles (admin)
+      tags:
+      - Console
+  /api/console/integrations/slack/authorize:
+    get:
+      operationId: console-slack-authorize
+      responses:
+        "302":
+          description: Found
+      summary: Start the Slack OAuth flow (admin)
+      tags:
+      - Console
+  /api/console/integrations/slack/callback:
+    get:
+      operationId: console-slack-callback
+      parameters:
+      - description: OAuth code
+        in: query
+        name: code
+        type: string
+      - description: CSRF state
+        in: query
+        name: state
+        type: string
+      responses:
+        "302":
+          description: Found
+      summary: Slack OAuth callback (admin)
       tags:
       - Console
   /api/console/me:

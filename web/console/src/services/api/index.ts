@@ -364,8 +364,35 @@ export type ApiGitHubIntegration = {
   active: boolean
 }
 
+// Slack integration state (bring-your-own-app OAuth). Secrets never
+// travel: the client secret and the OAuth-derived webhook are withheld;
+// only `clientId` (not a secret) and `hasClientSecret` come back.
+// `appConfigured` (client id + secret present) gates the "Add to Slack"
+// button; `connected` (a channel is wired) gates delivery. channelName /
+// teamName describe the connected channel. redirectUri is the exact
+// callback URL to register on the Slack App (computed from the request
+// host). lastError* surface the most recent best-effort delivery failure.
+export type ApiSlackIntegration = {
+  disabled: boolean
+  clientId?: string
+  hasClientSecret: boolean
+  appConfigured: boolean
+  connected: boolean
+  channelName?: string
+  teamName?: string
+  notifyOnEntry: boolean
+  notifyOnComment: boolean
+  notifyOnVote: boolean
+  connectedAt?: string
+  connectedBy?: string
+  lastErrorAt?: string
+  lastErrorMessage?: string
+  redirectUri?: string
+}
+
 export type ApiIntegrationsSettings = {
   github: ApiGitHubIntegration
+  slack: ApiSlackIntegration
 }
 
 // Backend storing uploaded files. "local" writes to the on-disk
@@ -748,7 +775,7 @@ export const API = () => ({
       request<ApiSettings>('PATCH', '/api/console/settings/ai', body),
     getAIQueue: () => request<ApiAIQueueStats>('GET', '/api/console/ai/queue'),
     getIntegrations: () =>
-      request<{ github: ApiGitHubIntegration }>('GET', '/api/console/integrations'),
+      request<ApiIntegrationsSettings>('GET', '/api/console/integrations'),
     // Connect or rotate the GitHub integration. Backend verifies the
     // (owner, repo, token) triple against GitHub before persisting —
     // a 400 surfaces the upstream message verbatim ("Bad credentials",
@@ -758,15 +785,39 @@ export const API = () => ({
       repo: string
       token: string
     }) =>
-      request<{ github: ApiGitHubIntegration }>(
+      request<ApiIntegrationsSettings>(
         'PUT',
         '/api/console/integrations/github',
         body,
       ),
     deleteGitHubIntegration: () =>
-      request<{ github: ApiGitHubIntegration }>(
+      request<ApiIntegrationsSettings>(
         'DELETE',
         '/api/console/integrations/github',
+      ),
+    // Save the Slack App credentials + event toggles. The actual channel
+    // connection happens via the OAuth browser flow (see
+    // slackAuthorizePath), not here. clientId/clientSecret are optional
+    // once stored — blank keeps the existing value, so a toggle-only save
+    // won't wipe the secret.
+    updateSlackIntegration: (body: {
+      clientId?: string
+      clientSecret?: string
+      notifyOnEntry: boolean
+      notifyOnComment: boolean
+      notifyOnVote: boolean
+    }) =>
+      request<ApiIntegrationsSettings>(
+        'PUT',
+        '/api/console/integrations/slack',
+        body,
+      ),
+    // Fully remove the Slack integration (revokes the token upstream and
+    // clears all Slack fields).
+    deleteSlackIntegration: () =>
+      request<ApiIntegrationsSettings>(
+        'DELETE',
+        '/api/console/integrations/slack',
       ),
     // Publish a feature-request or bug as a GitHub issue. AI
     // summarises the entry server-side; the resulting issue link is

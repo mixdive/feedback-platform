@@ -859,6 +859,106 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/console/integrations/slack": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Save Slack App credentials and event toggles (admin)",
+                "operationId": "console-update-slack-integration",
+                "parameters": [
+                    {
+                        "description": "Slack App credentials and event toggles",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/consoleUpdateSlackIntegrationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/IntegrationsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Disconnect and remove the Slack integration (admin)",
+                "operationId": "console-delete-slack-integration",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/IntegrationsResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/console/integrations/slack/authorize": {
+            "get": {
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Start the Slack OAuth flow (admin)",
+                "operationId": "console-slack-authorize",
+                "responses": {
+                    "302": {
+                        "description": "Found"
+                    }
+                }
+            }
+        },
+        "/api/console/integrations/slack/callback": {
+            "get": {
+                "tags": [
+                    "Console"
+                ],
+                "summary": "Slack OAuth callback (admin)",
+                "operationId": "console-slack-callback",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "OAuth code",
+                        "name": "code",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF state",
+                        "name": "state",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Found"
+                    }
+                }
+            }
+        },
         "/api/console/me": {
             "get": {
                 "produces": [
@@ -3029,6 +3129,9 @@ const docTemplate = `{
             "properties": {
                 "github": {
                     "$ref": "#/definitions/GitHubIntegration"
+                },
+                "slack": {
+                    "$ref": "#/definitions/SlackIntegration"
                 }
             }
         },
@@ -3037,6 +3140,9 @@ const docTemplate = `{
             "properties": {
                 "github": {
                     "$ref": "#/definitions/GitHubIntegration"
+                },
+                "slack": {
+                    "$ref": "#/definitions/SlackIntegration"
                 }
             }
         },
@@ -3335,6 +3441,56 @@ const docTemplate = `{
             "properties": {
                 "completed": {
                     "type": "boolean"
+                }
+            }
+        },
+        "SlackIntegration": {
+            "type": "object",
+            "properties": {
+                "appConfigured": {
+                    "type": "boolean"
+                },
+                "channelName": {
+                    "type": "string"
+                },
+                "clientId": {
+                    "type": "string"
+                },
+                "connected": {
+                    "type": "boolean"
+                },
+                "connectedAt": {
+                    "type": "string"
+                },
+                "connectedBy": {
+                    "type": "string"
+                },
+                "disabled": {
+                    "type": "boolean"
+                },
+                "hasClientSecret": {
+                    "type": "boolean"
+                },
+                "lastErrorAt": {
+                    "type": "string"
+                },
+                "lastErrorMessage": {
+                    "type": "string"
+                },
+                "notifyOnComment": {
+                    "type": "boolean"
+                },
+                "notifyOnEntry": {
+                    "type": "boolean"
+                },
+                "notifyOnVote": {
+                    "type": "boolean"
+                },
+                "redirectUri": {
+                    "type": "string"
+                },
+                "teamName": {
+                    "type": "string"
                 }
             }
         },
@@ -3831,6 +3987,28 @@ const docTemplate = `{
                 },
                 "uploads": {
                     "$ref": "#/definitions/consoleUpdateUploadsSettings"
+                }
+            }
+        },
+        "consoleUpdateSlackIntegrationRequest": {
+            "type": "object",
+            "properties": {
+                "clientId": {
+                    "type": "string",
+                    "example": "1234567890.1234567890"
+                },
+                "clientSecret": {
+                    "type": "string",
+                    "example": "abc123..."
+                },
+                "notifyOnComment": {
+                    "type": "boolean"
+                },
+                "notifyOnEntry": {
+                    "type": "boolean"
+                },
+                "notifyOnVote": {
+                    "type": "boolean"
                 }
             }
         },

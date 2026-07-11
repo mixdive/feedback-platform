@@ -37,4 +37,14 @@ const (
 	githubOwner = "contoso"
 	githubRepo  = "contoso-app"
 	githubToken = "ghp_DEMO_PLACEHOLDER_0000000000000000000000"
+
+	// Slack integration display values. Obvious placeholders — the
+	// Integrations card renders as "connected to #product-feedback" so
+	// the feature is visible, but nothing is ever posted (writes are
+	// blocked, and none of these resolve anyway).
+	slackClientID     = "0000000000000.0000000000000"
+	slackClientSecret = "DEMO_PLACEHOLDER_slack_client_secret"
+	slackWebhookURL   = "https://hooks.slack.com/services/DEMO/PLACEHOLDER/0000000000000000000000"
+	slackChannelName  = "#product-feedback"
+	slackTeamName     = "Contoso"
 )
