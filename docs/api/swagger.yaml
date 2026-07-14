@@ -450,15 +450,6 @@ definitions:
     - code
     - message
     type: object
-  FeatureRequestQuota:
-    properties:
-      max:
-        type: integer
-      unlimited:
-        type: boolean
-      used:
-        type: integer
-    type: object
   FeedbackSettings:
     properties:
       defaultEntryTypeTemplates:
@@ -473,10 +464,6 @@ definitions:
             type: string
           type: object
         type: object
-      maxFeatureRequestsPerUser:
-        type: integer
-      maxVotesPerUser:
-        type: integer
       supportRequest:
         $ref: '#/definitions/SupportRequestSettings'
     type: object
@@ -634,15 +621,6 @@ definitions:
           $ref: '#/definitions/PortalChangelogItem'
         type: array
     type: object
-  PortalFeatureRequestQuota:
-    properties:
-      max:
-        type: integer
-      unlimited:
-        type: boolean
-      used:
-        type: integer
-    type: object
   PortalFindSimilarResponse:
     properties:
       aiEnabled:
@@ -671,8 +649,6 @@ definitions:
     properties:
       email:
         type: string
-      featureRequestQuota:
-        $ref: '#/definitions/PortalFeatureRequestQuota'
       id:
         type: string
       imageUrl:
@@ -685,17 +661,6 @@ definitions:
         type: array
       username:
         type: string
-      voteQuota:
-        $ref: '#/definitions/PortalVoteQuota'
-    type: object
-  PortalVoteQuota:
-    properties:
-      max:
-        type: integer
-      unlimited:
-        type: boolean
-      used:
-        type: integer
     type: object
   Release:
     properties:
@@ -842,8 +807,6 @@ definitions:
     properties:
       email:
         type: string
-      featureRequestQuota:
-        $ref: '#/definitions/FeatureRequestQuota'
       id:
         type: string
       imageUrl:
@@ -856,8 +819,6 @@ definitions:
         type: array
       username:
         type: string
-      voteQuota:
-        $ref: '#/definitions/VoteQuota'
     type: object
   UserList:
     properties:
@@ -867,15 +828,6 @@ definitions:
         type: array
       meta:
         $ref: '#/definitions/ListMeta'
-    type: object
-  VoteQuota:
-    properties:
-      max:
-        type: integer
-      unlimited:
-        type: boolean
-      used:
-        type: integer
     type: object
   aianalyzer.Stats:
     properties:
@@ -1023,10 +975,6 @@ definitions:
             type: string
           type: object
         type: object
-      maxFeatureRequestsPerUser:
-        type: integer
-      maxVotesPerUser:
-        type: integer
       supportRequest:
         $ref: '#/definitions/consoleUpdateSupportRequestSettings'
     type: object

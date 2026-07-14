@@ -82,21 +82,6 @@ type User struct {
 	UpdatedAt time.Time
 	IsDeleted bool
 	IsBlocked bool
-	// VotesSpent is the running count of this user's votes that
-	// currently sit on OPEN entries (status new/evaluation/in-progress).
-	// Compared against Settings.Feedback.MaxVotesPerUser at vote time.
-	// Stored as a plain int so the Go zero value reads as "no quota
-	// consumed" — existing users on a pre-feature deployment start
-	// with their full quota available without any backfill.
-	VotesSpent int
-	// FeatureRequestsOpen is the running count of this user's
-	// authored feature-request entries currently in an OPEN status
-	// (new/evaluation/in-progress). Compared against
-	// Settings.Feedback.MaxFeatureRequestsPerUser at submission time.
-	// Same zero-value-means-empty discipline as VotesSpent so the
-	// rollout needs no backfill — existing users start with their
-	// full quota available.
-	FeatureRequestsOpen int
 }
 
 // NewUser constructs a User with a fresh ID, empty roles/accounts/keys, and

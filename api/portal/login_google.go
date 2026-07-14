@@ -154,7 +154,7 @@ func LoginGoogleHandler(do dataoperations.Store) gin.HandlerFunc {
 			return
 		}
 		middlewares.SetSessionCookie(c, sess.Token)
-		response.Success(c, loginGoogleResponse{User: newPortalUserPayload(do, user)})
+		response.Success(c, loginGoogleResponse{User: newPortalUserPayload(user)})
 	}
 }
 

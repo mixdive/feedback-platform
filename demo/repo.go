@@ -27,7 +27,7 @@
 // GitHub integration, faux-AI badges (type/topic/relation provenance with
 // reasons), admin+editor+portal users, admin & AI topics, completed +
 // planned releases, ~40 entries across every type/status incl. internal,
-// public + internal comments, votes with derived quotas, a merged-away
+// public + internal comments, votes, a merged-away
 // duplicate, a GitHub-linked entry, and the full activity timeline.
 // ----------------------------------------------------------------------
 package demo
@@ -87,20 +87,6 @@ func (r *Repo) Close() {}
 func (r *Repo) GetSettings() (*models.Settings, error) {
 	s := *r.d.settings
 	return &s, nil
-}
-
-func (r *Repo) MaxVotesPerUser() (int, error) {
-	if v := r.d.settings.Feedback.MaxVotesPerUser; v > 0 {
-		return v, nil
-	}
-	return models.DefaultMaxVotesPerUser, nil
-}
-
-func (r *Repo) MaxFeatureRequestsPerUser() (int, error) {
-	if v := r.d.settings.Feedback.MaxFeatureRequestsPerUser; v > 0 {
-		return v, nil
-	}
-	return models.DefaultMaxFeatureRequestsPerUser, nil
 }
 
 // ---------------------------------------------------------------------
@@ -825,18 +811,16 @@ func (r *Repo) CountEntriesInFlightRelationAnalysis(time.Duration) (int, error) 
 // defense-in-depth.
 // ---------------------------------------------------------------------
 
-func (r *Repo) InsertSettings(*models.Settings) error              { return dataoperations.ErrReadOnly }
-func (r *Repo) UpdateSettings(map[string]any) error                { return dataoperations.ErrReadOnly }
-func (r *Repo) EnsureFeedbackDefaults() error                      { return dataoperations.ErrReadOnly }
-func (r *Repo) MigrateEntryTypeTemplatesToMultiLang() error        { return dataoperations.ErrReadOnly }
-func (r *Repo) RecordAISettingsSuccess() error                     { return dataoperations.ErrReadOnly }
-func (r *Repo) RecordAISettingsError(string) error                 { return dataoperations.ErrReadOnly }
-func (r *Repo) InsertUser(*models.User) error                      { return dataoperations.ErrReadOnly }
-func (r *Repo) UpdateUser(*models.User) error                      { return dataoperations.ErrReadOnly }
-func (r *Repo) IncrementUserVotesSpent(string, int) error          { return dataoperations.ErrReadOnly }
-func (r *Repo) IncrementUserFeatureRequestsOpen(string, int) error { return dataoperations.ErrReadOnly }
-func (r *Repo) CreateSession(string) (*models.Session, error)      { return nil, dataoperations.ErrReadOnly }
-func (r *Repo) InsertEntry(*models.Entry) error                    { return dataoperations.ErrReadOnly }
+func (r *Repo) InsertSettings(*models.Settings) error         { return dataoperations.ErrReadOnly }
+func (r *Repo) UpdateSettings(map[string]any) error           { return dataoperations.ErrReadOnly }
+func (r *Repo) EnsureFeedbackDefaults() error                 { return dataoperations.ErrReadOnly }
+func (r *Repo) MigrateEntryTypeTemplatesToMultiLang() error   { return dataoperations.ErrReadOnly }
+func (r *Repo) RecordAISettingsSuccess() error                { return dataoperations.ErrReadOnly }
+func (r *Repo) RecordAISettingsError(string) error            { return dataoperations.ErrReadOnly }
+func (r *Repo) InsertUser(*models.User) error                 { return dataoperations.ErrReadOnly }
+func (r *Repo) UpdateUser(*models.User) error                 { return dataoperations.ErrReadOnly }
+func (r *Repo) CreateSession(string) (*models.Session, error) { return nil, dataoperations.ErrReadOnly }
+func (r *Repo) InsertEntry(*models.Entry) error               { return dataoperations.ErrReadOnly }
 func (r *Repo) SetEntryGitHubIssue(string, models.GitHubIssue) error {
 	return dataoperations.ErrReadOnly
 }

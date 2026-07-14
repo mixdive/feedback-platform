@@ -2992,20 +2992,6 @@ const docTemplate = `{
                 }
             }
         },
-        "FeatureRequestQuota": {
-            "type": "object",
-            "properties": {
-                "max": {
-                    "type": "integer"
-                },
-                "unlimited": {
-                    "type": "boolean"
-                },
-                "used": {
-                    "type": "integer"
-                }
-            }
-        },
         "FeedbackSettings": {
             "type": "object",
             "properties": {
@@ -3026,12 +3012,6 @@ const docTemplate = `{
                             "type": "string"
                         }
                     }
-                },
-                "maxFeatureRequestsPerUser": {
-                    "type": "integer"
-                },
-                "maxVotesPerUser": {
-                    "type": "integer"
                 },
                 "supportRequest": {
                     "$ref": "#/definitions/SupportRequestSettings"
@@ -3269,20 +3249,6 @@ const docTemplate = `{
                 }
             }
         },
-        "PortalFeatureRequestQuota": {
-            "type": "object",
-            "properties": {
-                "max": {
-                    "type": "integer"
-                },
-                "unlimited": {
-                    "type": "boolean"
-                },
-                "used": {
-                    "type": "integer"
-                }
-            }
-        },
         "PortalFindSimilarResponse": {
             "type": "object",
             "properties": {
@@ -3326,9 +3292,6 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "featureRequestQuota": {
-                    "$ref": "#/definitions/PortalFeatureRequestQuota"
-                },
                 "id": {
                     "type": "string"
                 },
@@ -3346,23 +3309,6 @@ const docTemplate = `{
                 },
                 "username": {
                     "type": "string"
-                },
-                "voteQuota": {
-                    "$ref": "#/definitions/PortalVoteQuota"
-                }
-            }
-        },
-        "PortalVoteQuota": {
-            "type": "object",
-            "properties": {
-                "max": {
-                    "type": "integer"
-                },
-                "unlimited": {
-                    "type": "boolean"
-                },
-                "used": {
-                    "type": "integer"
                 }
             }
         },
@@ -3581,9 +3527,6 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "featureRequestQuota": {
-                    "$ref": "#/definitions/FeatureRequestQuota"
-                },
                 "id": {
                     "type": "string"
                 },
@@ -3601,9 +3544,6 @@ const docTemplate = `{
                 },
                 "username": {
                     "type": "string"
-                },
-                "voteQuota": {
-                    "$ref": "#/definitions/VoteQuota"
                 }
             }
         },
@@ -3618,20 +3558,6 @@ const docTemplate = `{
                 },
                 "meta": {
                     "$ref": "#/definitions/ListMeta"
-                }
-            }
-        },
-        "VoteQuota": {
-            "type": "object",
-            "properties": {
-                "max": {
-                    "type": "integer"
-                },
-                "unlimited": {
-                    "type": "boolean"
-                },
-                "used": {
-                    "type": "integer"
                 }
             }
         },
@@ -3837,12 +3763,6 @@ const docTemplate = `{
                             "type": "string"
                         }
                     }
-                },
-                "maxFeatureRequestsPerUser": {
-                    "type": "integer"
-                },
-                "maxVotesPerUser": {
-                    "type": "integer"
                 },
                 "supportRequest": {
                     "$ref": "#/definitions/consoleUpdateSupportRequestSettings"

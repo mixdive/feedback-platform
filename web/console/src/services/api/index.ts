@@ -313,10 +313,9 @@ export type ApiAIQueueStats = {
   totalAnalyzed: number
 }
 
-// Feedback policy lives on the singleton settings document. v0.1 ships
-// a single knob — the per-user vote quota — but the sub-object exists
-// so future feedback rules (per-user comment caps, weighted votes, …)
-// land in one place rather than flattening more fields onto the parent.
+// Feedback policy lives on the singleton settings document. The
+// sub-object exists so future feedback rules land in one place rather
+// than flattening more fields onto the parent.
 //
 // entryTypeTemplates is the admin-managed markdown template per
 // (entry type, language) pair, used by the Portal to pre-fill the
@@ -331,8 +330,6 @@ export type ApiSupportRequestSettings = {
 }
 
 export type ApiFeedbackSettings = {
-  maxVotesPerUser: number
-  maxFeatureRequestsPerUser: number
   entryTypeTemplates: Record<string, Record<string, string>>
   // Bundled starter templates per (entry type, language), static on
   // every response. The "Reset to default" button in the Console

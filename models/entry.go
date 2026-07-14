@@ -64,10 +64,10 @@ func IsValidEntryStatus(v EntryStatus) bool {
 }
 
 // IsEntryStatusOpen reports whether v counts as an "open" workflow
-// stage for vote-quota purposes — votes on open entries consume the
-// per-user quota; votes on closed entries (completed/cancelled) do
-// not. Empty / unknown values are treated as open so a missing field
-// on a legacy entry doesn't accidentally exempt votes from the cap.
+// stage — every status except completed/cancelled. Backs the "open
+// only" list filter and the entries-list open/closed indicator. Empty
+// / unknown values are treated as open so a missing field on a legacy
+// entry defaults to the active side of the workflow.
 func IsEntryStatusOpen(v EntryStatus) bool {
 	switch v {
 	case EntryStatusCompleted, EntryStatusCancelled:

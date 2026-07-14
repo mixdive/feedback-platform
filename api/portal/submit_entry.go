@@ -74,11 +74,6 @@ func SubmitEntryHandler(do dataoperations.Store) gin.HandlerFunc {
 			e.EntryTypeAnalysis.Status = models.AnalysisStatusDisabled
 		}
 		creators := map[string]api.EntryCreator{}
-		// Console-access users (admins + editors) bypass the per-user
-		// feature-request quota entirely: no cap check, no counter
-		// bump. Mirrors the vote-quota exemption — Console users post
-		// freely as part of their triage workflow.
-		quotaApplies := false
 		if u := middlewares.CurrentUser(c); u != nil {
 			e.UserID = u.ID
 			creators[u.ID] = api.BuildEntryCreator(*u)
@@ -87,18 +82,6 @@ func SubmitEntryHandler(do dataoperations.Store) gin.HandlerFunc {
 			// stays invisible to them.
 			if req.IsInternal && u.HasConsoleAccess() {
 				e.IsInternal = true
-			}
-			quotaApplies = ft == models.EntryTypeFeatureRequest && !u.HasConsoleAccess()
-			if quotaApplies {
-				max, err := do.MaxFeatureRequestsPerUser()
-				if err != nil {
-					response.SystemError(c, err)
-					return
-				}
-				if u.FeatureRequestsOpen >= max {
-					response.ErrorWithStatusCodeAndMessage(c, 429, "You've reached the per-user limit for open feature requests. Wait for one of your existing requests to be completed or cancelled.")
-					return
-				}
 			}
 		}
 
@@ -118,18 +101,6 @@ func SubmitEntryHandler(do dataoperations.Store) gin.HandlerFunc {
 		if err := do.InsertActivity(act); err != nil {
 			response.SystemError(c, err)
 			return
-		}
-		// Bump the author's open-feature-requests counter after the
-		// insert succeeds. Doing it second means a failed insert
-		// doesn't burn a slot — and a failure here (DB hiccup) is
-		// recoverable: the entry exists, the counter just stays one
-		// behind until the next close transition reconciles it via
-		// the floor-at-zero refund path.
-		if quotaApplies && e.UserID != "" {
-			if err := do.IncrementUserFeatureRequestsOpen(e.UserID, 1); err != nil {
-				response.SystemError(c, err)
-				return
-			}
 		}
 		// Best-effort Slack notification for the new public entry.
 		// Internal entries (admin-authored notes) never leave the

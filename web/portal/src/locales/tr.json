@@ -52,17 +52,6 @@
     "voteCta": "Oy",
     "loadError": "{{message}}"
   },
-  "vote": {
-    "tooltip": "{{max}} oyun {{used}} tanesini kullandınız. Bir kayıt tamamlandığında veya iptal edildiğinde oylar iade edilir.",
-    "remaining_other": "{{max}} oyun {{remaining}} tanesi kaldı",
-    "countLabel_other": "oy"
-  },
-  "featureRequestQuota": {
-    "tooltip": "{{max}} özellik isteğinden {{used}} tanesi açık. Bir isteğiniz tamamlandığında veya iptal edildiğinde yer iade edilir.",
-    "remaining": "{{max}} özellik isteğinden {{remaining}} tanesi kaldı",
-    "hint": "{{max}} özellik isteği slotundan {{remaining}} tanesi kaldı. Bir isteğiniz tamamlandığında veya iptal edildiğinde yer iade edilir.",
-    "atLimit": "Kullanıcı başına {{max}} açık özellik isteği sınırına ulaştınız. Yenisini göndermeden önce birinin tamamlanmasını veya iptal edilmesini bekleyin."
-  },
   "entryDetail": {
     "backToEntries": "Geri bildirimlere dön",
     "notFound": "Geri bildirim bulunamadı.",

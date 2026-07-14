@@ -21,34 +21,15 @@ type loginCustomRequest struct {
 	Token string `json:"token" binding:"required,min=1"`
 } //@name portalLoginCustomRequest
 
-// voteQuotaPayload mirrors api.voteQuotaPayload — kept in lockstep with
-// api/me.go so the portal sees the same shape regardless of which
-// auth path it took.
-type voteQuotaPayload struct {
-	Used      int  `json:"used"`
-	Max       int  `json:"max"`
-	Unlimited bool `json:"unlimited"`
-} //@name PortalVoteQuota
-
-// featureRequestQuotaPayload mirrors api.featureRequestQuotaPayload —
-// kept in lockstep with api/me.go.
-type featureRequestQuotaPayload struct {
-	Used      int  `json:"used"`
-	Max       int  `json:"max"`
-	Unlimited bool `json:"unlimited"`
-} //@name PortalFeatureRequestQuota
-
 // userPayload mirrors the shape served by /api/me — kept in lockstep with
 // api/me.go so the portal can reuse the same response handler in Redux.
 type userPayload struct {
-	ID                  string                     `json:"id"`
-	Email               string                     `json:"email,omitempty"`
-	Name                string                     `json:"name,omitempty"`
-	Username            string                     `json:"username,omitempty"`
-	ImageURL            string                     `json:"imageUrl,omitempty"`
-	Roles               []string                   `json:"roles"`
-	VoteQuota           voteQuotaPayload           `json:"voteQuota"`
-	FeatureRequestQuota featureRequestQuotaPayload `json:"featureRequestQuota"`
+	ID       string   `json:"id"`
+	Email    string   `json:"email,omitempty"`
+	Name     string   `json:"name,omitempty"`
+	Username string   `json:"username,omitempty"`
+	ImageURL string   `json:"imageUrl,omitempty"`
+	Roles    []string `json:"roles"`
 } //@name PortalUserInfo
 
 // loginCustomResponse confirms a successful login and echoes user info so
@@ -179,11 +160,11 @@ func LoginCustomHandler(do dataoperations.Store) gin.HandlerFunc {
 			return
 		}
 		middlewares.SetSessionCookie(c, sess.Token)
-		response.Success(c, loginCustomResponse{User: newPortalUserPayload(do, user)})
+		response.Success(c, loginCustomResponse{User: newPortalUserPayload(user)})
 	}
 }
 
-func newPortalUserPayload(do dataoperations.Store, u *models.User) userPayload {
+func newPortalUserPayload(u *models.User) userPayload {
 	roles := make([]string, 0, len(u.Roles))
 	for _, r := range u.Roles {
 		roles = append(roles, string(r))
@@ -206,21 +187,6 @@ func newPortalUserPayload(do dataoperations.Store, u *models.User) userPayload {
 		out.Name = pickNonEmpty(out.Name, a.Name)
 		out.Username = pickNonEmpty(out.Username, a.Username)
 		out.ImageURL = pickNonEmpty(out.ImageURL, a.ImageURL)
-	}
-	if u.HasConsoleAccess() {
-		out.VoteQuota = voteQuotaPayload{Unlimited: true}
-		out.FeatureRequestQuota = featureRequestQuotaPayload{Unlimited: true}
-	} else {
-		voteMax, err := do.MaxVotesPerUser()
-		if err != nil || voteMax <= 0 {
-			voteMax = models.DefaultMaxVotesPerUser
-		}
-		out.VoteQuota = voteQuotaPayload{Used: u.VotesSpent, Max: voteMax}
-		frMax, err := do.MaxFeatureRequestsPerUser()
-		if err != nil || frMax <= 0 {
-			frMax = models.DefaultMaxFeatureRequestsPerUser
-		}
-		out.FeatureRequestQuota = featureRequestQuotaPayload{Used: u.FeatureRequestsOpen, Max: frMax}
 	}
 	return out
 }

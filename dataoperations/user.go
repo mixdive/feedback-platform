@@ -39,63 +39,6 @@ func (do *DataOperations) InsertUser(u *models.User) error {
 	return mongodb.InsertOne(do.DB, CollectionUsers, *u)
 }
 
-// IncrementUserVotesSpent adjusts a user's running vote-quota counter
-// atomically. delta is typically +1 (vote on open entry) or -1 (unvote
-// from an open entry, or refund when an entry closes).
-//
-// Negative deltas can drive the stored value below zero — we floor it
-// back to zero with a follow-up read+write so the quota check stays
-// monotonic, even at the cost of an extra roundtrip. The race here is
-// benign: the worst case is a single legitimate vote being rejected
-// while the floor pass races with a concurrent decrement, which the
-// user can retry.
-func (do *DataOperations) IncrementUserVotesSpent(userID string, delta int) error {
-	if userID == "" || delta == 0 {
-		return nil
-	}
-	if err := mongodb.IncrementValue(do.DB, CollectionUsers, userID, "votesspent", delta); err != nil {
-		return err
-	}
-	if delta >= 0 {
-		return nil
-	}
-	u, err := do.FindUserByID(userID)
-	if err != nil || u == nil {
-		return err
-	}
-	if u.VotesSpent < 0 {
-		return mongodb.SetValue(do.DB, CollectionUsers, userID, "votesspent", 0)
-	}
-	return nil
-}
-
-// IncrementUserFeatureRequestsOpen adjusts a user's running
-// feature-request-quota counter atomically. delta is +1 (user submits a
-// new feature-request) or -1 (one of their feature-requests closes, or
-// a closed feature-request reopens). Mirrors IncrementUserVotesSpent
-// including the floor-at-zero guard: an admin/editor never consumes
-// quota at submission time, so a refund firing on their closed entry
-// would otherwise drive the counter negative.
-func (do *DataOperations) IncrementUserFeatureRequestsOpen(userID string, delta int) error {
-	if userID == "" || delta == 0 {
-		return nil
-	}
-	if err := mongodb.IncrementValue(do.DB, CollectionUsers, userID, "featurerequestsopen", delta); err != nil {
-		return err
-	}
-	if delta >= 0 {
-		return nil
-	}
-	u, err := do.FindUserByID(userID)
-	if err != nil || u == nil {
-		return err
-	}
-	if u.FeatureRequestsOpen < 0 {
-		return mongodb.SetValue(do.DB, CollectionUsers, userID, "featurerequestsopen", 0)
-	}
-	return nil
-}
-
 // UpdateUser overwrites the persisted user document with the given value.
 // Used after attaching/refreshing an account so Accounts + Keys + UpdatedAt
 // land together.

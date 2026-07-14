@@ -111,14 +111,6 @@ export default function NewEntryPage() {
   const canSetInternal =
     !!me && me.roles.some((r) => r === 'admin' || r === 'editor')
 
-  // Block submit when the caller has hit their per-user open
-  // feature-request cap.
-  const atFeatureRequestLimit =
-    entryType === 'feature-request' &&
-    !!me &&
-    !me.featureRequestQuota.unlimited &&
-    me.featureRequestQuota.used >= me.featureRequestQuota.max
-
   const findSimilarMut = useMutation({
     mutationFn: (body: { title: string; description?: string }) =>
       API().portal.findSimilar(body),
@@ -387,16 +379,6 @@ export default function NewEntryPage() {
               />
             </div>
 
-            {entryType === 'feature-request' &&
-              me &&
-              !me.featureRequestQuota.unlimited &&
-              me.featureRequestQuota.max > 0 && (
-                <FeatureRequestQuotaHint
-                  used={me.featureRequestQuota.used}
-                  max={me.featureRequestQuota.max}
-                />
-              )}
-
             <div>
               <label className="block text-xs font-medium text-zinc-500 mb-2">
                 {t('new.fieldDescription')}
@@ -449,7 +431,7 @@ export default function NewEntryPage() {
               <Button
                 type="submit"
                 isLoading={submitMut.isPending}
-                disabled={title.trim().length < 3 || atFeatureRequestLimit}
+                disabled={title.trim().length < 3}
               >
                 {t('common.submit')}
               </Button>
@@ -537,25 +519,5 @@ function TypeSegmentedControl({
         </button>
       ))}
     </div>
-  )
-}
-
-function FeatureRequestQuotaHint({ used, max }: { used: number; max: number }) {
-  const { t } = useTranslation()
-  const remaining = Math.max(0, max - used)
-  const atLimit = used >= max
-  return (
-    <p
-      className={clsx(
-        'text-xs',
-        atLimit
-          ? 'text-rose-600 dark:text-rose-400'
-          : 'text-zinc-500 dark:text-zinc-400',
-      )}
-    >
-      {atLimit
-        ? t('featureRequestQuota.atLimit', { max })
-        : t('featureRequestQuota.hint', { remaining, max })}
-    </p>
   )
 }

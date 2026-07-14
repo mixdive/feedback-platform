@@ -42,8 +42,7 @@ type aiSettingsPayload struct {
 } //@name AISettings
 
 // feedbackSettingsPayload is the admin-facing projection of
-// FeedbackSettings. Exposes the per-user vote quota, the per-user
-// feature-request quota, and the per-(entry-type, language)
+// FeedbackSettings. Exposes the per-(entry-type, language)
 // description templates. Outer key is EntryType ("feature-request",
 // "bug", "support", "other"); inner key is a BCP-47 language code
 // ("en", "tr"); inner value is the markdown template ("" = no
@@ -63,8 +62,6 @@ type supportRequestPayload struct {
 } //@name SupportRequestSettings
 
 type feedbackSettingsPayload struct {
-	MaxVotesPerUser           int                          `json:"maxVotesPerUser"`
-	MaxFeatureRequestsPerUser int                          `json:"maxFeatureRequestsPerUser"`
 	EntryTypeTemplates        map[string]map[string]string `json:"entryTypeTemplates"`
 	DefaultEntryTypeTemplates map[string]map[string]string `json:"defaultEntryTypeTemplates"`
 	SupportRequest            supportRequestPayload        `json:"supportRequest"`
@@ -180,14 +177,6 @@ func newSettingsResponse(s *models.Settings, includeSecrets bool, store *storage
 	if includeSecrets {
 		key = s.Portal.JWTPrivateKey
 	}
-	maxVotes := s.Feedback.MaxVotesPerUser
-	if maxVotes <= 0 {
-		maxVotes = models.DefaultMaxVotesPerUser
-	}
-	maxFR := s.Feedback.MaxFeatureRequestsPerUser
-	if maxFR <= 0 {
-		maxFR = models.DefaultMaxFeatureRequestsPerUser
-	}
 	// Legacy deployments (or fresh ones where the backfill pass has
 	// not yet landed) come back with a nil map. Surface defaults so the
 	// Console editor renders the bundled starter templates the admin
@@ -218,8 +207,6 @@ func newSettingsResponse(s *models.Settings, includeSecrets bool, store *storage
 			LastErrorMessage: s.AI.LastErrorMessage,
 		},
 		Feedback: feedbackSettingsPayload{
-			MaxVotesPerUser:           maxVotes,
-			MaxFeatureRequestsPerUser: maxFR,
 			EntryTypeTemplates:        templates,
 			DefaultEntryTypeTemplates: models.DefaultEntryTypeTemplates(),
 			SupportRequest: supportRequestPayload{

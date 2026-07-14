@@ -112,9 +112,7 @@ func SetupHandler(do dataoperations.Store) gin.HandlerFunc {
 		s.ProjectName = req.ProjectName
 		s.Portal = portal
 		s.Feedback = models.FeedbackSettings{
-			MaxVotesPerUser:           models.DefaultMaxVotesPerUser,
-			MaxFeatureRequestsPerUser: models.DefaultMaxFeatureRequestsPerUser,
-			EntryTypeTemplatesByLang:  models.DefaultEntryTypeTemplates(),
+			EntryTypeTemplatesByLang: models.DefaultEntryTypeTemplates(),
 		}
 		s.SetupCompleted = true
 		if existing == nil {

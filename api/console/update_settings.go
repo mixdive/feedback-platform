@@ -51,10 +51,8 @@ type updateUploadsRequest struct {
 // includes it is authoritative for every (entry-type, language)
 // pair.
 type updateFeedbackRequest struct {
-	MaxVotesPerUser           *int                                  `json:"maxVotesPerUser,omitempty"`
-	MaxFeatureRequestsPerUser *int                                  `json:"maxFeatureRequestsPerUser,omitempty"`
-	EntryTypeTemplates        *map[string]map[string]string         `json:"entryTypeTemplates,omitempty"`
-	SupportRequest            *updateSupportRequestRequest          `json:"supportRequest,omitempty"`
+	EntryTypeTemplates *map[string]map[string]string `json:"entryTypeTemplates,omitempty"`
+	SupportRequest     *updateSupportRequestRequest  `json:"supportRequest,omitempty"`
 } //@name consoleUpdateFeedbackSettings
 
 // updateSettingsRequest is the body for PATCH /api/console/settings.
@@ -162,22 +160,6 @@ func UpdateSettingsHandler(do dataoperations.Store, store *storage.Holder) gin.H
 			}
 		}
 		if req.Feedback != nil {
-			if req.Feedback.MaxVotesPerUser != nil {
-				v := *req.Feedback.MaxVotesPerUser
-				if v < 1 {
-					response.BadRequestWithMessage(c, "Max votes per user must be at least 1.")
-					return
-				}
-				set["feedback.maxvotesperuser"] = v
-			}
-			if req.Feedback.MaxFeatureRequestsPerUser != nil {
-				v := *req.Feedback.MaxFeatureRequestsPerUser
-				if v < 1 {
-					response.BadRequestWithMessage(c, "Max feature requests per user must be at least 1.")
-					return
-				}
-				set["feedback.maxfeaturerequestsperuser"] = v
-			}
 			if req.Feedback.SupportRequest != nil {
 				// Mirrors the custom-auth invariant: enabling the
 				// button requires a usable absolute URL. Pull current

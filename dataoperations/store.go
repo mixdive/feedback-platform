@@ -38,8 +38,6 @@ type Store interface {
 	UpdateSettings(set map[string]any) error
 	EnsureFeedbackDefaults() error
 	MigrateEntryTypeTemplatesToMultiLang() error
-	MaxVotesPerUser() (int, error)
-	MaxFeatureRequestsPerUser() (int, error)
 	RecordAISettingsSuccess() error
 	RecordAISettingsError(msg string) error
 
@@ -54,8 +52,6 @@ type Store interface {
 	CountActiveAdmins() (int64, error)
 	InsertUser(u *models.User) error
 	UpdateUser(u *models.User) error
-	IncrementUserVotesSpent(userID string, delta int) error
-	IncrementUserFeatureRequestsOpen(userID string, delta int) error
 
 	// Sessions.
 	CreateSession(userID string) (*models.Session, error)

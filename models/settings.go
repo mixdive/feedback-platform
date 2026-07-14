@@ -79,18 +79,6 @@ type UploadSettings struct {
 	GCSBucket string
 }
 
-// DefaultMaxVotesPerUser is the default per-user vote quota seeded into
-// FeedbackSettings on first-run setup and used as the fallback when the
-// stored value is zero (pre-feature deployments that haven't gone
-// through the startup ensure-pass yet).
-const DefaultMaxVotesPerUser = 20
-
-// DefaultMaxFeatureRequestsPerUser caps the number of OPEN feature
-// requests a single user can have at once. Seeded into FeedbackSettings
-// on first-run setup and used as the fallback when the stored value is
-// zero — same backfill-by-fallback pattern as DefaultMaxVotesPerUser.
-const DefaultMaxFeatureRequestsPerUser = 10
-
 // DefaultTemplateLanguage is the canonical language for entry-type
 // templates. New deployments get this language seeded with bundled
 // copy; the Portal falls back to this language at render time when
@@ -173,17 +161,6 @@ Aslında ne oldu? Mümkünse ekran görüntüleri, ekran kayıtları veya hata m
 // future feedback policy (per-user comment quotas, vote weighting, …)
 // landing here instead of flattening more fields onto the parent.
 //
-// MaxVotesPerUser caps the number of votes a single user can have
-// allocated to OPEN entries at once. Votes on closed entries
-// (completed / cancelled) don't count against the cap; when an entry
-// transitions from open to closed every voter's quota is refunded by 1.
-//
-// MaxFeatureRequestsPerUser caps the number of OPEN entries with
-// category=feature-request a single user can have authored at once.
-// Mirrors the votes cap: closed (completed / cancelled) feature
-// requests don't count against the cap; on an open→closed transition
-// the author's quota is refunded by 1.
-//
 // EntryTypeTemplatesByLang is the admin-managed markdown template per
 // (entry type, language) pair, used by the Portal to pre-fill the
 // description field on the new-entry form. Outer key is EntryType
@@ -205,10 +182,8 @@ Aslında ne oldu? Mümkünse ekran görüntüleri, ekran kayıtları veya hata m
 // the new code; MigrateEntryTypeTemplatesToMultiLang then lifts each
 // legacy value into {"en": v} under the new key and $unsets the old.
 type FeedbackSettings struct {
-	MaxVotesPerUser           int
-	MaxFeatureRequestsPerUser int
-	EntryTypeTemplatesByLang  map[string]map[string]string
-	SupportRequest            SupportRequestSettings
+	EntryTypeTemplatesByLang map[string]map[string]string
+	SupportRequest           SupportRequestSettings
 }
 
 // SupportRequestSettings controls the Portal "New Support Request"

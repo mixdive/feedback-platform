@@ -17,9 +17,6 @@ import { useAppSelector } from '@/store/hooks'
 import { entryTypeInfo } from '@/utils/entry-type'
 import { message } from '@/utils/helpers'
 
-const MIN_VOTES = 1
-const MIN_FEATURE_REQUESTS = 1
-
 // Entry types that get a per-type description template on the Portal
 // new-entry form. Support is excluded — Portal can't create support
 // entries (the "New Support Request" button opens an external URL),
@@ -45,11 +42,8 @@ type TemplateLanguageCode = (typeof TEMPLATE_LANGUAGES)[number]['code']
 const DEFAULT_TEMPLATE_LANGUAGE: TemplateLanguageCode = 'en'
 
 export default function FeedbackSettingsPage() {
-  const queryClient = useQueryClient()
   const isAdmin = !!useAppSelector((s) => s.auth.user?.roles?.includes('admin'))
 
-  const [maxVotes, setMaxVotes] = useState<string | null>(null)
-  const [maxFeatureRequests, setMaxFeatureRequests] = useState<string | null>(null)
   const [editingType, setEditingType] = useState<ApiEntryTypeValue | null>(null)
 
   const { data, isLoading, error } = useQuery({
@@ -57,132 +51,13 @@ export default function FeedbackSettingsPage() {
     queryFn: () => API().console.getSettings(),
   })
 
-  useEffect(() => {
-    if (!data) return
-    if (maxVotes === null) {
-      setMaxVotes(String(data.feedback.maxVotesPerUser))
-    }
-    if (maxFeatureRequests === null) {
-      setMaxFeatureRequests(String(data.feedback.maxFeatureRequestsPerUser))
-    }
-  }, [data, maxVotes, maxFeatureRequests])
-
-  const updateMut = useMutation({
-    mutationFn: (next: {
-      maxVotesPerUser?: number
-      maxFeatureRequestsPerUser?: number
-    }) => API().console.updateSettings({ feedback: next }),
-    onSuccess: () => {
-      message('Feedback settings saved', 'success')
-      void queryClient.invalidateQueries({ queryKey: ['console', 'settings'] })
-    },
-    onError: (e) => message(e),
-  })
-
   if (isLoading) return <p className="text-zinc-500">Loading…</p>
   if (error) return <p className="text-rose-600">{(error as Error).message}</p>
-  if (maxVotes === null || maxFeatureRequests === null || !data) return null
-
-  const parsedVotes = Number(maxVotes)
-  const votesValidationError = (() => {
-    if (maxVotes.trim() === '') return 'Required.'
-    if (!Number.isInteger(parsedVotes)) return 'Must be a whole number.'
-    if (parsedVotes < MIN_VOTES) return `Must be at least ${MIN_VOTES}.`
-    return null
-  })()
-
-  const parsedFR = Number(maxFeatureRequests)
-  const frValidationError = (() => {
-    if (maxFeatureRequests.trim() === '') return 'Required.'
-    if (!Number.isInteger(parsedFR)) return 'Must be a whole number.'
-    if (parsedFR < MIN_FEATURE_REQUESTS) return `Must be at least ${MIN_FEATURE_REQUESTS}.`
-    return null
-  })()
-
-  const votesDirty = parsedVotes !== data.feedback.maxVotesPerUser
-  const frDirty = parsedFR !== data.feedback.maxFeatureRequestsPerUser
-  const anyQuotaDirty = votesDirty || frDirty
-  const anyQuotaError = !!votesValidationError || !!frValidationError
+  if (!data) return null
 
   return (
     <div className="space-y-6">
       {!isAdmin && <ReadOnlyBanner />}
-      <form
-        className="space-y-6 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6"
-        onSubmit={(e) => {
-          e.preventDefault()
-          if (!isAdmin || anyQuotaError || !anyQuotaDirty) return
-          const patch: { maxVotesPerUser?: number; maxFeatureRequestsPerUser?: number } = {}
-          if (votesDirty) patch.maxVotesPerUser = parsedVotes
-          if (frDirty) patch.maxFeatureRequestsPerUser = parsedFR
-          updateMut.mutate(patch)
-        }}
-      >
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
-          Feedback Settings
-        </h2>
-        <fieldset disabled={!isAdmin} className="space-y-5 disabled:opacity-70">
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Votes per user
-            </label>
-            <input
-              type="number"
-              min={MIN_VOTES}
-              step={1}
-              value={maxVotes}
-              onChange={(e) => setMaxVotes(e.target.value)}
-              className="block w-32 h-10 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-3 text-sm focus:border-sky-500 focus:outline-none disabled:cursor-not-allowed"
-            />
-            {votesValidationError ? (
-              <p className="text-xs text-rose-600 mt-1">{votesValidationError}</p>
-            ) : (
-              <p className="text-xs text-zinc-500 mt-1">
-                How many open entries a single user can have active votes on
-                at once. A vote is returned to the user when its entry is
-                completed or cancelled. Minimum 1. Admins and editors (anyone
-                with Console access) are not subject to this limit.
-              </p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Open feature requests per user
-            </label>
-            <input
-              type="number"
-              min={MIN_FEATURE_REQUESTS}
-              step={1}
-              value={maxFeatureRequests}
-              onChange={(e) => setMaxFeatureRequests(e.target.value)}
-              className="block w-32 h-10 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-3 text-sm focus:border-sky-500 focus:outline-none disabled:cursor-not-allowed"
-            />
-            {frValidationError ? (
-              <p className="text-xs text-rose-600 mt-1">{frValidationError}</p>
-            ) : (
-              <p className="text-xs text-zinc-500 mt-1">
-                How many feature requests a single user can have open at
-                once. The slot is returned to the user when one of their
-                feature requests is completed or cancelled. Minimum 1.
-                Admins and editors (anyone with Console access) are not
-                subject to this limit.
-              </p>
-            )}
-          </div>
-        </fieldset>
-        {isAdmin && (
-          <div className="flex justify-end">
-            <Button
-              type="submit"
-              isLoading={updateMut.isPending}
-              disabled={anyQuotaError || !anyQuotaDirty}
-            >
-              Save
-            </Button>
-          </div>
-        )}
-      </form>
-
       <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 space-y-4">
         <div>
           <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">

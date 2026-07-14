@@ -2990,20 +2990,6 @@
                 }
             }
         },
-        "FeatureRequestQuota": {
-            "type": "object",
-            "properties": {
-                "max": {
-                    "type": "integer"
-                },
-                "unlimited": {
-                    "type": "boolean"
-                },
-                "used": {
-                    "type": "integer"
-                }
-            }
-        },
         "FeedbackSettings": {
             "type": "object",
             "properties": {
@@ -3024,12 +3010,6 @@
                             "type": "string"
                         }
                     }
-                },
-                "maxFeatureRequestsPerUser": {
-                    "type": "integer"
-                },
-                "maxVotesPerUser": {
-                    "type": "integer"
                 },
                 "supportRequest": {
                     "$ref": "#/definitions/SupportRequestSettings"
@@ -3267,20 +3247,6 @@
                 }
             }
         },
-        "PortalFeatureRequestQuota": {
-            "type": "object",
-            "properties": {
-                "max": {
-                    "type": "integer"
-                },
-                "unlimited": {
-                    "type": "boolean"
-                },
-                "used": {
-                    "type": "integer"
-                }
-            }
-        },
         "PortalFindSimilarResponse": {
             "type": "object",
             "properties": {
@@ -3324,9 +3290,6 @@
                 "email": {
                     "type": "string"
                 },
-                "featureRequestQuota": {
-                    "$ref": "#/definitions/PortalFeatureRequestQuota"
-                },
                 "id": {
                     "type": "string"
                 },
@@ -3344,23 +3307,6 @@
                 },
                 "username": {
                     "type": "string"
-                },
-                "voteQuota": {
-                    "$ref": "#/definitions/PortalVoteQuota"
-                }
-            }
-        },
-        "PortalVoteQuota": {
-            "type": "object",
-            "properties": {
-                "max": {
-                    "type": "integer"
-                },
-                "unlimited": {
-                    "type": "boolean"
-                },
-                "used": {
-                    "type": "integer"
                 }
             }
         },
@@ -3579,9 +3525,6 @@
                 "email": {
                     "type": "string"
                 },
-                "featureRequestQuota": {
-                    "$ref": "#/definitions/FeatureRequestQuota"
-                },
                 "id": {
                     "type": "string"
                 },
@@ -3599,9 +3542,6 @@
                 },
                 "username": {
                     "type": "string"
-                },
-                "voteQuota": {
-                    "$ref": "#/definitions/VoteQuota"
                 }
             }
         },
@@ -3616,20 +3556,6 @@
                 },
                 "meta": {
                     "$ref": "#/definitions/ListMeta"
-                }
-            }
-        },
-        "VoteQuota": {
-            "type": "object",
-            "properties": {
-                "max": {
-                    "type": "integer"
-                },
-                "unlimited": {
-                    "type": "boolean"
-                },
-                "used": {
-                    "type": "integer"
                 }
             }
         },
@@ -3835,12 +3761,6 @@
                             "type": "string"
                         }
                     }
-                },
-                "maxFeatureRequestsPerUser": {
-                    "type": "integer"
-                },
-                "maxVotesPerUser": {
-                    "type": "integer"
                 },
                 "supportRequest": {
                     "$ref": "#/definitions/consoleUpdateSupportRequestSettings"

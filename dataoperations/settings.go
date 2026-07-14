@@ -52,43 +52,6 @@ func (do *DataOperations) RecordAISettingsSuccess() error {
 	})
 }
 
-// MaxVotesPerUser returns the per-user vote quota stored on the
-// singleton settings document, falling back to the hardcoded default
-// when the field is missing or zero (pre-feature deployments before
-// the EnsureFeedbackDefaults pass has run, or a freshly-inserted
-// settings doc whose feedback sub-document hasn't been seeded yet).
-func (do *DataOperations) MaxVotesPerUser() (int, error) {
-	s, err := do.GetSettings()
-	if err != nil || s == nil {
-		if err == nil {
-			return models.DefaultMaxVotesPerUser, nil
-		}
-		return 0, err
-	}
-	if s.Feedback.MaxVotesPerUser > 0 {
-		return s.Feedback.MaxVotesPerUser, nil
-	}
-	return models.DefaultMaxVotesPerUser, nil
-}
-
-// MaxFeatureRequestsPerUser returns the per-user feature-request quota
-// stored on the singleton settings document, falling back to the
-// hardcoded default when the field is missing or zero. Same fallback
-// shape as MaxVotesPerUser.
-func (do *DataOperations) MaxFeatureRequestsPerUser() (int, error) {
-	s, err := do.GetSettings()
-	if err != nil || s == nil {
-		if err == nil {
-			return models.DefaultMaxFeatureRequestsPerUser, nil
-		}
-		return 0, err
-	}
-	if s.Feedback.MaxFeatureRequestsPerUser > 0 {
-		return s.Feedback.MaxFeatureRequestsPerUser, nil
-	}
-	return models.DefaultMaxFeatureRequestsPerUser, nil
-}
-
 // EnsureFeedbackDefaults backfills any missing feedback policy fields on
 // the singleton settings document. Idempotent — running deployments
 // that came up before a feature shipped get its default applied the
@@ -108,12 +71,6 @@ func (do *DataOperations) EnsureFeedbackDefaults() error {
 		return err
 	}
 	patch := map[string]any{}
-	if s.Feedback.MaxVotesPerUser <= 0 {
-		patch["feedback.maxvotesperuser"] = models.DefaultMaxVotesPerUser
-	}
-	if s.Feedback.MaxFeatureRequestsPerUser <= 0 {
-		patch["feedback.maxfeaturerequestsperuser"] = models.DefaultMaxFeatureRequestsPerUser
-	}
 	if s.Feedback.EntryTypeTemplatesByLang == nil {
 		patch["feedback.entrytypetemplatesbylang"] = models.DefaultEntryTypeTemplates()
 	}

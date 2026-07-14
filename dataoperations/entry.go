@@ -275,21 +275,7 @@ func (do *DataOperations) SetEntryIsInternal(id string, value bool) error {
 // reaches this method via the regular update endpoint). Clearing the
 // type does not reset the analysis status — the decision to skip AI
 // is one-way.
-//
-// Reconciles the author's feature-request quota
-// (User.FeatureRequestsOpen) when the type crosses the
-// feature-request boundary on an OPEN entry: non-FR → FR deducts the
-// author by 1, FR → non-FR refunds. Closed entries never consume
-// feature-request quota in the first place, so re-typing them doesn't
-// touch the counter. The floor-at-zero guard inside
-// IncrementUserFeatureRequestsOpen absorbs a refund on an entry whose
-// author was an admin/editor at submission (and therefore never paid
-// into the counter).
 func (do *DataOperations) SetEntryType(id string, ft models.EntryType) error {
-	existing, err := do.FindEntryByID(id)
-	if err != nil {
-		return err
-	}
 	if err := mongodb.SetValue(do.DB, CollectionEntries, id, "entrytype", string(ft)); err != nil {
 		return err
 	}
@@ -298,104 +284,16 @@ func (do *DataOperations) SetEntryType(id string, ft models.EntryType) error {
 			return err
 		}
 	}
-	if err := mongodb.SetValue(do.DB, CollectionEntries, id, "updatedat", time.Now().UTC()); err != nil {
-		return err
-	}
-	if existing == nil || existing.UserID == "" || !models.IsEntryStatusOpen(existing.Status) {
-		return nil
-	}
-	wasFR := existing.EntryType == models.EntryTypeFeatureRequest
-	isFR := ft == models.EntryTypeFeatureRequest
-	if wasFR == isFR {
-		return nil
-	}
-	delta := -1
-	if isFR {
-		delta = 1
-	}
-	return do.IncrementUserFeatureRequestsOpen(existing.UserID, delta)
+	return mongodb.SetValue(do.DB, CollectionEntries, id, "updatedat", time.Now().UTC())
 }
 
 // SetEntryStatus writes the status field. Caller is responsible for
 // validating the value via models.IsValidEntryStatus before calling.
-//
-// Also reconciles per-user vote quotas (User.VotesSpent) when the
-// status transitions across the open/closed boundary: open→closed
-// refunds every voter on this entry by 1, closed→open deducts every
-// voter by 1. Voting on a closed entry never consumes quota in the
-// first place; this is the symmetric correction so a status flip
-// leaves the invariant "VotesSpent counts only votes on open entries"
-// intact.
-//
-// The author's feature-request quota (User.FeatureRequestsOpen) is
-// reconciled on the same boundary, but only when the entry's current
-// feedback type is feature-request — bug/support/other entries never
-// consumed feature-request quota at submission, so they have nothing
-// to refund. Admin/editor authors never consumed quota either; the
-// floor-at-zero guard inside IncrementUserFeatureRequestsOpen absorbs
-// the spurious refund without going negative.
 func (do *DataOperations) SetEntryStatus(id string, status models.EntryStatus) error {
-	existing, err := do.FindEntryByID(id)
-	if err != nil {
-		return err
-	}
-	wasOpen := false
-	if existing != nil {
-		wasOpen = models.IsEntryStatusOpen(existing.Status)
-	}
-	isOpen := models.IsEntryStatusOpen(status)
 	if err := mongodb.SetValue(do.DB, CollectionEntries, id, "status", string(status)); err != nil {
 		return err
 	}
-	if err := mongodb.SetValue(do.DB, CollectionEntries, id, "updatedat", time.Now().UTC()); err != nil {
-		return err
-	}
-	if existing == nil || wasOpen == isOpen {
-		return nil
-	}
-	delta := -1
-	if isOpen {
-		delta = 1
-	}
-	if err := do.adjustVotersQuota(id, delta); err != nil {
-		return err
-	}
-	if existing.EntryType == models.EntryTypeFeatureRequest && existing.UserID != "" {
-		if err := do.IncrementUserFeatureRequestsOpen(existing.UserID, delta); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// adjustVotersQuota walks the votes collection for one entry, groups
-// by user, and bumps each user's VotesSpent by delta. Anonymous votes
-// (UserID == "") are skipped — no quota row to adjust. Used by
-// SetEntryStatus on open/closed transitions; the floor-at-zero guard
-// inside IncrementUserVotesSpent handles a refund that would drive
-// the counter below zero.
-func (do *DataOperations) adjustVotersQuota(entryID string, delta int) error {
-	if entryID == "" || delta == 0 {
-		return nil
-	}
-	votes, err := mongodb.Query[models.Vote](do.DB, CollectionVotes, bson.M{"entryid": entryID}, nil)
-	if err != nil {
-		return err
-	}
-	seen := map[string]struct{}{}
-	for _, v := range votes {
-		if v.UserID == "" {
-			continue
-		}
-		if _, dup := seen[v.UserID]; dup {
-			continue
-		}
-		seen[v.UserID] = struct{}{}
-		if err := do.IncrementUserVotesSpent(v.UserID, delta); err != nil {
-			return err
-		}
-	}
-	return nil
+	return mongodb.SetValue(do.DB, CollectionEntries, id, "updatedat", time.Now().UTC())
 }
 
 // SetEntryTypeAnalysis overwrites the entrytypeanalysis

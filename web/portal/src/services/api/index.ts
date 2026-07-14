@@ -155,25 +155,6 @@ export type ApiFindSimilarResponse = {
   aiEnabled: boolean
 }
 
-// Per-user vote quota state. Console-access users (admins + editors)
-// have `unlimited: true` and ignore `used` / `max`. Non-admin portal
-// users see counts in terms of votes already cast against open
-// entries.
-export type ApiVoteQuota = {
-  used: number
-  max: number
-  unlimited: boolean
-}
-
-// Per-user open-feature-request quota state. Same shape and Console
-// bypass rule as ApiVoteQuota; `used` counts the caller's currently
-// open authored feature requests.
-export type ApiFeatureRequestQuota = {
-  used: number
-  max: number
-  unlimited: boolean
-}
-
 export type ApiPortalUser = {
   id: string
   email?: string
@@ -181,8 +162,6 @@ export type ApiPortalUser = {
   username?: string
   imageUrl?: string
   roles: string[]
-  voteQuota: ApiVoteQuota
-  featureRequestQuota: ApiFeatureRequestQuota
 }
 
 export type ApiFile = {

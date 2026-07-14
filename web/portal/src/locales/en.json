@@ -52,19 +52,6 @@
     "voteCta": "Vote",
     "loadError": "{{message}}"
   },
-  "vote": {
-    "tooltip": "You've used {{used}} of {{max}} votes. Votes are returned when an entry is completed or cancelled.",
-    "remaining_one": "{{remaining}} of {{max}} vote left",
-    "remaining_other": "{{remaining}} of {{max}} votes left",
-    "countLabel_one": "vote",
-    "countLabel_other": "votes"
-  },
-  "featureRequestQuota": {
-    "tooltip": "You have {{used}} of {{max}} feature requests open. A slot is returned when one of your feature requests is completed or cancelled.",
-    "remaining": "{{remaining}} of {{max}} feature requests left",
-    "hint": "{{remaining}} of {{max}} feature-request slots left. A slot is returned when one of your feature requests is completed or cancelled.",
-    "atLimit": "You've reached the per-user limit of {{max}} open feature requests. Wait for one to be completed or cancelled before submitting another."
-  },
   "entryDetail": {
     "backToEntries": "Back to entries",
     "notFound": "Feedback not found.",

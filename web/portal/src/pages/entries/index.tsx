@@ -24,8 +24,7 @@ import {
   type ApiEntryStatusValue,
   type ApiEntryTypeValue,
 } from '@/services/api'
-import { authResolved } from '@/store'
-import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { useAppSelector } from '@/store/hooks'
 import { useSiteConfig } from '@/store/site/hooks'
 import { entryStatusInfo } from '@/utils/entry-status'
 import { message } from '@/utils/helpers'
@@ -37,7 +36,6 @@ type Sort = 'top' | 'new'
 export default function EntriesPage() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
-  const dispatch = useAppDispatch()
   const me = useAppSelector((s) => s.auth.user)
   const siteConfig = useSiteConfig()
   const showSupportButton =
@@ -78,12 +76,6 @@ export default function EntriesPage() {
     mutationFn: (id: string) => API().portal.addVote(id),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['portal', 'entries'] })
-      // Vote toggles change VotesSpent on the user record. Refetch
-      // /api/me so the header quota chip reflects the new count.
-      API()
-        .auth.me()
-        .then((res) => dispatch(authResolved(res.user)))
-        .catch(() => {})
     },
     onError: (e) => message(e),
   })
@@ -94,17 +86,6 @@ export default function EntriesPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-xl sm:text-2xl font-semibold">{t('entries.pageTitle')}</h1>
-          {me && !me.voteQuota.unlimited && me.voteQuota.max > 0 && (
-            <VoteQuotaChip used={me.voteQuota.used} max={me.voteQuota.max} />
-          )}
-          {me &&
-            !me.featureRequestQuota.unlimited &&
-            me.featureRequestQuota.max > 0 && (
-              <FeatureRequestQuotaChip
-                used={me.featureRequestQuota.used}
-                max={me.featureRequestQuota.max}
-              />
-            )}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Link to="/new">
@@ -364,42 +345,4 @@ function emptyStateCopy(tab: Tab, t: TFunc): string {
     default:
       return t('entries.emptyDefault')
   }
-}
-
-function VoteQuotaChip({ used, max }: { used: number; max: number }) {
-  const { t } = useTranslation()
-  const remaining = Math.max(0, max - used)
-  const atLimit = used >= max
-  return (
-    <span
-      title={t('vote.tooltip', { used, max })}
-      className={clsx(
-        'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium',
-        atLimit
-          ? 'border-rose-300 dark:border-rose-500/40 bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300'
-          : 'border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300',
-      )}
-    >
-      {t('vote.remaining', { count: remaining, remaining, max })}
-    </span>
-  )
-}
-
-function FeatureRequestQuotaChip({ used, max }: { used: number; max: number }) {
-  const { t } = useTranslation()
-  const remaining = Math.max(0, max - used)
-  const atLimit = used >= max
-  return (
-    <span
-      title={t('featureRequestQuota.tooltip', { used, max })}
-      className={clsx(
-        'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium',
-        atLimit
-          ? 'border-rose-300 dark:border-rose-500/40 bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300'
-          : 'border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300',
-      )}
-    >
-      {t('featureRequestQuota.remaining', { remaining, max })}
-    </span>
-  )
 }

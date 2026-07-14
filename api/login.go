@@ -80,7 +80,7 @@ func LoginHandler(do dataoperations.Store) gin.HandlerFunc {
 			return
 		}
 		middlewares.SetSessionCookie(c, s.Token)
-		response.Success(c, loginResponse{User: NewUserPayloadWithQuota(do, user)})
+		response.Success(c, loginResponse{User: newUserPayload(user)})
 	}
 }
 

@@ -83,9 +83,9 @@ func main() {
 			if err := do.MigrateEntryTypeTemplatesToMultiLang(); err != nil {
 				log.Printf("mixdive: migrate entry-type templates to multi-lang: %v", err)
 			}
-			// Backfill feedback policy defaults on deployments that came
-			// up before the per-user vote quota shipped. Idempotent —
-			// no-op once feedback.maxvotesperuser is set.
+			// Backfill feedback policy defaults (entry-type templates) on
+			// deployments that came up before those fields shipped.
+			// Idempotent — no-op once the templates map is set.
 			if err := do.EnsureFeedbackDefaults(); err != nil {
 				log.Printf("mixdive: ensure feedback defaults: %v", err)
 			}

@@ -108,9 +108,7 @@ func (b *builder) buildSettings() {
 	s.PrimaryColor = primaryColor
 	s.Portal = portal
 	s.Feedback = models.FeedbackSettings{
-		MaxVotesPerUser:           models.DefaultMaxVotesPerUser,
-		MaxFeatureRequestsPerUser: models.DefaultMaxFeatureRequestsPerUser,
-		EntryTypeTemplatesByLang:  models.DefaultEntryTypeTemplates(),
+		EntryTypeTemplatesByLang: models.DefaultEntryTypeTemplates(),
 	}
 	// AI is reported as off (no API key in a self-contained demo and no
 	// worker runs against this store). The AI *badges* are baked onto
@@ -185,41 +183,8 @@ func (b *builder) buildPortalUsers() {
 			CreatedAt: b.daysAgo(100),
 		})
 		u.CreatedAt = b.daysAgo(100)
-		u.VotesSpent = b.votesSpentBy(ud.key)
-		u.FeatureRequestsOpen = b.openFeatureRequestsBy(ud.key)
 		b.d.users = append(b.d.users, *u)
 	}
-}
-
-func (b *builder) votesSpentBy(userKey string) int {
-	n := 0
-	for _, e := range entryDefs() {
-		if !models.IsEntryStatusOpen(b.entryStatus[e.key]) {
-			continue
-		}
-		for _, vk := range e.voterKeys {
-			if vk == userKey {
-				n++
-			}
-		}
-	}
-	return n
-}
-
-func (b *builder) openFeatureRequestsBy(userKey string) int {
-	n := 0
-	for _, e := range entryDefs() {
-		if e.authorKey != userKey {
-			continue
-		}
-		if e.entryType != models.EntryTypeFeatureRequest {
-			continue
-		}
-		if models.IsEntryStatusOpen(b.entryStatus[e.key]) {
-			n++
-		}
-	}
-	return n
 }
 
 func (b *builder) buildTopics() {

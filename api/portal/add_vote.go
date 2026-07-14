@@ -44,12 +44,6 @@ func AddVoteHandler(do dataoperations.Store) gin.HandlerFunc {
 			response.SystemError(c, err)
 			return
 		}
-		entryOpen := models.IsEntryStatusOpen(e.Status)
-		// Console-access users (admins + editors) bypass the per-user
-		// vote quota entirely: no decrement on add, no refund on
-		// remove, no cap check. Their VotesSpent counter stays at 0
-		// (or its pre-promotion value).
-		quotaApplies := entryOpen && !u.HasConsoleAccess()
 		var voted bool
 		if existing != nil {
 			if err := do.DeleteVote(u.ID, id); err != nil {
@@ -60,29 +54,8 @@ func AddVoteHandler(do dataoperations.Store) gin.HandlerFunc {
 				response.SystemError(c, err)
 				return
 			}
-			if quotaApplies {
-				if err := do.IncrementUserVotesSpent(u.ID, -1); err != nil {
-					response.SystemError(c, err)
-					return
-				}
-			}
 			voted = false
 		} else {
-			if quotaApplies {
-				max, err := do.MaxVotesPerUser()
-				if err != nil {
-					response.SystemError(c, err)
-					return
-				}
-				if u.VotesSpent >= max {
-					response.ErrorWithStatusCodeAndMessage(c, 429, "You've reached the per-user vote limit. Remove a vote from another open entry or wait for it to be completed.")
-					return
-				}
-				if err := do.IncrementUserVotesSpent(u.ID, 1); err != nil {
-					response.SystemError(c, err)
-					return
-				}
-			}
 			v := models.NewVote()
 			v.UserID = u.ID
 			v.EntryID = id
