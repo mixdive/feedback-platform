@@ -7,7 +7,6 @@ import {
   ChevronUp,
   ExternalLink,
   Lightbulb,
-  Lock,
   MessageSquare,
   Sparkles,
 } from 'lucide-react'
@@ -67,7 +66,6 @@ export default function NewEntryPage() {
   // phase changes (so navigating between matches → form → matches does
   // not stomp the user's work).
   const [descriptionTouched, setDescriptionTouched] = useState(false)
-  const [isInternal, setIsInternal] = useState(false)
   const [matches, setMatches] = useState<ApiFindSimilarMatch[]>([])
 
   // Active language for template selection. resolvedLanguage handles
@@ -106,11 +104,6 @@ export default function NewEntryPage() {
     setDescription('')
   }, [entryType, activeLang, descriptionTouched])
 
-  // Visibility toggle is admin/editor-only — the option stays invisible
-  // to regular portal users by design.
-  const canSetInternal =
-    !!me && me.roles.some((r) => r === 'admin' || r === 'editor')
-
   const findSimilarMut = useMutation({
     mutationFn: (body: { title: string; description?: string }) =>
       API().portal.findSimilar(body),
@@ -126,7 +119,6 @@ export default function NewEntryPage() {
       title: string
       description?: string
       entryType?: ApiEntryTypeValue
-      isInternal?: boolean
     }) => API().portal.submit(body),
     onSuccess: (entry) => {
       message(t('new.submitted'), 'success')
@@ -168,7 +160,6 @@ export default function NewEntryPage() {
       title: tr,
       description: description.trim() || undefined,
       entryType,
-      isInternal: canSetInternal && isInternal ? true : undefined,
     })
   }
 
@@ -398,31 +389,6 @@ export default function NewEntryPage() {
                 }
               />
             </div>
-
-            {canSetInternal && (
-              <div>
-                <label className="block text-xs font-medium text-zinc-500 mb-2">
-                  {t('new.fieldVisibility')}
-                </label>
-                <label className="flex items-start gap-3 rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 p-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={isInternal}
-                    onChange={(e) => setIsInternal(e.target.checked)}
-                    className="mt-0.5 size-4 rounded border-zinc-300 dark:border-zinc-700 text-amber-600 focus:ring-amber-500"
-                  />
-                  <span className="text-sm">
-                    <span className="inline-flex items-center gap-1 font-medium text-zinc-900 dark:text-zinc-100">
-                      <Lock className="size-3.5" />
-                      {t('new.internalLabel')}
-                    </span>
-                    <span className="block text-xs text-zinc-500">
-                      {t('new.internalDescription')}
-                    </span>
-                  </span>
-                </label>
-              </div>
-            )}
 
             <div className="flex items-center justify-end gap-2">
               <Button type="button" variant="ghost" onClick={() => navigate('/')}>

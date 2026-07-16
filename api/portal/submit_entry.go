@@ -14,14 +14,12 @@ import (
 
 // submitEntryRequest is the body for POST /api/portal/entry.
 //
-// IsInternal is honored only when the submitter has Console access
-// (admin/editor); other portal users have the field ignored so the
-// option stays invisible end-to-end.
+// Portal-created entries are always public; internal visibility can
+// only be set later from the Console.
 type submitEntryRequest struct {
 	Title       string `json:"title"        binding:"required,min=3,max=200" example:"Add dark mode"`
 	Description string `json:"description,omitempty"                         example:"Would love a system-aware dark mode toggle."`
 	EntryType   string `json:"entryType,omitempty"                           example:"feature-request"`
-	IsInternal  bool   `json:"isInternal,omitempty"`
 } //@name portalSubmitEntryRequest
 
 // SubmitEntryHandler creates a new entry. When the visitor is signed
@@ -77,12 +75,6 @@ func SubmitEntryHandler(do dataoperations.Store) gin.HandlerFunc {
 		if u := middlewares.CurrentUser(c); u != nil {
 			e.UserID = u.ID
 			creators[u.ID] = api.BuildEntryCreator(*u)
-			// IsInternal is admin/editor-only signal: silently ignore
-			// the flag from non-Console portal users so the option
-			// stays invisible to them.
-			if req.IsInternal && u.HasConsoleAccess() {
-				e.IsInternal = true
-			}
 		}
 
 		if err := do.InsertEntry(e); err != nil {

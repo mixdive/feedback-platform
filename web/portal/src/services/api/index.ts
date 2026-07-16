@@ -274,7 +274,6 @@ export const API = () => ({
       title: string
       description?: string
       entryType?: ApiEntryTypeValue
-      isInternal?: boolean
     }) => request<ApiEntry>('POST', '/api/portal/entry', body),
     findSimilar: (body: { title: string; description?: string }) =>
       request<ApiFindSimilarResponse>('POST', '/api/portal/entry/find-similar', body),
