@@ -87,21 +87,22 @@ func slackEntryRef(c *gin.Context, entryID, title string) string {
 	return t
 }
 
-// slackAuthorName resolves a display name for a message actor. Returns
-// "Anonymous" for a nil user (anonymous portal submission) and falls
-// back through name → username → a generic label.
+// slackAuthorName resolves a display name for a message actor, following
+// the same precedence as the Console and Portal (username → name →
+// "Anonymous"; see web/{console,portal}/src/utils/user-display.ts). A nil
+// user (anonymous portal submission) also reads as "Anonymous".
 func slackAuthorName(u *models.User) string {
 	if u == nil {
 		return "Anonymous"
 	}
 	ec := api.BuildEntryCreator(*u)
-	if ec.Name != "" {
-		return slackEscape(ec.Name)
-	}
 	if ec.Username != "" {
 		return slackEscape(ec.Username)
 	}
-	return "a user"
+	if ec.Name != "" {
+		return slackEscape(ec.Name)
+	}
+	return "Anonymous"
 }
 
 // slackEntryTypeLabel maps the kebab-case EntryType enum to a

@@ -82,7 +82,8 @@ func AddVoteHandler(do dataoperations.Store) gin.HandlerFunc {
 			if updated.VoteCount == 1 {
 				noun = "vote"
 			}
-			msg := fmt.Sprintf(":thumbsup: *New vote* on %s — now %d %s",
+			msg := fmt.Sprintf(":thumbsup: *New vote* by %s on %s — now %d %s",
+				slackAuthorName(u),
 				slackEntryRef(c, updated.ID, updated.Title),
 				updated.VoteCount,
 				noun,
