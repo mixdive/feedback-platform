@@ -858,11 +858,9 @@ func (r *Repo) SetEntryRelationAnalysis(string, models.EntryRelationAnalysis) er
 func (r *Repo) FailEntryRelationAnalysis(string, string) error { return dataoperations.ErrReadOnly }
 func (r *Repo) InsertComment(*models.Comment) error            { return dataoperations.ErrReadOnly }
 func (r *Repo) SetCommentIsInternal(string, bool) error        { return dataoperations.ErrReadOnly }
-func (r *Repo) InsertVote(*models.Vote) error                  { return dataoperations.ErrReadOnly }
 func (r *Repo) InsertVoteIfAbsent(*models.Vote) (bool, error) {
 	return false, dataoperations.ErrReadOnly
 }
-func (r *Repo) DeleteVote(string, string) error { return dataoperations.ErrReadOnly }
 func (r *Repo) DeleteVoteIfPresent(string, string) (bool, error) {
 	return false, dataoperations.ErrReadOnly
 }

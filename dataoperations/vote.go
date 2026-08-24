@@ -20,14 +20,6 @@ func (do *DataOperations) FindVote(userID, entryID string) (*models.Vote, error)
 	return mongodb.QueryOne[models.Vote](do.DB, CollectionVotes, filter, nil)
 }
 
-// InsertVote persists a new vote unconditionally. Prefer
-// InsertVoteIfAbsent for anything user-driven — this one carries no
-// uniqueness guarantee of its own and only survives because the unique
-// index rejects a duplicate outright.
-func (do *DataOperations) InsertVote(v *models.Vote) error {
-	return mongodb.InsertOne(do.DB, CollectionVotes, *v)
-}
-
 // InsertVoteIfAbsent atomically creates the (user, entry) vote and reports
 // whether THIS call is the one that created it. A false return means the
 // user had already voted and nothing was written.
@@ -63,17 +55,6 @@ func (do *DataOperations) InsertVoteIfAbsent(v *models.Vote) (bool, error) {
 		return false, err
 	}
 	return prev == nil, nil
-}
-
-// DeleteVote removes the user's vote for the entry. No-op when none
-// exists. Kept for callers that don't care whether a row was there;
-// the vote toggle uses DeleteVoteIfPresent instead.
-func (do *DataOperations) DeleteVote(userID, entryID string) error {
-	if userID == "" || entryID == "" {
-		return nil
-	}
-	filter := bson.M{"userid": userID, "entryid": entryID}
-	return mongodb.DeleteAll(do.DB, CollectionVotes, filter)
 }
 
 // DeleteVoteIfPresent removes the user's vote for the entry and reports

@@ -108,9 +108,7 @@ type Store interface {
 
 	// Votes.
 	FindVote(userID, entryID string) (*models.Vote, error)
-	InsertVote(v *models.Vote) error
 	InsertVoteIfAbsent(v *models.Vote) (bool, error)
-	DeleteVote(userID, entryID string) error
 	DeleteVoteIfPresent(userID, entryID string) (bool, error)
 	ReconcileVoteCounts() (VoteReconcileReport, error)
 	CountVotesForEntry(entryID string) (int, error)
