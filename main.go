@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/mixdive/feedback-platform/dataoperations"
 	"github.com/mixdive/feedback-platform/demo"
@@ -42,6 +43,9 @@ func main() {
 	var do dataoperations.Store
 	var demoUser *models.User
 	var uploadSettings models.UploadSettings
+	// voteJanitorEnabled stays false in DEMO mode and on a not-yet-set-up
+	// deployment — neither has data worth reconciling.
+	var voteJanitorEnabled bool
 
 	if isDemoEnabled(os.Getenv("DEMO")) {
 		// DEMO mode: a self-contained, in-memory, read-only store. No
@@ -99,10 +103,33 @@ func main() {
 			} else if n > 0 {
 				log.Printf("mixdive: backfilled %d entry-created activity row(s)", n)
 			}
+			// Re-sync Entry.VoteCount with the votes collection and move
+			// any duplicate (user, entry) vote rows into votes_archive.
+			// Nothing is destroyed — the earliest vote of each pair stays
+			// put and the surplus is archived before it's removed. Must run
+			// BEFORE EnsureIndexes: the unique vote index cannot build over
+			// duplicates.
+			logVoteReconcile(do.ReconcileVoteCounts())
+			// Indexes last, and never fatal. A unique index that existing
+			// data violates simply doesn't get built; the collection is
+			// untouched and the atomic upsert in InsertVoteIfAbsent still
+			// enforces one vote per user on its own.
+			if err := do.EnsureIndexes(); err != nil {
+				log.Printf("mixdive: ensure indexes: %v", err)
+			}
+			voteJanitorEnabled = true
 			uploadSettings = s.Uploads
 		}
 	}
 	defer do.Close()
+
+	// Keep the counters honest while the process runs, not just at boot.
+	// Cheap and write-free on a healthy deployment, and idempotent enough
+	// that two instances ticking at once is harmless.
+	if voteJanitorEnabled {
+		stopJanitor := startVoteJanitor(do)
+		defer stopJanitor()
+	}
 
 	// Storage holder for uploaded blobs. Backend choice lives on the
 	// settings document; this constructor never fails — a misconfigured
@@ -132,6 +159,62 @@ func main() {
 	log.Printf("mixdive: listening on %s", httpAddr)
 	if err := r.Run(httpAddr); err != nil {
 		log.Fatalf("mixdive: server exited: %v", err)
+	}
+}
+
+// voteJanitorInterval is how often a running instance re-syncs
+// Entry.VoteCount with the votes collection. Hourly is plenty: the atomic
+// upsert prevents drift in the first place, so this is a safety net for
+// crashes between the vote write and the counter increment, and for
+// anything a future handler gets wrong.
+const voteJanitorInterval = time.Hour
+
+// voteRepairLogLimit caps the per-entry detail lines one reconcile run
+// prints. The first run on a drifted deployment can repair a lot of
+// entries at once, and burying the summary under thousands of lines helps
+// nobody — the full picture always survives in votes_archive.
+const voteRepairLogLimit = 100
+
+// startVoteJanitor runs ReconcileVoteCounts on a ticker and returns a stop
+// function. The first run has already happened at startup, so the ticker
+// deliberately doesn't fire immediately.
+func startVoteJanitor(do dataoperations.Store) func() {
+	done := make(chan struct{})
+	go func() {
+		t := time.NewTicker(voteJanitorInterval)
+		defer t.Stop()
+		for {
+			select {
+			case <-done:
+				return
+			case <-t.C:
+				logVoteReconcile(do.ReconcileVoteCounts())
+			}
+		}
+	}()
+	return func() { close(done) }
+}
+
+// logVoteReconcile writes the audit trail for one reconcile run. A clean
+// run stays silent; a run that changed something logs every counter it
+// rewrote, so an operator can see exactly what moved and reverse it from
+// votes_archive if they disagree.
+func logVoteReconcile(rep dataoperations.VoteReconcileReport, err error) {
+	if err != nil {
+		log.Printf("mixdive: reconcile vote counts: %v (%s before the failure)", err, rep.Summary())
+		return
+	}
+	if rep.Clean() {
+		return
+	}
+	log.Printf("mixdive: reconcile vote counts: %s", rep.Summary())
+	for i, r := range rep.Repairs {
+		if i == voteRepairLogLimit {
+			log.Printf("mixdive: … and %d more counter repair(s) not listed",
+				len(rep.Repairs)-voteRepairLogLimit)
+			break
+		}
+		log.Printf("mixdive: entry %s votecount %d -> %d", r.EntryID, r.From, r.To)
 	}
 }
 

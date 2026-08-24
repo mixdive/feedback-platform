@@ -855,11 +855,25 @@ func (r *Repo) SetEntryRelationsFromAnalyzer(string, []models.EntryRelation) err
 func (r *Repo) SetEntryRelationAnalysis(string, models.EntryRelationAnalysis) error {
 	return dataoperations.ErrReadOnly
 }
-func (r *Repo) FailEntryRelationAnalysis(string, string) error  { return dataoperations.ErrReadOnly }
-func (r *Repo) InsertComment(*models.Comment) error             { return dataoperations.ErrReadOnly }
-func (r *Repo) SetCommentIsInternal(string, bool) error         { return dataoperations.ErrReadOnly }
-func (r *Repo) InsertVote(*models.Vote) error                   { return dataoperations.ErrReadOnly }
-func (r *Repo) DeleteVote(string, string) error                 { return dataoperations.ErrReadOnly }
+func (r *Repo) FailEntryRelationAnalysis(string, string) error { return dataoperations.ErrReadOnly }
+func (r *Repo) InsertComment(*models.Comment) error            { return dataoperations.ErrReadOnly }
+func (r *Repo) SetCommentIsInternal(string, bool) error        { return dataoperations.ErrReadOnly }
+func (r *Repo) InsertVote(*models.Vote) error                  { return dataoperations.ErrReadOnly }
+func (r *Repo) InsertVoteIfAbsent(*models.Vote) (bool, error) {
+	return false, dataoperations.ErrReadOnly
+}
+func (r *Repo) DeleteVote(string, string) error { return dataoperations.ErrReadOnly }
+func (r *Repo) DeleteVoteIfPresent(string, string) (bool, error) {
+	return false, dataoperations.ErrReadOnly
+}
+
+// ReconcileVoteCounts and EnsureIndexes are no-ops in demo mode: the
+// dataset is in-memory, immutable, and already consistent, and there is no
+// Mongo connection to build an index on.
+func (r *Repo) ReconcileVoteCounts() (dataoperations.VoteReconcileReport, error) {
+	return dataoperations.VoteReconcileReport{}, nil
+}
+func (r *Repo) EnsureIndexes() error                            { return nil }
 func (r *Repo) MigrateVotesToEntry(string, string) (int, error) { return 0, dataoperations.ErrReadOnly }
 func (r *Repo) SetEntryVoteCount(string, int) error             { return dataoperations.ErrReadOnly }
 func (r *Repo) InsertEntryTopic(*models.EntryTopic) error       { return dataoperations.ErrReadOnly }

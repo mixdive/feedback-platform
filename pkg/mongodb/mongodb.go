@@ -566,3 +566,55 @@ func Aggregate[T any](db *MongoDB, collectionName string, pipeline interface{}) 
 
 	return results, nil
 }
+
+// DeleteAllCount removes every document matching the filter and reports how
+// many were actually removed. Sibling of DeleteAll for callers whose next
+// step depends on whether anything really went away — the vote toggle only
+// decrements the entry counter when a row genuinely disappeared, so a
+// double-submitted un-vote can't drive the counter negative.
+func DeleteAllCount(db *MongoDB, collectionName string, filter interface{}) (int64, error) {
+	db.logMongo()
+	client, err := db.getClient()
+	if err != nil {
+		return 0, err
+	}
+
+	collection := client.Database(db.DBName).Collection(collectionName)
+
+	ctx, _ := context.WithTimeout(context.Background(), 100*time.Second)
+	res, err := collection.DeleteMany(ctx, filter)
+	if err != nil {
+		return 0, err
+	}
+	return res.DeletedCount, nil
+}
+
+// IsDuplicateKeyError reports whether err is (or wraps) a Mongo E11000
+// unique-constraint violation. Callers that write behind a unique index use
+// it to tell "someone else already wrote this exact row" (a benign race)
+// apart from a real failure.
+func IsDuplicateKeyError(err error) bool {
+	return err != nil && mongo.IsDuplicateKeyError(err)
+}
+
+// EnsureIndex creates one index on a collection if it isn't there already.
+// Mongo's createIndexes is idempotent for an identical spec, so this is safe
+// to run on every boot and costs nothing after the first.
+//
+// It never destroys data: building a unique index over a collection that
+// still holds violating documents FAILS and leaves both the data and any
+// pre-existing index untouched. Callers log that error and carry on rather
+// than treating it as fatal.
+func EnsureIndex(db *MongoDB, collectionName string, model mongo.IndexModel) error {
+	db.logMongo()
+	client, err := db.getClient()
+	if err != nil {
+		return err
+	}
+
+	collection := client.Database(db.DBName).Collection(collectionName)
+
+	ctx, _ := context.WithTimeout(context.Background(), 120*time.Second)
+	_, err = collection.Indexes().CreateOne(ctx, model)
+	return err
+}

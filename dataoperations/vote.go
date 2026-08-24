@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 
 	"github.com/mixdive/feedback-platform/models"
 	"github.com/mixdive/feedback-platform/pkg/mongodb"
@@ -19,20 +20,77 @@ func (do *DataOperations) FindVote(userID, entryID string) (*models.Vote, error)
 	return mongodb.QueryOne[models.Vote](do.DB, CollectionVotes, filter, nil)
 }
 
-// InsertVote persists a new vote. The handler is responsible for checking
-// no vote exists already; we don't have a unique index to lean on.
+// InsertVote persists a new vote unconditionally. Prefer
+// InsertVoteIfAbsent for anything user-driven — this one carries no
+// uniqueness guarantee of its own and only survives because the unique
+// index rejects a duplicate outright.
 func (do *DataOperations) InsertVote(v *models.Vote) error {
 	return mongodb.InsertOne(do.DB, CollectionVotes, *v)
 }
 
+// InsertVoteIfAbsent atomically creates the (user, entry) vote and reports
+// whether THIS call is the one that created it. A false return means the
+// user had already voted and nothing was written.
+//
+// This is what makes the vote counter tamper-proof. The old read-then-write
+// toggle let N concurrent requests all observe "no vote yet" and all insert,
+// inflating both the votes collection and Entry.VoteCount by N for a single
+// user. Here the decision and the write are one findOneAndUpdate, so exactly
+// one racer sees created==true and exactly one increment follows. The unique
+// index is the second line of defense: a racer that loses at the index level
+// gets E11000, which we report as "already voted" rather than an error.
+func (do *DataOperations) InsertVoteIfAbsent(v *models.Vote) (bool, error) {
+	if v == nil || v.UserID == "" || v.EntryID == "" {
+		return false, nil
+	}
+	filter := bson.M{"userid": v.UserID, "entryid": v.EntryID}
+	update := bson.M{"$setOnInsert": bson.M{
+		"_id":       v.ID,
+		"userid":    v.UserID,
+		"entryid":   v.EntryID,
+		"createdat": v.CreatedAt,
+	}}
+	// Before-image semantics: a nil previous document means the upsert
+	// inserted, which is precisely the "we created it" signal.
+	opts := options.FindOneAndUpdate().
+		SetUpsert(true).
+		SetReturnDocument(options.Before)
+	prev, err := mongodb.FindOneAndUpdate[models.Vote](do.DB, CollectionVotes, filter, update, opts)
+	if err != nil {
+		if mongodb.IsDuplicateKeyError(err) {
+			return false, nil
+		}
+		return false, err
+	}
+	return prev == nil, nil
+}
+
 // DeleteVote removes the user's vote for the entry. No-op when none
-// exists.
+// exists. Kept for callers that don't care whether a row was there;
+// the vote toggle uses DeleteVoteIfPresent instead.
 func (do *DataOperations) DeleteVote(userID, entryID string) error {
 	if userID == "" || entryID == "" {
 		return nil
 	}
 	filter := bson.M{"userid": userID, "entryid": entryID}
 	return mongodb.DeleteAll(do.DB, CollectionVotes, filter)
+}
+
+// DeleteVoteIfPresent removes the user's vote for the entry and reports
+// whether a row was actually removed. The un-vote half of the toggle
+// decrements Entry.VoteCount only on a true return, so two un-vote requests
+// racing on the same vote can't decrement twice and drive the counter below
+// the real number of rows.
+func (do *DataOperations) DeleteVoteIfPresent(userID, entryID string) (bool, error) {
+	if userID == "" || entryID == "" {
+		return false, nil
+	}
+	filter := bson.M{"userid": userID, "entryid": entryID}
+	n, err := mongodb.DeleteAllCount(do.DB, CollectionVotes, filter)
+	if err != nil {
+		return false, err
+	}
+	return n > 0, nil
 }
 
 // CountVotesForEntry returns the number of vote rows pointing at an entry.

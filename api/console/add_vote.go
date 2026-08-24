@@ -41,29 +41,43 @@ func AddVoteHandler(do dataoperations.Store) gin.HandlerFunc {
 			response.SystemError(c, err)
 			return
 		}
+		// The read above only picks the direction of the toggle; it is
+		// never what enforces one-vote-per-user. The write below is atomic
+		// and reports whether it actually changed a row, and the counter
+		// moves only when it did. That is what stops a flood of concurrent
+		// requests from one user — every one of which reads "not voted yet"
+		// — from stacking N rows and N increments onto a single entry.
 		var voted bool
 		if existing != nil {
-			if err := do.DeleteVote(u.ID, id); err != nil {
+			removed, err := do.DeleteVoteIfPresent(u.ID, id)
+			if err != nil {
 				response.SystemError(c, err)
 				return
 			}
-			if err := do.IncrementEntryVoteCount(id, -1); err != nil {
-				response.SystemError(c, err)
-				return
+			if removed {
+				if err := do.IncrementEntryVoteCount(id, -1); err != nil {
+					response.SystemError(c, err)
+					return
+				}
 			}
 			voted = false
 		} else {
 			v := models.NewVote()
 			v.UserID = u.ID
 			v.EntryID = id
-			if err := do.InsertVote(v); err != nil {
+			created, err := do.InsertVoteIfAbsent(v)
+			if err != nil {
 				response.SystemError(c, err)
 				return
 			}
-			if err := do.IncrementEntryVoteCount(id, 1); err != nil {
-				response.SystemError(c, err)
-				return
+			if created {
+				if err := do.IncrementEntryVoteCount(id, 1); err != nil {
+					response.SystemError(c, err)
+					return
+				}
 			}
+			// voted reflects the end state either way: losing the race means
+			// the vote is already there, which is still "voted".
 			voted = true
 		}
 		updated, err := do.FindEntryByID(id)

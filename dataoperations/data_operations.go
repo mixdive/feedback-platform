@@ -13,16 +13,20 @@ import "github.com/mixdive/feedback-platform/pkg/mongodb"
 
 // Collection name constants.
 const (
-	CollectionUsers           = "users"
-	CollectionSettings        = "settings"
+	CollectionUsers       = "users"
+	CollectionSettings    = "settings"
 	CollectionEntries     = "entries"
 	CollectionEntryTopics = "entry_topics"
-	CollectionReleases        = "releases"
-	CollectionSessions        = "sessions"
-	CollectionVotes           = "votes"
-	CollectionComments        = "comments"
-	CollectionFiles           = "files"
-	CollectionActivities      = "activities"
+	CollectionReleases    = "releases"
+	CollectionSessions    = "sessions"
+	CollectionVotes       = "votes"
+	// CollectionVotesArchive holds vote rows the reconciliation pass pulled
+	// out of CollectionVotes. Nothing reads it at runtime; it exists so a
+	// duplicate-vote cleanup is always reversible.
+	CollectionVotesArchive = "votes_archive"
+	CollectionComments     = "comments"
+	CollectionFiles        = "files"
+	CollectionActivities   = "activities"
 )
 
 // DataOperations bundles the underlying Mongo connector and exposes typed
